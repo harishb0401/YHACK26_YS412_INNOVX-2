@@ -93,7 +93,7 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
             <ShieldCheck className="w-3.5 h-3.5" /> Transparent 8-Step Journey
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            How EcoLink Connects E-Waste Lifecycle
+            How ECO-Link Connects E-Waste Lifecycle
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
             From initial collection logging to verified material recovery and certificate issuance, our deterministic workflow guarantees accountability at every phase.

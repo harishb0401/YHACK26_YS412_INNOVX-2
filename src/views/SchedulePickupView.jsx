@@ -57,7 +57,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
   return (
     <div className="min-h-screen bg-[#F8F5EA] py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-        
+
         {/* Header */}
         <div className="text-center space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-bold uppercase tracking-wider">
@@ -67,13 +67,13 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
             Schedule a Doorstep Pickup
           </h1>
           <p className="text-sm text-[#718078] max-w-lg mx-auto">
-            Get your household or office recyclable waste picked up at your doorstep by verified EcoLoop collectors.
+            Get your household or office recyclable waste picked up at your doorstep by verified ECO-Link collectors.
           </p>
         </div>
 
         {/* Pickup Form Card */}
         <div className="bg-white rounded-[28px] border border-[#3F7655]/20 shadow-md p-6 sm:p-10 space-y-8">
-          
+
           {isBooked ? (
             <div className="text-center py-8 space-y-6 animate-fadeIn">
               <div className="w-20 h-20 rounded-full bg-[#DDEBD8] text-[#3F7655] flex items-center justify-center mx-auto shadow-inner">
@@ -115,7 +115,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-7">
-              
+
               {/* Step 1: What do you have? */}
               <div className="space-y-3">
                 <label className="block text-sm font-extrabold text-[#203128]">
@@ -129,11 +129,10 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                         type="button"
                         key={idx}
                         onClick={() => toggleMaterial(mat)}
-                        className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                          isSelected 
-                            ? 'bg-[#3F7655] text-white shadow-md' 
+                        className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${isSelected
+                            ? 'bg-[#3F7655] text-white shadow-md'
                             : 'bg-[#F8F5EA] text-[#203128] border border-[#3F7655]/15 hover:bg-[#DDEBD8]'
-                        }`}
+                          }`}
                       >
                         <span>{isSelected ? '✓' : '+'}</span>
                         <span>{mat}</span>

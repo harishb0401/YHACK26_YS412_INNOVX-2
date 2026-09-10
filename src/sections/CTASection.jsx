@@ -19,7 +19,7 @@ export default function CTASection({ setActiveView, onOpenAddWasteModal }) {
         </h2>
 
         <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto mt-4 leading-relaxed">
-          Whether you accumulate corporate electronic waste or manage certified material recovery facilities, EcoLink provides full transparency and rule-matched logistics.
+          Whether you accumulate corporate electronic waste or manage certified material recovery facilities, ECO-Link provides full transparency and rule-matched logistics.
         </p>
 
         {/* Dual Onboarding Action Buttons */}

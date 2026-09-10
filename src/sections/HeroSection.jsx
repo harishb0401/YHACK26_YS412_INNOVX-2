@@ -28,7 +28,7 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
 
             {/* Supporting Text */}
             <p className="text-lg sm:text-xl text-slate-600 max-w-2xl leading-relaxed mx-auto lg:mx-0">
-              EcoLink connects verified collectors and recyclers through a transparent digital platform that helps electronic waste reach responsible recycling facilities.
+              ECO-Link connects verified collectors and recyclers through a transparent digital platform that helps electronic waste reach responsible recycling facilities.
             </p>
 
             {/* CTA Buttons & Fast Track Bar */}

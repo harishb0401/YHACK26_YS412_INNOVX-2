@@ -1,28 +1,33 @@
 import React, { useState } from 'react';
-import { Search, Globe, Menu, X, ArrowRight, User, Sparkles, Calendar, MapPin, BookOpen, Award, LayoutDashboard, Leaf } from 'lucide-react';
+import { 
+  Search, Globe, Menu, X, ArrowRight, User, Sparkles, 
+  MapPin, BookOpen, ShieldCheck, LayoutDashboard, Truck, Package, Shield
+} from 'lucide-react';
+import { useTranslation } from '../i18n';
 
-export default function Navbar({ activeView, setActiveView, onOpenSearchModal }) {
+export default function Navbar({ 
+  activeView, 
+  setActiveView, 
+  onOpenSearchModal,
+  currentRole = 'public',
+  onChangeRole
+}) {
+  const { t, lang, setLang } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [selectedLang, setSelectedLang] = useState('EN');
+  const [roleMenuOpen, setRoleMenuOpen] = useState(false);
 
   const navLinks = [
-    { name: 'Home', view: 'landing' },
-    { name: 'How it works', view: 'landing', anchor: '#how-it-works' },
-    { name: 'Recycle Guide', view: 'guide' },
-    { name: 'Locations', view: 'locations' },
-    { name: 'Schedule Pickup', view: 'pickup' },
-    { name: 'Dashboard', view: 'dashboard' },
-    { name: 'Rewards', view: 'rewards' },
+    { name: t("navHome"), view: 'landing' },
+    { name: t("navCollector"), view: 'collector' },
+    { name: t("navRecycler"), view: 'recycler' },
+    { name: t("navGenerator"), view: 'generator' },
+    { name: t("navGuide"), view: 'guide' },
+    { name: t("navLocations"), view: 'locations' },
+    { name: t("navAdmin"), view: 'admin' },
   ];
 
-  const handleNavClick = (link) => {
-    setActiveView(link.view);
-    if (link.anchor) {
-      setTimeout(() => {
-        const elem = document.querySelector(link.anchor);
-        if (elem) elem.scrollIntoView({ behavior: 'smooth' });
-      }, 100);
-    }
+  const handleNavClick = (viewName) => {
+    setActiveView(viewName);
     setMobileMenuOpen(false);
   };
 
@@ -31,28 +36,28 @@ export default function Navbar({ activeView, setActiveView, onOpenSearchModal })
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">
           
-          {/* Logo: ♻ EcoLoop */}
+          {/* Logo: ♻ ECO-Link */}
           <div 
-            onClick={() => setActiveView('landing')} 
+            onClick={() => handleNavClick('landing')} 
             className="flex items-center gap-2.5 cursor-pointer group shrink-0"
           >
             <div className="w-10 h-10 rounded-2xl bg-[#3F7655] flex items-center justify-center text-white shadow-md shadow-[#3F7655]/20 group-hover:scale-105 transition-transform">
               <span className="text-xl font-black">♻</span>
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-[#244936]">
-              Eco<span className="text-[#3F7655]">Loop</span>
+              ECO-<span className="text-[#3F7655]">Link</span>
             </span>
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
+          <nav className="hidden xl:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
             {navLinks.map((link, idx) => {
-              const isActive = activeView === link.view && !link.anchor;
+              const isActive = activeView === link.view;
               return (
                 <button
                   key={idx}
-                  onClick={() => handleNavClick(link)}
-                  className={`px-4 py-2 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer ${
+                  onClick={() => handleNavClick(link.view)}
+                  className={`px-3.5 py-2 text-xs font-bold rounded-full transition-all duration-200 cursor-pointer ${
                     isActive 
                       ? 'bg-[#3F7655] text-white shadow-sm' 
                       : 'text-[#203128] hover:text-[#3F7655] hover:bg-[#DDEBD8]/60'
@@ -64,55 +69,64 @@ export default function Navbar({ activeView, setActiveView, onOpenSearchModal })
             })}
           </nav>
 
-          {/* Right Action Tools: Search, Language, Log in, Get Started */}
+          {/* Right Action Tools: Search, Language, Role Selector */}
           <div className="hidden sm:flex items-center gap-3">
             
-            {/* Search Icon Trigger */}
+            {/* Search Trigger */}
             <button
               onClick={onOpenSearchModal}
-              title="Search materials (Can I recycle this?)"
+              title="Search e-waste materials & reference rates"
               className="p-2.5 rounded-full text-[#203128] hover:text-[#3F7655] hover:bg-[#DDEBD8]/60 transition border border-[#3F7655]/10 flex items-center gap-1.5 text-xs font-semibold"
             >
               <Search className="w-4 h-4 text-[#3F7655]" />
-              <span className="hidden xl:inline text-[#718078]">Search item...</span>
+              <span className="hidden md:inline text-[#718078]">{t("navSearchPlaceholder")}</span>
             </button>
 
-            {/* Language Selector */}
-            <div className="relative group">
-              <button 
-                className="px-2.5 py-1.5 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/15 rounded-full flex items-center gap-1 hover:border-[#3F7655]/40 transition"
+            {/* Language Switcher: EN | தமிழ் */}
+            <div className="flex items-center bg-white border border-[#3F7655]/20 rounded-full p-1 shadow-sm">
+              <button
+                onClick={() => setLang('en')}
+                className={`px-2.5 py-1 text-xs font-bold rounded-full transition cursor-pointer ${
+                  lang === 'en' 
+                    ? 'bg-[#3F7655] text-white' 
+                    : 'text-[#203128] hover:text-[#3F7655]'
+                }`}
               >
-                <Globe className="w-3.5 h-3.5 text-[#3F7655]" />
-                <span>{selectedLang}</span>
-                <span className="text-[10px]">▾</span>
+                EN
               </button>
-              <div className="absolute right-0 top-full mt-1 bg-white border border-[#3F7655]/15 rounded-xl shadow-lg p-1 hidden group-hover:block z-50 min-w-[70px]">
-                <button onClick={() => setSelectedLang('EN')} className="w-full text-left px-2.5 py-1 text-xs hover:bg-[#DDEBD8] rounded-lg">EN</button>
-                <button onClick={() => setSelectedLang('ES')} className="w-full text-left px-2.5 py-1 text-xs hover:bg-[#DDEBD8] rounded-lg">ES</button>
-                <button onClick={() => setSelectedLang('DE')} className="w-full text-left px-2.5 py-1 text-xs hover:bg-[#DDEBD8] rounded-lg">DE</button>
-              </div>
+              <button
+                onClick={() => setLang('ta')}
+                className={`px-2.5 py-1 text-xs font-bold rounded-full transition cursor-pointer ${
+                  lang === 'ta' 
+                    ? 'bg-[#3F7655] text-white' 
+                    : 'text-[#203128] hover:text-[#3F7655]'
+                }`}
+              >
+                தமிழ்
+              </button>
             </div>
 
-            {/* Log in Button */}
+            {/* Fast Portal Selector Button */}
             <button
-              onClick={() => setActiveView('dashboard')}
-              className="px-3.5 py-2 text-xs font-bold text-[#203128] hover:text-[#3F7655] transition"
+              onClick={() => handleNavClick('collector')}
+              className="px-4 py-2 text-xs font-extrabold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-full border border-[#3F7655]/20 transition flex items-center gap-1.5 cursor-pointer"
             >
-              Log in
+              <Truck className="w-3.5 h-3.5 text-[#3F7655]" />
+              <span>Collector</span>
             </button>
 
-            {/* Primary CTA: Get Started */}
             <button
-              onClick={() => setActiveView('pickup')}
-              className="px-5 py-2.5 text-xs font-bold text-white bg-[#3F7655] hover:bg-[#244936] rounded-full shadow-md shadow-[#3F7655]/20 hover:shadow-lg transition-all flex items-center gap-1.5 cursor-pointer group"
+              onClick={() => handleNavClick('recycler')}
+              className="px-4 py-2 text-xs font-extrabold text-white bg-[#3F7655] hover:bg-[#244936] rounded-full shadow-md shadow-[#3F7655]/20 transition flex items-center gap-1.5 cursor-pointer"
             >
-              <span>Get Started</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Recycler</span>
             </button>
+
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="flex items-center lg:hidden">
+          {/* Mobile Menu Trigger */}
+          <div className="flex items-center xl:hidden">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="p-2 rounded-xl text-[#203128] hover:bg-[#DDEBD8]/60 focus:outline-none"
@@ -120,36 +134,57 @@ export default function Navbar({ activeView, setActiveView, onOpenSearchModal })
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
+
         </div>
       </div>
 
-      {/* Mobile Nav Drawer */}
+      {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-b border-[#3F7655]/15 bg-[#F8F5EA] px-4 pt-2 pb-6 space-y-3">
+        <div className="xl:hidden border-b border-[#3F7655]/15 bg-[#F8F5EA] px-4 pt-3 pb-6 space-y-3">
+          
+          {/* Language Toggle in Mobile Drawer */}
+          <div className="flex items-center justify-between pb-2 border-b border-[#3F7655]/10">
+            <span className="text-xs font-bold text-[#718078]">Language / மொழி:</span>
+            <div className="flex items-center bg-white border border-[#3F7655]/20 rounded-full p-1">
+              <button
+                onClick={() => setLang('en')}
+                className={`px-3 py-1 text-xs font-bold rounded-full ${lang === 'en' ? 'bg-[#3F7655] text-white' : 'text-[#203128]'}`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLang('ta')}
+                className={`px-3 py-1 text-xs font-bold rounded-full ${lang === 'ta' ? 'bg-[#3F7655] text-white' : 'text-[#203128]'}`}
+              >
+                தமிழ்
+              </button>
+            </div>
+          </div>
+
+          {/* Mobile Nav Links */}
           <div className="flex flex-col space-y-1">
             {navLinks.map((link, idx) => (
               <button
                 key={idx}
-                onClick={() => handleNavClick(link)}
-                className="text-left px-3.5 py-2.5 rounded-xl text-sm font-bold text-[#203128] hover:bg-[#DDEBD8] hover:text-[#244936]"
+                onClick={() => handleNavClick(link.view)}
+                className={`text-left px-3.5 py-2.5 rounded-xl text-sm font-bold ${
+                  activeView === link.view 
+                    ? 'bg-[#3F7655] text-white' 
+                    : 'text-[#203128] hover:bg-[#DDEBD8]'
+                }`}
               >
                 {link.name}
               </button>
             ))}
           </div>
-          <div className="pt-3 border-t border-[#3F7655]/10 flex flex-col gap-2">
+
+          <div className="pt-2 border-t border-[#3F7655]/10 flex flex-col gap-2">
             <button
               onClick={onOpenSearchModal}
               className="w-full py-2.5 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/20 rounded-xl flex items-center justify-center gap-2"
             >
               <Search className="w-4 h-4 text-[#3F7655]" />
-              <span>Can I recycle this item? (Search)</span>
-            </button>
-            <button
-              onClick={() => { setActiveView('pickup'); setMobileMenuOpen(false); }}
-              className="w-full text-center py-2.5 text-sm font-bold text-white bg-[#3F7655] hover:bg-[#244936] rounded-xl shadow"
-            >
-              Get Started (Schedule Pickup)
+              <span>{t("navSearchPlaceholder")}</span>
             </button>
           </div>
         </div>

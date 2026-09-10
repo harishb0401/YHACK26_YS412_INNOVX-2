@@ -16,7 +16,7 @@ export default function VerificationSection() {
             Accredited Recyclers & Verified Collectors
           </h2>
           <p className="text-base text-slate-600 mt-3">
-            Every entity on the EcoLink platform undergoes rigorous identity, EPA license, and facility audit verification before handling e-waste manifests.
+            Every entity on the ECO-Link platform undergoes rigorous identity, EPA license, and facility audit verification before handling e-waste manifests.
           </p>
         </div>
 

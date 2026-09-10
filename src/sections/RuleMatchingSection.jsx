@@ -32,7 +32,7 @@ export default function RuleMatchingSection({ setActiveView }) {
             Transparent Rule-Based Recycler Assignment
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
-            EcoLink uses strict, verifiable business rules to automatically match logged electronic waste batches with licensed, available recyclers in proximity.
+            ECO-Link uses strict, verifiable business rules to automatically match logged electronic waste batches with licensed, available recyclers in proximity.
           </p>
         </div>
 

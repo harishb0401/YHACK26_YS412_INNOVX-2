@@ -1,7 +1,10 @@
 import React from 'react';
 import { Leaf, ShieldCheck } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function Footer({ setActiveView }) {
+  const { t } = useTranslation();
+
   return (
     <footer className="bg-[#244936] text-white pt-16 pb-12 border-t border-[#3F7655]/40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -15,42 +18,42 @@ export default function Footer({ setActiveView }) {
                 ♻
               </div>
               <span className="text-2xl font-extrabold tracking-tight text-white">
-                Eco<span className="text-[#F2C94C]">Loop</span>
+                ECO-<span className="text-[#F2C94C]">Link</span>
               </span>
             </div>
             
             <p className="text-[#DDEBD8] text-sm max-w-sm leading-relaxed">
-              Making recycling simple for everyone through verified drop-off points, doorstep collection pickups, and interactive sorting guides.
+              {t("platformSubtitle")}
             </p>
 
             <div className="flex items-center gap-2 text-xs font-semibold text-[#F2C94C] pt-1">
-              <Leaf className="w-4 h-4 text-[#F2C94C]" />
-              <span>Certified Sustainable Web Architecture</span>
+              <ShieldCheck className="w-4 h-4 text-[#F2C94C]" />
+              <span>{t("cpcbVerified")} · EPR Traceability Layer</span>
             </div>
           </div>
 
-          {/* Column 2: Product */}
+          {/* Column 2: Portals */}
           <div className="space-y-3 text-sm">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Product</h4>
+            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Portals</h4>
             <ul className="space-y-2 text-[#DDEBD8]">
               <li>
-                <button onClick={() => setActiveView('landing')} className="hover:text-[#F2C94C] transition">
-                  How it works
+                <button onClick={() => setActiveView('collector')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navCollector")}
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveView('locations')} className="hover:text-[#F2C94C] transition">
-                  Locations
+                <button onClick={() => setActiveView('recycler')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navRecycler")}
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveView('pickup')} className="hover:text-[#F2C94C] transition">
-                  Doorstep Pickup
+                <button onClick={() => setActiveView('generator')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navGenerator")}
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveView('rewards')} className="hover:text-[#F2C94C] transition">
-                  Rewards System
+                <button onClick={() => setActiveView('admin')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navAdmin")}
                 </button>
               </li>
             </ul>
@@ -61,48 +64,41 @@ export default function Footer({ setActiveView }) {
             <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Resources</h4>
             <ul className="space-y-2 text-[#DDEBD8]">
               <li>
-                <button onClick={() => setActiveView('guide')} className="hover:text-[#F2C94C] transition">
-                  Recycling Guide
+                <button onClick={() => setActiveView('guide')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navGuide")}
                 </button>
               </li>
               <li>
-                <button onClick={() => setActiveView('landing')} className="hover:text-[#F2C94C] transition">
-                  Eco Journal
+                <button onClick={() => setActiveView('locations')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navLocations")}
                 </button>
               </li>
               <li>
-                <a href="#faq" className="hover:text-[#F2C94C] transition">
-                  FAQ
-                </a>
-              </li>
-              <li>
-                <button onClick={() => setActiveView('dashboard')} className="hover:text-[#F2C94C] transition">
-                  Impact Ledger
+                <button onClick={() => setActiveView('landing')} className="hover:text-[#F2C94C] transition cursor-pointer">
+                  {t("navHowItWorks")}
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Company */}
+          {/* Column 4: Standards & Compliance */}
           <div className="space-y-3 text-sm">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Company</h4>
-            <ul className="space-y-2 text-[#DDEBD8]">
-              <li><a href="#about" className="hover:text-[#F2C94C] transition">About Us</a></li>
-              <li><a href="#contact" className="hover:text-[#F2C94C] transition">Contact</a></li>
-              <li><a href="#careers" className="hover:text-[#F2C94C] transition">Careers</a></li>
-              <li><a href="#sustainability" className="hover:text-[#F2C94C] transition">Sustainability Policy</a></li>
+            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Compliance</h4>
+            <ul className="space-y-2 text-[#DDEBD8] text-xs">
+              <li>CPCB / EPR Guideline Aligned</li>
+              <li>Deterministic Rule Engine</li>
+              <li>Digital Material Lots (QR)</li>
+              <li>Tamil Nadu SIDCO Nodes</li>
             </ul>
           </div>
 
         </div>
 
-        {/* Bottom copyright */}
+        {/* Bottom copyright & disclaimer */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#DDEBD8]/70">
-          <p>© {new Date().getFullYear()} EcoLoop Platform Inc. All rights reserved.</p>
-          <div className="flex items-center gap-4">
-            <a href="#privacy" className="hover:text-[#F2C94C] transition">Privacy Policy</a>
-            <span>·</span>
-            <a href="#terms" className="hover:text-[#F2C94C] transition">Terms of Service</a>
+          <p>© {new Date().getFullYear()} ECO-Link Platform. All rights reserved.</p>
+          <div className="text-[11px] text-[#DDEBD8]/60 max-w-md text-center sm:text-right">
+            {t("verificationDisclaimer")}
           </div>
         </div>
 
