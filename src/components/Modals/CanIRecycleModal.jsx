@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { X, Search, CheckCircle2, AlertTriangle, ArrowRight, MapPin, Sparkles, RefreshCw } from 'lucide-react';
 import { searchableMaterials } from '../../mockData';
 import { useTranslation, useLanguage } from '../../i18n';
 
 export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
+  const navigate = useNavigate();
   const { t } = useTranslation();
   const { tCategory } = useLanguage();
 
@@ -62,71 +64,59 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
           </button>
         </div>
 
-        {/* Search Input Container */}
-        <div className="p-6 space-y-6 overflow-y-auto">
+        {/* Modal Body */}
+        <div className="p-6 space-y-6">
           
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="text-center space-y-1">
-              <h4 className="text-base font-bold text-[#203128]">{t("tellUsWhatYouAreThrowing")}</h4>
-              <p className="text-xs text-[#718078]">{t("searchAnyItemAdvice")}</p>
-            </div>
+          {/* Search Bar Input */}
+          <form onSubmit={handleSearch} className="relative">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder={t("searchModalPlaceholder")}
+              className="w-full bg-white border-2 border-[#3F7655]/30 rounded-2xl pl-11 pr-24 py-3.5 text-xs font-semibold text-[#203128] focus:border-[#3F7655] focus:outline-none shadow-sm"
+            />
+            <Search className="w-5 h-5 text-[#3F7655] absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <button
+              type="submit"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-4 py-2 bg-[#3F7655] hover:bg-[#244936] text-white text-xs font-bold rounded-xl transition cursor-pointer"
+            >
+              {t("navSearchPlaceholder")}
+            </button>
+          </form>
 
-            <div className="relative">
-              <Search className="w-5 h-5 text-[#3F7655] absolute left-4 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder={t("searchModalInputPlaceholder")}
-                className="w-full bg-white border border-[#3F7655]/25 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-semibold text-[#203128] focus:border-[#3F7655] focus:outline-none shadow-sm"
-              />
-            </div>
-
-            {/* Quick popular chips */}
-            <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-              <span className="text-[11px] font-semibold text-[#718078]">{t("popular")}:</span>
+          {/* Popular Search Chips */}
+          <div className="space-y-2">
+            <span className="text-[11px] font-extrabold text-[#718078] uppercase tracking-wider block">
+              {t("popularSearches")}
+            </span>
+            <div className="flex flex-wrap gap-2">
               {popularChips.map((chip, idx) => (
                 <button
-                  type="button"
                   key={idx}
                   onClick={() => {
                     setQuery(chip);
-                    const found = searchableMaterials.find(m => m.keywords.includes(chip));
+                    const found = searchableMaterials.find(m => m.item.toLowerCase() === chip);
                     if (found) setResult(found);
                   }}
-                  className="px-2.5 py-1 text-xs font-semibold rounded-full bg-white border border-[#3F7655]/15 text-[#244936] hover:bg-[#DDEBD8] transition"
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer border ${
+                    query.toLowerCase() === chip
+                      ? 'bg-[#3F7655] text-white border-[#3F7655]'
+                      : 'bg-white text-[#203128] border-[#3F7655]/15 hover:bg-[#DDEBD8]'
+                  }`}
                 >
                   {chip}
                 </button>
               ))}
             </div>
+          </div>
 
-            <button
-              type="submit"
-              className="w-full py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white font-bold text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <RefreshCw className="w-4 h-4" />
-              <span>{t("checkItemStatus")}</span>
-            </button>
-          </form>
-
-          {/* Result Card Display */}
+          {/* Search Result Card */}
           {result && (
-            <div className="p-6 rounded-2xl bg-white border border-[#3F7655]/20 shadow-sm space-y-4">
+            <div className="bg-white p-5 rounded-2xl border border-[#3F7655]/20 shadow-sm space-y-4 animate-fadeIn">
               
-              {/* Verdict Header */}
-              <div className="flex items-center justify-between border-b border-[#3F7655]/10 pb-3">
-                <div className="flex items-center gap-2">
-                  {result.isRecyclable ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-[#DDEBD8] text-[#244936]">
-                      <CheckCircle2 className="w-4 h-4 text-[#3F7655]" /> {t("yesRecyclable")}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" /> {t("specialDisposalRequired")}
-                    </span>
-                  )}
-                </div>
+              {/* Item Icon */}
+              <div className="w-12 h-12 rounded-2xl bg-[#DDEBD8] flex items-center justify-center">
                 <span className="text-xl">{result.icon || '📦'}</span>
               </div>
 
@@ -148,7 +138,7 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
               <div className="pt-2 flex justify-end">
                 <button
                   onClick={() => {
-                    setActiveView('locations');
+                    navigate('/locations');
                     onClose();
                   }}
                   className="px-4 py-2 bg-[#3F7655] hover:bg-[#244936] text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer"
