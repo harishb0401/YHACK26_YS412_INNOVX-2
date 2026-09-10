@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
 import { evaluateRecyclerMatch } from '../mockData';
+import { useTranslation, useLanguage } from '../i18n';
 
 export default function RecyclerDashboard({ 
   ewasteList, 
@@ -13,6 +14,9 @@ export default function RecyclerDashboard({
   onTrackItem, 
   setActiveView 
 }) {
+  const { t } = useTranslation();
+  const { tCategory, tStatus } = useLanguage();
+
   const [activeTab, setActiveTab] = useState('Available Waste');
   const [selectedCategoryFilter, setSelectedCategoryFilter] = useState('All');
 
@@ -29,15 +33,15 @@ export default function RecyclerDashboard({
 
   // Sidebar Items
   const sidebarItems = [
-    { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Available Waste', icon: ShoppingBag },
-    { name: 'Accepted Waste', icon: ShieldCheck },
-    { name: 'Incoming Waste', icon: Truck },
-    { name: 'Processing', icon: RefreshCw },
-    { name: 'Completed Recycling', icon: CheckCircle2 },
-    { name: 'Certificates', icon: Award },
-    { name: 'Impact', icon: TrendingUp },
-    { name: 'Profile', icon: User },
+    { name: t("navDashboard"), icon: LayoutDashboard },
+    { name: t("availableDemands"), icon: ShoppingBag },
+    { name: t("acceptedLots"), icon: ShieldCheck },
+    { name: t("statusInTransit"), icon: Truck },
+    { name: t("statusProcessing"), icon: RefreshCw },
+    { name: t("statusRecycled"), icon: CheckCircle2 },
+    { name: t("officialRecyclingProof"), icon: Award },
+    { name: t("navRewards"), icon: TrendingUp },
+    { name: t("recyclerPortal"), icon: User },
   ];
 
   // Recycler Metric Numbers
@@ -71,7 +75,7 @@ export default function RecyclerDashboard({
             <div>
               <h4 className="text-sm font-bold text-white leading-tight">GreenMat Eco</h4>
               <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                Verified Recycler ✓
+                {t("verifiedRecyclerBadge")}
               </span>
             </div>
           </div>
@@ -101,7 +105,7 @@ export default function RecyclerDashboard({
         </div>
 
         <div className="pt-6 border-t border-slate-800 text-xs text-slate-500">
-          Facility ID: <span className="text-slate-300 font-mono">REC-401</span>
+          {t("facilityId")}: <span className="text-slate-300 font-mono">REC-401</span>
         </div>
       </aside>
 
@@ -112,17 +116,17 @@ export default function RecyclerDashboard({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Recycler Facility Dashboard
+              {t("recyclerPortal")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Browse rule-eligible e-waste batches, accept pickups, and manage stage-by-stage material recovery.
+              {t("cpcbVerifLayerSub")}
             </p>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold border border-emerald-200 flex items-center gap-1.5">
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              Facility Status: Active Intake
+              {t("cpcbVerified")}
             </span>
           </div>
         </div>
@@ -131,39 +135,39 @@ export default function RecyclerDashboard({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Available Waste</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">{t("availableDemands")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-slate-900">{availableCount}</span>
               <span className="text-xs text-slate-400 font-mono">Marketplace</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Eligible e-waste batches online</p>
+            <p className="text-xs text-slate-500 font-medium">{t("acceptedCategoriesSubtitle")}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider block">Incoming Waste</span>
+            <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider block">{t("statusInTransit")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-purple-600">{incomingCount}</span>
               <span className="text-xs text-purple-600/70 font-mono">In Transit</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Scheduled pickups & en route</p>
+            <p className="text-xs text-slate-500 font-medium">{t("transportationStep")}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block">Currently Processing</span>
+            <span className="text-xs font-semibold text-blue-600 uppercase tracking-wider block">{t("statusProcessing")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-blue-600">{processingCount}</span>
               <span className="text-xs text-blue-600/70 font-mono">Active</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Dismantling & sorting floor</p>
+            <p className="text-xs text-slate-500 font-medium">{t("dismantlingSortingExtraction")}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">Completed Recycling</span>
+            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">{t("statusRecycled")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-emerald-600">{completedCount}</span>
               <span className="text-xs text-emerald-600/70 font-mono">Certificates</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Proof issued & impact logged</p>
+            <p className="text-xs text-slate-500 font-medium">{t("statusRecycledCertified")}</p>
           </div>
 
         </div>
@@ -174,10 +178,10 @@ export default function RecyclerDashboard({
             <div>
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
                 <ShoppingBag className="w-5 h-5 text-emerald-600" />
-                Available E-Waste Batches
+                {t("availableDemands")}
               </h2>
               <p className="text-xs text-slate-500">
-                Rule-matched manifests eligible for receipt by GreenMat Eco-Processing Center
+                {t("scrapRatesSubtitle")}
               </p>
             </div>
           </div>
@@ -199,7 +203,7 @@ export default function RecyclerDashboard({
                         {waste.id}
                       </span>
                       <span className="text-xs text-slate-400 font-medium">
-                        Posted: {waste.date}
+                        {t("date")}: {waste.date}
                       </span>
                     </div>
 
@@ -209,18 +213,18 @@ export default function RecyclerDashboard({
 
                     {/* Badge Category */}
                     <span className="inline-block text-xs font-semibold text-slate-700 bg-slate-100 px-2.5 py-1 rounded-lg mb-4">
-                      Category: {waste.category}
+                      {t("category")}: {tCategory(waste.category)}
                     </span>
 
                     {/* Metadata Grid */}
                     <div className="space-y-2 text-xs text-slate-600 bg-slate-50/80 p-3.5 rounded-2xl border border-slate-100 mb-4">
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Total Weight:</span>
+                        <span className="text-slate-500">{t("totalWeight")}:</span>
                         <span className="font-bold text-slate-900">{waste.weight} kg ({waste.quantity} units)</span>
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Location:</span>
+                        <span className="text-slate-500">{t("pickupAddressLocation")}:</span>
                         <span className="font-medium text-slate-800 text-right truncate max-w-[180px]">{waste.pickupLocation}</span>
                       </div>
 
@@ -230,14 +234,14 @@ export default function RecyclerDashboard({
                       </div>
 
                       <div className="flex justify-between">
-                        <span className="text-slate-500">Condition:</span>
+                        <span className="text-slate-500">{t("conditionSpecialHandling")}:</span>
                         <span className="font-medium text-slate-800">{waste.condition}</span>
                       </div>
                     </div>
 
                     {/* Rule Match Verdict Pills */}
                     <div className="pt-2 border-t border-slate-100 space-y-1">
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">Rule Criteria Checks:</span>
+                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">{t("ruleMatchLogic")}:</span>
                       <div className="flex flex-wrap gap-1">
                         {ruleResult.checks.map((c, i) => (
                           <span key={i} className={`text-[10px] font-semibold px-2 py-0.5 rounded ${c.passed ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}>
@@ -255,7 +259,7 @@ export default function RecyclerDashboard({
                       className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition flex items-center gap-1 cursor-pointer"
                     >
                       <Eye className="w-3.5 h-3.5" />
-                      <span>View Details</span>
+                      <span>{t("viewDetails")}</span>
                     </button>
 
                     <button
@@ -263,7 +267,7 @@ export default function RecyclerDashboard({
                       className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 shadow transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Accept Waste</span>
+                      <span>{t("createLot")}</span>
                     </button>
                   </div>
 
@@ -278,10 +282,10 @@ export default function RecyclerDashboard({
           <div>
             <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <RefreshCw className="w-5 h-5 text-emerald-600" />
-              Recycling Floor Workflow Manager
+              {t("acceptedLots")}
             </h2>
             <p className="text-xs text-slate-500">
-              Update processing status as incoming e-waste progresses from intake receipt to final material recovery and certificate issuance.
+              {t("updateProcessingStage")}
             </p>
           </div>
 
@@ -298,54 +302,54 @@ export default function RecyclerDashboard({
                   </div>
                   <h4 className="text-sm font-bold text-slate-900">{item.wasteType}</h4>
                   <p className="text-xs text-slate-500">
-                    Collector: {item.collector?.name} • Weight: {item.weight} kg • Location: {item.pickupLocation}
+                    {t("collectorLabel")}: {item.collector?.name} • {t("weight")}: {item.weight} kg • {t("locationCity")}: {item.pickupLocation}
                   </p>
                 </div>
 
                 {/* Status Advancement Buttons */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-xs text-slate-500 font-semibold mr-1">Update Status:</span>
+                  <span className="text-xs text-slate-500 font-semibold mr-1">{t("stage")}:</span>
 
                   {item.status !== 'In Transit' && item.status !== 'Received' && item.status !== 'Processing' && item.status !== 'Recycled' && (
                     <button
                       onClick={() => onUpdateStatus(item.id, 'In Transit')}
-                      className="px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold hover:bg-purple-100 transition"
+                      className="px-3 py-1.5 rounded-lg bg-purple-50 text-purple-700 border border-purple-200 text-xs font-semibold hover:bg-purple-100 transition cursor-pointer"
                     >
-                      Set In Transit
+                      {t("statusInTransit")}
                     </button>
                   )}
 
                   {item.status !== 'Received' && item.status !== 'Processing' && item.status !== 'Recycled' && (
                     <button
                       onClick={() => onUpdateStatus(item.id, 'Received')}
-                      className="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-xs font-semibold hover:bg-teal-100 transition"
+                      className="px-3 py-1.5 rounded-lg bg-teal-50 text-teal-700 border border-teal-200 text-xs font-semibold hover:bg-teal-100 transition cursor-pointer"
                     >
-                      Confirm Dock Intake
+                      {t("statusReceived")}
                     </button>
                   )}
 
                   {item.status !== 'Processing' && item.status !== 'Recycled' && (
                     <button
                       onClick={() => onUpdateStatus(item.id, 'Processing')}
-                      className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition"
+                      className="px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 border border-blue-200 text-xs font-semibold hover:bg-blue-100 transition cursor-pointer"
                     >
-                      Start Dismantling & Processing
+                      {t("statusProcessing")}
                     </button>
                   )}
 
                   {item.status !== 'Recycled' && (
                     <button
                       onClick={() => onUpdateStatus(item.id, 'Recycled')}
-                      className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow hover:bg-emerald-700 transition flex items-center gap-1"
+                      className="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-bold shadow hover:bg-emerald-700 transition flex items-center gap-1 cursor-pointer"
                     >
                       <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Issue Recycling Certificate</span>
+                      <span>{t("issueCertificate")}</span>
                     </button>
                   )}
 
                   {item.status === 'Recycled' && (
                     <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 flex items-center gap-1">
-                      <Award className="w-3.5 h-3.5" /> Certificate #CERT-2026 Issued ✓
+                      <Award className="w-3.5 h-3.5" /> {t("statusRecycledCertified")}
                     </span>
                   )}
                 </div>
@@ -359,3 +363,4 @@ export default function RecyclerDashboard({
     </div>
   );
 }
+

@@ -1,7 +1,10 @@
 import React from 'react';
 import { ArrowRight, Search, ShieldCheck, Truck, Factory, RefreshCw, Sparkles, CheckCircle2, Building2 } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuickTrack }) {
+  const { t } = useTranslation();
+
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-emerald-50/70 via-white to-slate-50 py-16 lg:py-24">
       {/* Decorative Background Accents */}
@@ -18,17 +21,17 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100/80 text-emerald-800 text-xs font-semibold tracking-wide border border-emerald-200/60 shadow-sm">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
               <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Verified Rule-Based E-Waste Network</span>
+              <span>{t("verifiedRuleNetwork")}</span>
             </div>
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-[1.15]">
-              Turning E-Waste Into a <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">Circular Future</span>
+              {t("turningEWaste")} <span className="bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 bg-clip-text text-transparent">{t("circularFuture")}</span>
             </h1>
 
             {/* Supporting Text */}
             <p className="text-lg sm:text-xl text-slate-600 max-w-2xl leading-relaxed mx-auto lg:mx-0">
-              ECO-Link connects verified collectors and recyclers through a transparent digital platform that helps electronic waste reach responsible recycling facilities.
+              {t("heroSubtitleText")}
             </p>
 
             {/* CTA Buttons & Fast Track Bar */}
@@ -37,7 +40,7 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                 onClick={onOpenAddWasteModal}
                 className="w-full sm:w-auto px-8 py-4 text-base font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-2xl shadow-lg shadow-emerald-600/25 hover:shadow-emerald-600/40 hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 group cursor-pointer"
               >
-                <span>Get Started</span>
+                <span>{t("getStarted")}</span>
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
 
@@ -46,13 +49,13 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                 className="w-full sm:w-auto px-7 py-4 text-base font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 rounded-2xl shadow-sm hover:shadow transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Search className="w-5 h-5 text-emerald-600" />
-                <span>Track E-Waste</span>
+                <span>{t("trackEWasteBtn")}</span>
               </button>
             </div>
 
             {/* Quick Tracking ID Try Bar */}
             <div className="pt-2 flex flex-wrap items-center justify-center lg:justify-start gap-2 text-xs text-slate-500">
-              <span className="font-medium text-slate-600">Sample Tracking Code:</span>
+              <span className="font-medium text-slate-600">{t("sampleTrackingCodeHero")}</span>
               <button
                 onClick={() => onQuickTrack("EW-2026-001245")}
                 className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-emerald-700 hover:bg-emerald-50 hover:border-emerald-300 font-mono font-bold transition flex items-center gap-1"
@@ -65,16 +68,16 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
             {/* Micro badges below hero */}
             <div className="pt-4 border-t border-slate-200/70 grid grid-cols-3 gap-4 max-w-lg mx-auto lg:mx-0 text-center">
               <div>
-                <p className="text-xl font-bold text-slate-900">100%</p>
-                <p className="text-xs text-slate-500 font-medium">Digital Audit Trail</p>
+                <p className="text-xl font-bold text-slate-900">{t("digitalAuditTrail100")}</p>
+                <p className="text-xs text-slate-500 font-medium">{t("digitalAuditTrailLabel")}</p>
               </div>
               <div>
-                <p className="text-xl font-bold text-slate-900">5-Point</p>
-                <p className="text-xs text-slate-500 font-medium">Rule Match Logic</p>
+                <p className="text-xl font-bold text-slate-900">{t("fivePointRule")}</p>
+                <p className="text-xs text-slate-500 font-medium">{t("ruleMatchLogic")}</p>
               </div>
               <div>
-                <p className="text-xl font-bold text-slate-900">Zero</p>
-                <p className="text-xs text-slate-500 font-medium">Landfill Diverted</p>
+                <p className="text-xl font-bold text-slate-900">{t("zeroLandfill")}</p>
+                <p className="text-xs text-slate-500 font-medium">{t("landfillDiverted")}</p>
               </div>
             </div>
 
@@ -87,10 +90,10 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
             <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 relative">
               <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <span className="text-xs font-bold tracking-wider uppercase text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200">
-                  E-Waste Journey Workflow
+                  {t("ewasteJourneyWorkflow")}
                 </span>
                 <span className="flex items-center gap-1 text-xs text-slate-400 font-mono">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Live Tracking
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> {t("liveTrackingPill")}
                 </span>
               </div>
 
@@ -104,10 +107,10 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900">Collector</h4>
+                      <h4 className="text-sm font-bold text-slate-900">{t("collectorLabel")}</h4>
                       <span className="text-[10px] font-semibold text-emerald-700 bg-emerald-100/60 px-2 py-0.5 rounded">1. Logged</span>
                     </div>
-                    <p className="text-xs text-slate-500 truncate">Verifies e-waste type, quantity & weight</p>
+                    <p className="text-xs text-slate-500 truncate">{t("wfStep2Desc")}</p>
                   </div>
                 </div>
 
@@ -125,10 +128,10 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900">Transportation</h4>
-                      <span className="text-[10px] font-semibold text-teal-700 bg-teal-100/60 px-2 py-0.5 rounded">2. Matched & In Transit</span>
+                      <h4 className="text-sm font-bold text-slate-900">{t("transportationStep")}</h4>
+                      <span className="text-[10px] font-semibold text-teal-700 bg-teal-100/60 px-2 py-0.5 rounded">{t("matchedAndInTransit")}</span>
                     </div>
-                    <p className="text-xs text-slate-500 truncate">Rule-based dispatch & GPS Tracking ID</p>
+                    <p className="text-xs text-slate-500 truncate">{t("ruleBasedDispatch")}</p>
                   </div>
                 </div>
 
@@ -146,10 +149,10 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900">Recycler</h4>
-                      <span className="text-[10px] font-semibold text-cyan-700 bg-cyan-100/60 px-2 py-0.5 rounded">3. Intake & Processing</span>
+                      <h4 className="text-sm font-bold text-slate-900">{t("recyclerLabel")}</h4>
+                      <span className="text-[10px] font-semibold text-cyan-700 bg-cyan-100/60 px-2 py-0.5 rounded">{t("intakeAndProcessing")}</span>
                     </div>
-                    <p className="text-xs text-slate-500 truncate">Dismantling, sorting & extraction</p>
+                    <p className="text-xs text-slate-500 truncate">{t("dismantlingSortingExtraction")}</p>
                   </div>
                 </div>
 
@@ -167,10 +170,10 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-emerald-950">Recycled Materials</h4>
-                      <span className="text-[10px] font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-full">4. Verified Certificate</span>
+                      <h4 className="text-sm font-bold text-emerald-950">{t("recycledMaterialsStep")}</h4>
+                      <span className="text-[10px] font-bold text-white bg-emerald-600 px-2 py-0.5 rounded-full">{t("verifiedCertStep")}</span>
                     </div>
-                    <p className="text-xs text-emerald-700 font-medium truncate">Gold, Copper, Aluminum recovered</p>
+                    <p className="text-xs text-emerald-700 font-medium truncate">{t("recoveredMetalsSub")}</p>
                   </div>
                 </div>
 
@@ -185,7 +188,7 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
               </div>
               <div>
                 <p className="text-xs font-bold text-slate-900">1,240 kg</p>
-                <p className="text-[11px] text-slate-500 font-medium">E-Waste Recycled</p>
+                <p className="text-[11px] text-slate-500 font-medium">{t("recycledKgTotal")}</p>
               </div>
             </div>
 
@@ -195,8 +198,8 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-slate-900">32 Verified</p>
-                <p className="text-[11px] text-slate-500 font-medium">Recyclers Online</p>
+                <p className="text-xs font-bold text-slate-900">{t("verifiedRecyclersOnline", { count: 32 })}</p>
+                <p className="text-[11px] text-slate-500 font-medium">{t("recyclersOnlineLabel")}</p>
               </div>
             </div>
 
@@ -206,8 +209,8 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
                 <Sparkles className="w-4 h-4" />
               </div>
               <div className="pr-2">
-                <p className="text-xs font-bold text-slate-900">96%</p>
-                <p className="text-[10px] text-slate-500 font-medium">Success Rate</p>
+                <p className="text-xs font-bold text-slate-900">{t("successRateStat")}</p>
+                <p className="text-[10px] text-slate-500 font-medium">{t("successRateLabel")}</p>
               </div>
             </div>
 
@@ -218,3 +221,4 @@ export default function HeroSection({ setActiveView, onOpenAddWasteModal, onQuic
     </section>
   );
 }
+

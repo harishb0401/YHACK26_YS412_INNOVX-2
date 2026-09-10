@@ -2,34 +2,37 @@ import React from 'react';
 import { Leaf, TrendingUp, Layers, CheckCircle2, Award, ArrowUpRight } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Legend } from 'recharts';
 import { monthlyRecyclingData } from '../mockData';
+import { useTranslation } from '../i18n';
 
 export default function EnvironmentalImpactSection({ stats }) {
+  const { t } = useTranslation();
+
   const cards = [
     {
-      title: "E-Waste Diverted From Landfill",
-      value: stats.landfillDiverted || "12.45 Tons",
-      subtitle: "Prevented toxic lead & mercury leeching",
+      title: t("wasteDivertedLandfill"),
+      value: stats?.landfillDiverted || "12.45 Tons",
+      subtitle: t("landfillDiverted"),
       icon: Leaf,
       color: "text-emerald-600 bg-emerald-100"
     },
     {
-      title: "Materials Recovered",
-      value: stats.materialRecoveryRate || "92.6%",
-      subtitle: "Refined Gold, Copper, Silver & Steel",
+      title: t("materialsRecoveredRate"),
+      value: stats?.materialRecoveryRate || "92.6%",
+      subtitle: t("recoveredMetalsSub"),
       icon: Layers,
       color: "text-teal-600 bg-teal-100"
     },
     {
-      title: "Estimated CO₂ Saved",
-      value: `${stats.co2SavedTonnes || "28.4"} Tonnes`,
-      subtitle: "Equivalent to 1,420 trees planted",
+      title: t("co2Offset"),
+      value: `${stats?.co2SavedTonnes || "28.4"} Tonnes`,
+      subtitle: t("matureTreesEquiv"),
       icon: TrendingUp,
       color: "text-cyan-600 bg-cyan-100"
     },
     {
-      title: "Recycling Completion Rate",
-      value: stats.successfulProcessingRate || "96.0%",
-      subtitle: "Closed-loop verification achieved",
+      title: t("completionRate"),
+      value: stats?.successfulProcessingRate || "96.0%",
+      subtitle: t("statusRecycledCertified"),
       icon: CheckCircle2,
       color: "text-emerald-700 bg-emerald-100"
     }
@@ -42,13 +45,13 @@ export default function EnvironmentalImpactSection({ stats }) {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3 border border-emerald-200">
-            <Leaf className="w-3.5 h-3.5" /> Environmental Savings Ledger
+            <Leaf className="w-3.5 h-3.5" /> {t("environmentalSavingsLedger")}
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Quantified Ecological Impact
+            {t("quantifiedEcologicalImpact")}
           </h2>
           <p className="text-base text-slate-600 mt-3">
-            Real-time tracking of e-waste diverted from municipal landfills into high-purity recycled raw materials.
+            {t("quantifiedEcologicalDesc")}
           </p>
         </div>
 
@@ -66,7 +69,7 @@ export default function EnvironmentalImpactSection({ stats }) {
                     <IconComp className="w-6 h-6" />
                   </div>
                   <span className="text-xs font-mono font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200">
-                    Live Ledger
+                    {t("immutableLog")}
                   </span>
                 </div>
 
@@ -86,10 +89,10 @@ export default function EnvironmentalImpactSection({ stats }) {
             <div>
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
-                Monthly E-Waste Processing Growth (kg)
+                {t("monthlyGrowthTitle")}
               </h3>
               <p className="text-xs text-slate-400 mt-0.5">
-                Comparison between collected e-waste volume and verified recycled volume (Jan – Aug 2026).
+                {t("monthlyGrowthDesc")}
               </p>
             </div>
 
@@ -114,8 +117,8 @@ export default function EnvironmentalImpactSection({ stats }) {
                   contentStyle={{ backgroundColor: '#0f172a', borderColor: '#334155', borderRadius: '12px', color: '#fff' }}
                   itemStyle={{ fontSize: '12px' }}
                 />
-                <Bar dataKey="collected" fill="#10b981" radius={[6, 6, 0, 0]} name="Collected (kg)" />
-                <Bar dataKey="recycled" fill="#2dd4bf" radius={[6, 6, 0, 0]} name="Recycled (kg)" />
+                <Bar dataKey="collected" fill="#10b981" radius={[6, 6, 0, 0]} name={t("recycledKgTotal")} />
+                <Bar dataKey="recycled" fill="#2dd4bf" radius={[6, 6, 0, 0]} name={t("statusRecycled")} />
               </BarChart>
             </ResponsiveContainer>
           </div>

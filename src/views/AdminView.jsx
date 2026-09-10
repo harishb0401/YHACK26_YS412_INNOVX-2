@@ -13,7 +13,7 @@ export default function AdminView({
   materialLots = [],
   onViewLotDetails
 }) {
-  const { t } = useTranslation();
+  const { t, tCategory, tStatus } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [priceData, setPriceData] = useState(referenceScrapPrices);
 
@@ -35,11 +35,11 @@ export default function AdminView({
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-black">{t("adminPortal")}</h1>
                 <span className="text-xs font-bold text-white bg-emerald-600 px-2.5 py-0.5 rounded-full">
-                  System Master
+                  {t("systemMaster")}
                 </span>
               </div>
               <p className="text-xs text-[#DDEBD8] mt-0.5">
-                Rule Engine Configuration · CPCB Audits · Traceable Material Lots
+                {t("ruleEngineConfig")}
               </p>
             </div>
           </div>
@@ -54,7 +54,7 @@ export default function AdminView({
               <span className="text-lg font-black text-rose-400">{activePriceAlertsCount}</span>
             </div>
             <div className="text-center px-2">
-              <span className="text-[10px] text-[#DDEBD8] font-bold block">Recyclers</span>
+              <span className="text-[10px] text-[#DDEBD8] font-bold block">{t("cpcbRecyclers")}</span>
               <span className="text-lg font-black text-[#DDEBD8]">14 CPCB</span>
             </div>
           </div>
@@ -111,41 +111,41 @@ export default function AdminView({
           <div className="mt-6 space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
               <div className="bg-white p-5 rounded-[24px] border border-[#3F7655]/20 shadow-sm">
-                <span className="text-xs text-[#718078] font-bold block">Total Recycled E-Waste</span>
+                <span className="text-xs text-[#718078] font-bold block">{t("totalRecycledEWaste")}</span>
                 <span className="text-2xl font-black text-[#244936]">{totalWeightRecycled + 38650} kg</span>
-                <span className="text-[11px] text-emerald-600 font-bold block mt-1">↑ +24% this month</span>
+                <span className="text-[11px] text-emerald-600 font-bold block mt-1">↑ +24%</span>
               </div>
               <div className="bg-white p-5 rounded-[24px] border border-[#3F7655]/20 shadow-sm">
-                <span className="text-xs text-[#718078] font-bold block">Gold Recovered</span>
+                <span className="text-xs text-[#718078] font-bold block">{t("goldRecovered")}</span>
                 <span className="text-2xl font-black text-amber-600">482.5 g</span>
-                <span className="text-[11px] text-slate-500 font-bold block mt-1">Certified purity: 98.4%</span>
+                <span className="text-[11px] text-slate-500 font-bold block mt-1">{t("goldRecoveredPurity")}</span>
               </div>
               <div className="bg-white p-5 rounded-[24px] border border-[#3F7655]/20 shadow-sm">
-                <span className="text-xs text-[#718078] font-bold block">Registered Collectors</span>
+                <span className="text-xs text-[#718078] font-bold block">{t("registeredCollectors")}</span>
                 <span className="text-2xl font-black text-[#203128]">86</span>
-                <span className="text-[11px] text-emerald-600 font-bold block mt-1">100% ID Verified</span>
+                <span className="text-[11px] text-emerald-600 font-bold block mt-1">{t("idVerified100")}</span>
               </div>
               <div className="bg-white p-5 rounded-[24px] border border-[#3F7655]/20 shadow-sm">
-                <span className="text-xs text-[#718078] font-bold block">CPCB Recyclers</span>
+                <span className="text-xs text-[#718078] font-bold block">{t("cpcbRecyclers")}</span>
                 <span className="text-2xl font-black text-[#3F7655]">14 Facilities</span>
-                <span className="text-[11px] text-emerald-600 font-bold block mt-1">EPR Compliant</span>
+                <span className="text-[11px] text-emerald-600 font-bold block mt-1">{t("eprCompliant")}</span>
               </div>
             </div>
 
             {/* Active Material Lots Overview Table */}
             <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-black text-[#244936]">Active Digital Material Lots</h3>
+              <h3 className="text-base font-black text-[#244936]">{t("activeDigitalLots")}</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#DDEBD8]/50 text-[#244936] font-bold border-b border-[#3F7655]/15">
                     <tr>
-                      <th className="p-3">Lot ID</th>
-                      <th className="p-3">Collector</th>
-                      <th className="p-3">Recycler</th>
-                      <th className="p-3 text-right">Weight</th>
-                      <th className="p-3 text-right">Estimated Value</th>
-                      <th className="p-3">Stage</th>
-                      <th className="p-3 text-center">Action</th>
+                      <th className="p-3">{t("lotId")}</th>
+                      <th className="p-3">{t("collectorLabel")}</th>
+                      <th className="p-3">{t("recyclerLabel")}</th>
+                      <th className="p-3 text-right">{t("totalWeight")}</th>
+                      <th className="p-3 text-right">{t("estimatedLotValue")}</th>
+                      <th className="p-3">{t("stage")}</th>
+                      <th className="p-3 text-center">{t("actions")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#3F7655]/10">
@@ -155,18 +155,18 @@ export default function AdminView({
                         <td className="p-3 font-semibold">{lot.collectorName}</td>
                         <td className="p-3 text-slate-600">{lot.recyclerName}</td>
                         <td className="p-3 text-right font-bold">{lot.totalWeightKg} kg</td>
-                        <td className="p-3 text-right font-black text-[#3F7655]">₹{lot.estimatedLotValue}</td>
+                        <td className="p-3 text-right font-black text-[#3F7655]">₹{lot.estimatedLotValue.toLocaleString()}</td>
                         <td className="p-3">
                           <span className="text-[11px] font-bold bg-[#DDEBD8] text-[#244936] px-2 py-0.5 rounded-full">
-                            {lot.status}
+                            {tStatus(lot.status)}
                           </span>
                         </td>
                         <td className="p-3 text-center">
                           <button
                             onClick={() => onViewLotDetails(lot)}
-                            className="px-3 py-1 bg-[#244936] text-white rounded-lg font-bold text-[11px] hover:bg-[#14291E]"
+                            className="px-3 py-1 bg-[#244936] text-white rounded-lg font-bold text-[11px] hover:bg-[#14291E] cursor-pointer"
                           >
-                            Inspect
+                            {t("inspectBtn")}
                           </button>
                         </td>
                       </tr>
@@ -184,8 +184,8 @@ export default function AdminView({
             <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-[#3F7655]/15">
                 <div>
-                  <h3 className="text-base font-black text-[#244936]">Scrap Pricing Rule Dataset</h3>
-                  <p className="text-xs text-[#718078]">Configurable deterministic reference prices used for lot calculations and price warnings.</p>
+                  <h3 className="text-base font-black text-[#244936]">{t("scrapPricingDatasetTitle")}</h3>
+                  <p className="text-xs text-[#718078]">{t("scrapPricingDatasetSub")}</p>
                 </div>
               </div>
 
@@ -193,12 +193,12 @@ export default function AdminView({
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#DDEBD8]/50 text-[#244936] font-bold border-b border-[#3F7655]/15">
                     <tr>
-                      <th className="p-3">Material Category</th>
-                      <th className="p-3">Baseline Rate</th>
-                      <th className="p-3">Acceptable Range</th>
-                      <th className="p-3">Hazard Level</th>
-                      <th className="p-3">Recoverable Metals</th>
-                      <th className="p-3">Source & Date</th>
+                      <th className="p-3">{t("materialCategory")}</th>
+                      <th className="p-3">{t("baselineRate")}</th>
+                      <th className="p-3">{t("acceptableRange")}</th>
+                      <th className="p-3">{t("hazardLevel")}</th>
+                      <th className="p-3">{t("recoverableMetals")}</th>
+                      <th className="p-3">{t("sourceAndDate")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#3F7655]/10">
@@ -206,7 +206,7 @@ export default function AdminView({
                       <tr key={item.id} className="hover:bg-slate-50">
                         <td className="p-3 font-bold text-slate-900 flex items-center gap-2">
                           <span>{item.icon}</span>
-                          <span>{item.material}</span>
+                          <span>{tCategory(item.category)} - {item.material}</span>
                         </td>
                         <td className="p-3 font-black text-[#3F7655]">₹{item.referencePrice} / kg</td>
                         <td className="p-3 font-semibold text-slate-700">₹{item.referenceMin} – ₹{item.referenceMax} / kg</td>
@@ -232,9 +232,9 @@ export default function AdminView({
         {activeTab === 'audits' && (
           <div className="mt-6 space-y-4">
             <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-black text-[#244936]">CPCB/EPR Recycler Verification Layer</h3>
+              <h3 className="text-base font-black text-[#244936]">{t("cpcbVerifLayerTitle")}</h3>
               <p className="text-xs text-[#718078]">
-                Displaying platform-verified status layer for recycling facilities with documented CPCB/EPR registrations.
+                {t("cpcbVerifLayerSub")}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
@@ -242,13 +242,13 @@ export default function AdminView({
                   <div className="flex items-center justify-between">
                     <h4 className="font-extrabold text-sm text-[#203128]">GreenCycle Material Recovery Ltd</h4>
                     <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                      ✓ CPCB Verified
+                      ✓ {t("cpcbVerified")}
                     </span>
                   </div>
                   <div className="text-xs text-slate-600 space-y-1">
-                    <div><strong>Registration:</strong> TN-EPR-2026-8821 (Demo)</div>
-                    <div><strong>Facility Location:</strong> Ambattur Industrial Estate, Chennai</div>
-                    <div><strong>Audit Date:</strong> 15 Jan 2026 · Recovery Tech: Hydrometallurgy & Mechanical</div>
+                    <div><strong>{t("cpcbRegTitle")}:</strong> TN-EPR-2026-8821 (Demo)</div>
+                    <div><strong>{t("facilityLocation")}:</strong> Ambattur Industrial Estate, Chennai</div>
+                    <div><strong>{t("auditDate")}:</strong> 15 Jan 2026 · {t("recoveryTech")}: Hydrometallurgy & Mechanical</div>
                   </div>
                 </div>
 
@@ -256,13 +256,13 @@ export default function AdminView({
                   <div className="flex items-center justify-between">
                     <h4 className="font-extrabold text-sm text-[#203128]">Madurai CleanMetals Eco-Processing</h4>
                     <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                      ✓ CPCB Verified
+                      ✓ {t("cpcbVerified")}
                     </span>
                   </div>
                   <div className="text-xs text-slate-600 space-y-1">
-                    <div><strong>Registration:</strong> TN-EPR-2026-4412 (Demo)</div>
-                    <div><strong>Facility Location:</strong> Kappalur SIDCO, Madurai</div>
-                    <div><strong>Audit Date:</strong> 02 Feb 2026 · Recovery Tech: Secondary Smelting & Battery Pyrolysis</div>
+                    <div><strong>{t("cpcbRegTitle")}:</strong> TN-EPR-2026-4412 (Demo)</div>
+                    <div><strong>{t("facilityLocation")}:</strong> Kappalur SIDCO, Madurai</div>
+                    <div><strong>{t("auditDate")}:</strong> 02 Feb 2026 · {t("recoveryTech")}: Secondary Smelting & Battery Pyrolysis</div>
                   </div>
                 </div>
               </div>
@@ -274,15 +274,15 @@ export default function AdminView({
         {activeTab === 'logs' && (
           <div className="mt-6 space-y-4">
             <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 shadow-sm space-y-4">
-              <h3 className="text-base font-black text-[#244936]">System Event & Rule Audit Log</h3>
+              <h3 className="text-base font-black text-[#244936]">{t("systemEventLogTitle")}</h3>
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
                   <thead className="bg-[#DDEBD8]/50 text-[#244936] font-bold border-b border-[#3F7655]/15">
                     <tr>
-                      <th className="p-3">Timestamp</th>
-                      <th className="p-3">Action Type</th>
-                      <th className="p-3">Entity Involved</th>
-                      <th className="p-3">Status / Outcome</th>
+                      <th className="p-3">{t("timestampCol")}</th>
+                      <th className="p-3">{t("actionTypeCol")}</th>
+                      <th className="p-3">{t("entityInvolvedCol")}</th>
+                      <th className="p-3">{t("statusOutcomeCol")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[#3F7655]/10">
@@ -293,7 +293,7 @@ export default function AdminView({
                         <td className="p-3 text-slate-700">{log.entity}</td>
                         <td className="p-3">
                           <span className="text-[11px] font-bold bg-[#DDEBD8] text-[#244936] px-2 py-0.5 rounded-full">
-                            {log.status}
+                            {tStatus(log.status)}
                           </span>
                         </td>
                       </tr>

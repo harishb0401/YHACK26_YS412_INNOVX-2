@@ -14,7 +14,7 @@ export default function RecyclerView({
   onSelectCollectorAndCreateLot,
   onViewLotDetails 
 }) {
-  const { t } = useTranslation();
+  const { t, tCategory, tStatus, tCondition } = useTranslation();
   const [activeTab, setActiveTab] = useState('requirements');
   const [selectedRequirement, setSelectedRequirement] = useState(requirements[0] || null);
 
@@ -54,7 +54,7 @@ export default function RecyclerView({
                 </span>
               </div>
               <p className="text-xs text-[#DDEBD8] mt-1">
-                CPCB / EPR: <strong>{recyclerProfile.cpcbRegistrationNo}</strong> · {recyclerProfile.location}
+                {t("cpcbRegTitle")}: <strong>{recyclerProfile.cpcbRegistrationNo}</strong> · {recyclerProfile.location}
               </p>
             </div>
           </div>
@@ -86,7 +86,7 @@ export default function RecyclerView({
             }`}
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>My Active Requirements ({requirements.length})</span>
+            <span>{t("myActiveRequirements")} ({requirements.length})</span>
           </button>
 
           <button
@@ -133,23 +133,23 @@ export default function RecyclerView({
                 >
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-1 rounded-full">
-                      {req.category}
+                      {tCategory(req.category)}
                     </span>
                     <span className="text-xs font-bold text-slate-500">
-                      Expires in {req.expiresInDays}d
+                      {t("expiresInDays", { days: req.expiresInDays })}
                     </span>
                   </div>
 
                   <div>
-                    <h3 className="text-lg font-black text-[#244936]">{req.requiredQuantityKg} kg Required</h3>
+                    <h3 className="text-lg font-black text-[#244936]">{req.requiredQuantityKg} kg {t("targetQty")}</h3>
                     <p className="text-xs text-[#718078] mt-1">
-                      Budget Target: <strong>₹{req.targetPricePerKg}/kg</strong> · Ref: ₹{req.referenceMin}–₹{req.referenceMax}/kg
+                      {t("budgetRate")}: <strong>₹{req.targetPricePerKg}/kg</strong> · {t("refRangeRate", { min: req.referenceMin, max: req.referenceMax })}
                     </p>
                   </div>
 
                   <div className="bg-[#FAF8F2] p-3 rounded-2xl border border-[#3F7655]/15 text-xs text-[#718078] space-y-1">
-                    <div><strong>Condition:</strong> {req.preferredCondition}</div>
-                    <div><strong>Location:</strong> {req.location}</div>
+                    <div><strong>{t("preferredCondition")}:</strong> {tCondition(req.preferredCondition)}</div>
+                    <div><strong>{t("targetLocation")}:</strong> {req.location}</div>
                   </div>
 
                   <button
@@ -158,9 +158,9 @@ export default function RecyclerView({
                       setSelectedRequirement(req);
                       setActiveTab('matching');
                     }}
-                    className="w-full py-2.5 px-4 text-xs font-extrabold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-xl transition flex items-center justify-center gap-1.5"
+                    className="w-full py-2.5 px-4 text-xs font-extrabold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-xl transition flex items-center justify-center gap-1.5 cursor-pointer"
                   >
-                    <span>View Matching Collectors</span>
+                    <span>{t("viewMatchingCollectors")}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -177,22 +177,22 @@ export default function RecyclerView({
             <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                  MATCHING ENGINE
+                  {t("ruleBasedEngine")}
                 </span>
                 <h3 className="text-base font-black text-[#244936] mt-1">
-                  Comparing Collectors for: {selectedRequirement?.category} ({selectedRequirement?.requiredQuantityKg} kg)
+                  {t("comparingCollectorsFor", { category: tCategory(selectedRequirement?.category), qty: selectedRequirement?.requiredQuantityKg })}
                 </h3>
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-slate-500">Select Requirement:</span>
+                <span className="text-xs font-bold text-slate-500">{t("selectRequirement")}:</span>
                 <select
                   value={selectedRequirement?.id}
                   onChange={(e) => setSelectedRequirement(requirements.find(r => r.id === e.target.value))}
                   className="text-xs font-bold bg-[#F8F5EA] border border-[#3F7655]/20 rounded-xl px-3 py-2"
                 >
                   {requirements.map(r => (
-                    <option key={r.id} value={r.id}>{r.category} ({r.requiredQuantityKg}kg - {r.id})</option>
+                    <option key={r.id} value={r.id}>{tCategory(r.category)} ({r.requiredQuantityKg}kg - {r.id})</option>
                   ))}
                 </select>
               </div>
@@ -200,7 +200,7 @@ export default function RecyclerView({
 
             {/* Collectors Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              {matchingCollectors.map((col, idx) => (
+              {matchingCollectors.map((col) => (
                 <div
                   key={col.id}
                   className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 shadow-sm space-y-4 flex flex-col justify-between"
@@ -208,10 +208,10 @@ export default function RecyclerView({
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-black text-[#244936] bg-[#F2C94C] px-2.5 py-1 rounded-full">
-                        {col.matchScore}% Rule Match
+                        {t("ruleMatch", { score: col.matchScore })}
                       </span>
                       <span className="text-xs font-bold text-slate-500">
-                        {col.reliabilityScore} ★ ({col.lotsCompleted} lots)
+                        {col.reliabilityScore} ★ ({col.lotsCompleted} {t("lotsLabel")})
                       </span>
                     </div>
 
@@ -223,11 +223,11 @@ export default function RecyclerView({
                     {/* Declared items preview */}
                     <div className="bg-[#FAF8F2] p-3 rounded-2xl border border-[#3F7655]/15 space-y-2">
                       <div className="text-[11px] font-bold text-slate-600 flex justify-between">
-                        <span>Available Weight:</span>
+                        <span>{t("availableWeight")}:</span>
                         <strong className="text-[#244936]">{col.availableWeightKg} kg</strong>
                       </div>
                       <div className="text-[11px] font-bold text-slate-600 flex justify-between">
-                        <span>Asking Price:</span>
+                        <span>{t("askingPrice")}:</span>
                         <strong className="text-[#3F7655]">₹{col.askingPricePerKg} / kg</strong>
                       </div>
                     </div>
@@ -236,7 +236,7 @@ export default function RecyclerView({
                     {col.hasPriceWarning && (
                       <div className="bg-amber-50 rounded-xl p-2.5 border border-amber-300 flex items-center gap-2 text-[11px] text-amber-800 font-bold">
                         <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                        <span>Asking price +{col.priceWarningDetails.percentAbove}% above reference max (₹{selectedRequirement.referenceMax})</span>
+                        <span>{t("askingPrice")} +{col.priceWarningDetails.percentAbove}% ({t("refRangeRate", { min: selectedRequirement.referenceMin, max: selectedRequirement.referenceMax })})</span>
                       </div>
                     )}
                   </div>
@@ -269,26 +269,26 @@ export default function RecyclerView({
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                        DIGITAL LOT
+                        {t("digitalMaterialLot")}
                       </span>
                       <h4 className="text-base font-black text-[#244936] mt-0.5">{lot.id}</h4>
                     </div>
                     <span className="text-xs font-bold bg-[#DDEBD8] text-[#244936] px-2.5 py-1 rounded-full">
-                      Step {lot.timelineStep}/7: {lot.status}
+                      {t("stepProgress", { step: lot.timelineStep, status: tStatus(lot.status) })}
                     </span>
                   </div>
 
                   <div className="bg-[#FAF8F2] p-3 rounded-2xl border border-[#3F7655]/15 grid grid-cols-3 gap-2 text-center text-xs">
                     <div>
-                      <span className="text-[10px] text-[#718078] font-bold block">Weight</span>
+                      <span className="text-[10px] text-[#718078] font-bold block">{t("totalWeight")}</span>
                       <span className="font-black text-[#203128]">{lot.totalWeightKg} kg</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#718078] font-bold block">Estimated Value</span>
-                      <span className="font-black text-[#3F7655]">₹{lot.estimatedLotValue}</span>
+                      <span className="text-[10px] text-[#718078] font-bold block">{t("estimatedLotValue")}</span>
+                      <span className="font-black text-[#3F7655]">₹{lot.estimatedLotValue.toLocaleString()}</span>
                     </div>
                     <div>
-                      <span className="text-[10px] text-[#718078] font-bold block">Collector</span>
+                      <span className="text-[10px] text-[#718078] font-bold block">{t("collectorLabel")}</span>
                       <span className="font-bold text-slate-700 truncate block">{lot.collectorName.split(' ')[0]}</span>
                     </div>
                   </div>
@@ -297,10 +297,10 @@ export default function RecyclerView({
                     <span className="text-xs text-slate-500">{lot.location}</span>
                     <button
                       onClick={() => onViewLotDetails(lot)}
-                      className="px-4 py-2 text-xs font-extrabold text-white bg-[#3F7655] hover:bg-[#244936] rounded-xl transition flex items-center gap-1.5"
+                      className="px-4 py-2 text-xs font-extrabold text-white bg-[#3F7655] hover:bg-[#244936] rounded-xl transition flex items-center gap-1.5 cursor-pointer"
                     >
                       <QrCode className="w-4 h-4" />
-                      <span>{t("lotDetails")} & QR</span>
+                      <span>{t("viewDetailsAndQR")}</span>
                     </button>
                   </div>
                 </div>

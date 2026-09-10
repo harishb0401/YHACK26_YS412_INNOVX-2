@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { X, PlusCircle, CheckCircle2, ShieldCheck, Sparkles, AlertCircle, ArrowRight, Upload } from 'lucide-react';
 import { categoriesList, verifiedRecyclersList, evaluateRecyclerMatch } from '../../mockData';
+import { useTranslation, useLanguage } from '../../i18n';
 
 export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
+  const { t } = useTranslation();
+  const { tCategory } = useLanguage();
+
   if (!isOpen) return null;
 
   const [formData, setFormData] = useState({
@@ -86,8 +90,8 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
               <PlusCircle className="w-6 h-6" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Add New E-Waste Manifest</h3>
-              <p className="text-xs text-slate-400">Log electronic waste details for rule-based recycler assignment</p>
+              <h3 className="text-lg font-bold text-white">{t("addNewManifest")}</h3>
+              <p className="text-xs text-slate-400">{t("logWasteSubtitle")}</p>
             </div>
           </div>
           <button
@@ -106,21 +110,21 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
                 <CheckCircle2 className="w-10 h-10" />
               </div>
               
-              <h4 className="text-2xl font-black text-slate-900">E-Waste Registered Successfully!</h4>
+              <h4 className="text-2xl font-black text-slate-900">{t("wasteRegisteredSuccess")}</h4>
               
               <p className="text-sm text-slate-600 max-w-md mx-auto">
-                Your e-waste manifest has been recorded and evaluated by the rule engine.
+                {t("wasteManifestEvaluated")}
               </p>
 
               <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 max-w-sm mx-auto font-mono text-left space-y-2">
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Tracking ID:</span>
+                  <span className="text-slate-500">{t("trackingId")}:</span>
                   <span className="font-bold text-emerald-600">{generatedId}</span>
                 </div>
                 <div className="flex justify-between text-xs">
-                  <span className="text-slate-500">Rule Match Result:</span>
+                  <span className="text-slate-500">{t("ruleMatchResult")}:</span>
                   <span className="font-semibold text-slate-900">
-                    {matchedRecyclers.length > 0 ? `${matchedRecyclers[0].companyName} Assigned` : 'Pending Match'}
+                    {matchedRecyclers.length > 0 ? `${matchedRecyclers[0].companyName} ${t("assigned")}` : t("pendingMatch")}
                   </span>
                 </div>
               </div>
@@ -131,9 +135,9 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
                     setSubmitted(false);
                     onClose();
                   }}
-                  className="px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition text-sm"
+                  className="px-6 py-2.5 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition text-sm cursor-pointer"
                 >
-                  Done & View Dashboard
+                  {t("doneViewDashboard")}
                 </button>
               </div>
             </div>
@@ -143,26 +147,26 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
               {/* Row 1: Waste Type & Category */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Waste Item Description</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("wasteItemDesc")}</label>
                   <input
                     type="text"
                     required
                     value={formData.wasteType}
                     onChange={(e) => setFormData({ ...formData, wasteType: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:bg-white focus:border-emerald-500 focus:outline-none"
-                    placeholder="e.g. Server Racks & Workstations"
+                    placeholder={t("wasteItemPlaceholder")}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Waste Category</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("wasteCategory")}</label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:bg-white focus:border-emerald-500 focus:outline-none"
                   >
                     {categoriesList.map((cat, i) => (
-                      <option key={i} value={cat}>{cat}</option>
+                      <option key={i} value={cat}>{tCategory(cat)}</option>
                     ))}
                   </select>
                 </div>
@@ -171,7 +175,7 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
               {/* Row 2: Quantity & Weight */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Quantity (Units)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("quantityUnits")}</label>
                   <input
                     type="number"
                     required
@@ -183,7 +187,7 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">Estimated Total Weight (kg)</label>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("estimatedTotalWeight")}</label>
                   <input
                     type="number"
                     required
@@ -197,27 +201,27 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
 
               {/* Row 3: Pickup Location */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Pickup Address / Location</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("pickupAddressLocation")}</label>
                 <input
                   type="text"
                   required
                   value={formData.pickupLocation}
                   onChange={(e) => setFormData({ ...formData, pickupLocation: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:bg-white focus:border-emerald-500 focus:outline-none"
-                  placeholder="Street address, City, ZIP"
+                  placeholder={t("pickupAddressPlaceholder")}
                 />
               </div>
 
               {/* Row 4: Condition */}
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1.5">Condition & Special Handling</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">{t("conditionSpecialHandling")}</label>
                 <input
                   type="text"
                   required
                   value={formData.condition}
                   onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-sm focus:bg-white focus:border-emerald-500 focus:outline-none"
-                  placeholder="e.g. Operational, Defective, Dismantled"
+                  placeholder={t("conditionPlaceholder")}
                 />
               </div>
 
@@ -226,17 +230,17 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
                 <div className="flex items-center gap-3">
                   <Sparkles className="w-5 h-5 text-emerald-600 shrink-0" />
                   <div>
-                    <h5 className="text-xs font-bold text-emerald-950">Live Rule Engine Evaluation</h5>
+                    <h5 className="text-xs font-bold text-emerald-950">{t("liveRuleEval")}</h5>
                     <p className="text-[11px] text-emerald-700">
                       {matchedRecyclers.length > 0 
-                        ? `${matchedRecyclers.length} Verified Recycler(s) match Category, Capacity & Distance (<50km)`
-                        : 'No available recycler matches all 5 rule conditions'}
+                        ? t("matchedRecyclersCount", { count: matchedRecyclers.length })
+                        : t("noRecyclerMatches")}
                     </p>
                   </div>
                 </div>
                 {matchedRecyclers.length > 0 && (
                   <span className="text-[11px] font-bold text-white bg-emerald-600 px-2.5 py-1 rounded-md shrink-0">
-                    Auto-Match Ready ✓
+                    {t("autoMatchReady")}
                   </span>
                 )}
               </div>
@@ -246,15 +250,15 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition"
+                  className="px-5 py-2.5 text-sm font-semibold text-slate-600 hover:text-slate-900 transition cursor-pointer"
                 >
-                  Cancel
+                  {t("cancel")}
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition flex items-center gap-2"
+                  className="px-6 py-2.5 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition flex items-center gap-2 cursor-pointer"
                 >
-                  <span>Submit E-Waste Manifest</span>
+                  <span>{t("submitWasteManifest")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -267,3 +271,4 @@ export default function AddWasteModal({ isOpen, onClose, onAddEwaste }) {
     </div>
   );
 }
+

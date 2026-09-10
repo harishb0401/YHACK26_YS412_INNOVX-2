@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
 import { Calendar, Clock, MapPin, CheckCircle2, ArrowRight, Truck, Award, Sparkles, Scale } from 'lucide-react';
+import { useTranslation, useLanguage } from '../i18n';
 
 export default function SchedulePickupView({ setActiveView, onPickupScheduled }) {
+  const { t } = useTranslation();
+  const { tCategory } = useLanguage();
+
   const [selectedMaterials, setSelectedMaterials] = useState(["Plastic", "Paper"]);
   const [weightKg, setWeightKg] = useState(15);
   const [pickupDate, setPickupDate] = useState("Saturday, 14 Sep");
@@ -61,13 +65,13 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
         {/* Header */}
         <div className="text-center space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-bold uppercase tracking-wider">
-            <Truck className="w-4 h-4 text-[#3F7655]" /> Doorstep Recycling Collection
+            <Truck className="w-4 h-4 text-[#3F7655]" /> {t("doorstepCollection")}
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#203128] tracking-tight">
-            Schedule a Doorstep Pickup
+            {t("scheduleDoorstepPickup")}
           </h1>
           <p className="text-sm text-[#718078] max-w-lg mx-auto">
-            Get your household or office recyclable waste picked up at your doorstep by verified ECO-Link collectors.
+            {t("scheduleDoorstepDesc")}
           </p>
         </div>
 
@@ -81,34 +85,34 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl font-black text-[#203128]">Pickup Scheduled Successfully!</h2>
+                <h2 className="text-2xl font-black text-[#203128]">{t("pickupScheduledSuccess")}</h2>
                 <p className="text-sm text-[#718078] max-w-md mx-auto">
-                  Collector driver assigned for <span className="font-bold text-[#203128]">{pickupDate} ({timeSlot})</span>.
+                  {t("collectorAssignedFor", { date: pickupDate, time: timeSlot })}
                 </p>
               </div>
 
               {/* Reward Points Box */}
               <div className="p-4 rounded-2xl bg-[#F8F5EA] border border-[#3F7655]/20 max-w-sm mx-auto text-left space-y-2">
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#718078] font-medium">Estimated Weight:</span>
+                  <span className="text-[#718078] font-medium">{t("estimatedWeightLabel")}:</span>
                   <span className="font-bold text-[#203128]">{weightKg} kg</span>
                 </div>
                 <div className="flex justify-between items-center text-xs">
-                  <span className="text-[#718078] font-medium">Materials:</span>
-                  <span className="font-bold text-[#203128]">{selectedMaterials.join(', ')}</span>
+                  <span className="text-[#718078] font-medium">{t("materialsLabel")}:</span>
+                  <span className="font-bold text-[#203128]">{selectedMaterials.map(m => tCategory(m)).join(', ')}</span>
                 </div>
                 <div className="pt-2 border-t border-[#3F7655]/15 flex justify-between items-center text-sm font-extrabold text-[#3F7655]">
-                  <span>Earned Points:</span>
+                  <span>{t("rewardPoints")}:</span>
                   <span className="bg-[#DDEBD8] px-2.5 py-0.5 rounded-md">+{earnedPoints} pts 🌱</span>
                 </div>
               </div>
 
               <div className="pt-4 flex justify-center gap-3">
                 <button
-                  onClick={() => setActiveView('dashboard')}
-                  className="px-6 py-3 bg-[#3F7655] hover:bg-[#244936] text-white font-bold rounded-2xl shadow transition text-sm flex items-center gap-2"
+                  onClick={() => setActiveView('generator')}
+                  className="px-6 py-3 bg-[#3F7655] hover:bg-[#244936] text-white font-bold rounded-2xl shadow transition text-sm flex items-center gap-2 cursor-pointer"
                 >
-                  <span>View Dashboard Impact</span>
+                  <span>{t("viewDashboardImpact")}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
@@ -119,7 +123,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
               {/* Step 1: What do you have? */}
               <div className="space-y-3">
                 <label className="block text-sm font-extrabold text-[#203128]">
-                  1. What do you have to recycle?
+                  {t("whatDoYouHaveToRecycle")}
                 </label>
                 <div className="flex flex-wrap gap-2">
                   {materialsOptions.map((mat, idx) => {
@@ -135,7 +139,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                           }`}
                       >
                         <span>{isSelected ? '✓' : '+'}</span>
-                        <span>{mat}</span>
+                        <span>{tCategory(mat)}</span>
                       </button>
                     );
                   })}
@@ -147,10 +151,10 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                 <div className="flex justify-between items-center">
                   <label className="text-sm font-extrabold text-[#203128] flex items-center gap-1.5">
                     <Scale className="w-4 h-4 text-[#3F7655]" />
-                    2. Estimated total weight ({weightKg} kg)
+                    {t("estimatedTotalWeightTitle", { weight: weightKg })}
                   </label>
                   <span className="text-xs font-bold text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                    +{calculatedPoints} Impact Points
+                    {t("impactPointsEarned", { points: calculatedPoints })}
                   </span>
                 </div>
 
@@ -165,9 +169,9 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                 />
 
                 <div className="flex justify-between text-xs text-[#718078] font-mono">
-                  <span>5 kg (Small Bag)</span>
+                  <span>{t("smallBag")}</span>
                   <span>50 kg</span>
-                  <span>100 kg (Large Batch)</span>
+                  <span>{t("largeBatch")}</span>
                 </div>
               </div>
 
@@ -176,7 +180,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                 <div>
                   <label className="block text-xs font-extrabold text-[#203128] mb-1.5 flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-[#3F7655]" />
-                    3. Choose pickup date
+                    {t("choosePickupDate")}
                   </label>
                   <select
                     value={pickupDate}
@@ -192,7 +196,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                 <div>
                   <label className="block text-xs font-extrabold text-[#203128] mb-1.5 flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-[#3F7655]" />
-                    4. Choose time slot
+                    {t("chooseTimeSlot")}
                   </label>
                   <select
                     value={timeSlot}
@@ -210,14 +214,14 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
               <div className="space-y-2 pt-2 border-t border-[#3F7655]/10">
                 <label className="block text-xs font-extrabold text-[#203128] flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-[#3F7655]" />
-                  5. Pickup address
+                  {t("pickupAddressTitle")}
                 </label>
                 <input
                   type="text"
                   required
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
-                  placeholder="📍 Enter full street address..."
+                  placeholder={t("pickupAddressInputPlaceholder")}
                   className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-xl px-3.5 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
                 />
               </div>
@@ -228,7 +232,7 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
                   type="submit"
                   className="w-full py-4 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-base rounded-2xl shadow-md hover:shadow-lg transition flex items-center justify-center gap-2 cursor-pointer"
                 >
-                  <span>Confirm & Schedule Pickup</span>
+                  <span>{t("confirmAndSchedulePickup")}</span>
                   <ArrowRight className="w-5 h-5" />
                 </button>
               </div>
@@ -242,3 +246,4 @@ export default function SchedulePickupView({ setActiveView, onPickupScheduled })
     </div>
   );
 }
+

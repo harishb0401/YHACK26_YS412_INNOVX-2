@@ -4,8 +4,12 @@ import {
   Award, Building2, Factory, Calendar, FileText, ArrowRight, Check 
 } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
+import { useTranslation, useLanguage } from '../i18n';
 
 export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-001245" }) {
+  const { t } = useTranslation();
+  const { tCategory, tStatus } = useLanguage();
+
   const [searchInput, setSearchInput] = useState(initialTrackingId);
   const [activeItem, setActiveItem] = useState(() => {
     return ewasteList.find(item => item.id.toUpperCase() === initialTrackingId.toUpperCase()) || ewasteList[0];
@@ -59,15 +63,15 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
         {/* Tracking Header & Search Box */}
         <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-md text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase border border-emerald-200">
-            <Truck className="w-4 h-4 text-emerald-600" /> Live Waste Tracking Portal
+            <Truck className="w-4 h-4 text-emerald-600" /> {t("liveTrackingPortal")}
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            Track E-Waste Manifest Journey
+            {t("trackManifestJourney")}
           </h1>
 
           <p className="text-sm text-slate-500 max-w-xl mx-auto">
-            Enter your unique 12-digit Waste Tracking ID to view the verified end-to-end status from collector pickup to recycled material audit.
+            {t("trackManifestSubtitle")}
           </p>
 
           {/* Search Form */}
@@ -78,7 +82,7 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
                 type="text"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="Enter Tracking ID (e.g. EW-2026-001245)"
+                placeholder={t("enterTrackingIdPlaceholder")}
                 className="w-full bg-slate-50 border border-slate-300 rounded-2xl pl-12 pr-4 py-3.5 text-base font-mono font-semibold text-slate-900 focus:bg-white focus:border-emerald-500 focus:outline-none"
               />
             </div>
@@ -86,14 +90,14 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
               type="submit"
               className="px-7 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer shrink-0"
             >
-              <span>Track Now</span>
+              <span>{t("trackNow")}</span>
               <ArrowRight className="w-5 h-5" />
             </button>
           </form>
 
           {/* Quick Click Sample IDs */}
           <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-slate-500 pt-2">
-            <span className="font-semibold text-slate-600">Sample Tracking Codes:</span>
+            <span className="font-semibold text-slate-600">{t("sampleTrackingCodes")}:</span>
             {sampleIds.map((id) => (
               <button
                 key={id}
@@ -125,7 +129,7 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                   <div>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">Manifest ID</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">{t("manifestId")}</span>
                     <h3 className="text-xl font-black font-mono text-emerald-700">{activeItem.id}</h3>
                   </div>
                   <StatusBadge status={activeItem.status} />
@@ -133,26 +137,26 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
 
                 <div className="space-y-3 pt-1">
                   <div>
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Waste Description</span>
+                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{t("wasteItemDesc")}</span>
                     <p className="text-base font-bold text-slate-900">{activeItem.wasteType}</p>
                     <span className="inline-block text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-0.5 rounded mt-1">
-                      {activeItem.category}
+                      {tCategory(activeItem.category)}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 pt-2 text-xs border-t border-slate-100">
                     <div>
-                      <span className="text-slate-400 block font-medium">Weight</span>
+                      <span className="text-slate-400 block font-medium">{t("weight")}</span>
                       <span className="text-sm font-bold text-slate-900">{activeItem.weight} kg</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block font-medium">Quantity</span>
+                      <span className="text-slate-400 block font-medium">{t("quantityUnits")}</span>
                       <span className="text-sm font-bold text-slate-900">{activeItem.quantity} units</span>
                     </div>
                   </div>
 
                   <div className="pt-2 text-xs border-t border-slate-100">
-                    <span className="text-slate-400 block font-medium">Pickup Location</span>
+                    <span className="text-slate-400 block font-medium">{t("pickupAddressLocation")}</span>
                     <p className="text-xs font-semibold text-slate-800 flex items-center gap-1 mt-0.5">
                       <MapPin className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                       {activeItem.pickupLocation}
@@ -164,7 +168,7 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
               {/* Verified Parties Details */}
               <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
                 <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 pb-2">
-                  Verified Stakeholders
+                  {t("verifiedStakeholders")}
                 </h4>
 
                 {/* Collector Info */}
@@ -173,7 +177,7 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
                     <Building2 className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-emerald-700">Verified Collector</span>
+                    <span className="text-[10px] uppercase font-bold text-emerald-700">{t("verifiedCollector")}</span>
                     <h5 className="text-xs font-bold text-slate-900">{activeItem.collector?.name || "Apex Logistics"}</h5>
                     <p className="text-[11px] text-slate-500 font-mono">ID: {activeItem.collector?.id || "COL-8821"}</p>
                   </div>
@@ -185,21 +189,21 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
                     <Factory className="w-5 h-5" />
                   </div>
                   <div>
-                    <span className="text-[10px] uppercase font-bold text-teal-700">Assigned Recycler</span>
+                    <span className="text-[10px] uppercase font-bold text-teal-700">{t("assignedRecycler")}</span>
                     <h5 className="text-xs font-bold text-slate-900">
                       {activeItem.recycler?.name || "GreenMat Eco-Processing Center"}
                     </h5>
-                    <p className="text-[11px] text-slate-500 font-mono">Facility ID: {activeItem.recycler?.id || "REC-401"}</p>
+                    <p className="text-[11px] text-slate-500 font-mono">{t("facilityId")}: {activeItem.recycler?.id || "REC-401"}</p>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-2 text-xs pt-2">
                   <div>
-                    <span className="text-slate-400 block">Pickup Date</span>
+                    <span className="text-slate-400 block">{t("pickupDate")}</span>
                     <span className="font-semibold text-slate-800">{activeItem.date}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block">Expected Processing</span>
+                    <span className="text-slate-400 block">{t("expectedProcessing")}</span>
                     <span className="font-semibold text-slate-800">{activeItem.expectedCompletion}</span>
                   </div>
                 </div>
@@ -209,17 +213,17 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
               {activeItem.proof && (
                 <div className="bg-gradient-to-br from-emerald-900 to-teal-950 text-white p-6 rounded-3xl shadow-xl space-y-3">
                   <div className="flex items-center gap-2 text-emerald-400 font-bold text-xs">
-                    <Award className="w-4 h-4" /> Official Recycling Proof
+                    <Award className="w-4 h-4" /> {t("officialRecyclingProof")}
                   </div>
                   <h4 className="text-base font-bold text-white">Certificate #{activeItem.proof.certificateId}</h4>
                   
                   <div className="grid grid-cols-2 gap-2 text-xs text-emerald-100 pt-2 border-t border-emerald-800">
                     <div>
-                      <span className="text-slate-400 block">Recovered Gold</span>
+                      <span className="text-slate-400 block">{t("goldRecovered")}</span>
                       <span className="font-bold text-white">{activeItem.proof.recoveredGoldGrams}</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block">Recovered Copper</span>
+                      <span className="text-slate-400 block">{t("copperRecovered")}</span>
                       <span className="font-bold text-white">{activeItem.proof.recoveredCopperKg}</span>
                     </div>
                   </div>
@@ -233,11 +237,11 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
               
               <div className="flex items-center justify-between border-b border-slate-100 pb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-slate-900">End-to-End Tracking Timeline</h3>
-                  <p className="text-xs text-slate-500">7 verified milestone audit events</p>
+                  <h3 className="text-lg font-bold text-slate-900">{t("endToEndTimeline")}</h3>
+                  <p className="text-xs text-slate-500">{t("verifiedMilestones")}</p>
                 </div>
                 <span className="text-xs font-mono text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-full font-bold">
-                  Immutable Log
+                  {t("immutableLog")}
                 </span>
               </div>
 
@@ -269,7 +273,7 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
                       <div className="flex-1 bg-slate-50/70 p-4 rounded-2xl border border-slate-100 group-hover:border-emerald-200 transition">
                         <div className="flex items-center justify-between">
                           <h4 className={`text-sm font-bold ${isCompleted ? 'text-slate-900' : isActive ? 'text-blue-700 font-extrabold' : 'text-slate-400'}`}>
-                            {stepName} {isCompleted && '✓'}
+                            {tStatus(stepName)} {isCompleted && '✓'}
                           </h4>
                           <span className="text-[11px] font-mono text-slate-400">
                             {date}
@@ -297,3 +301,4 @@ export default function TrackingView({ ewasteList, initialTrackingId = "EW-2026-
     </div>
   );
 }
+

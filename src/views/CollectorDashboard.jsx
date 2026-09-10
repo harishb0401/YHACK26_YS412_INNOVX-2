@@ -4,6 +4,7 @@ import {
   User, Calendar, Search, Filter, Eye, ArrowUpRight, ShieldCheck, CheckCircle2, Clock
 } from 'lucide-react';
 import StatusBadge from '../components/StatusBadge';
+import { useTranslation, useLanguage } from '../i18n';
 
 export default function CollectorDashboard({ 
   ewasteList, 
@@ -11,21 +12,24 @@ export default function CollectorDashboard({
   onTrackItem, 
   setActiveView 
 }) {
+  const { t } = useTranslation();
+  const { tCategory, tStatus } = useLanguage();
+
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
 
   // Sidebar Items
   const sidebarItems = [
-    { name: 'Dashboard', icon: LayoutDashboard },
-    { name: 'Add E-Waste', icon: PlusCircle, action: onOpenAddWasteModal },
-    { name: 'My Waste', icon: Package },
-    { name: 'Recycler Requests', icon: ShieldCheck },
-    { name: 'Pickup Schedule', icon: Calendar },
-    { name: 'Tracking', icon: Truck, action: () => setActiveView('tracking') },
-    { name: 'Certificates', icon: Award },
-    { name: 'Impact', icon: TrendingUp },
-    { name: 'Profile', icon: User },
+    { name: t("navDashboard"), icon: LayoutDashboard },
+    { name: t("addNewManifest"), icon: PlusCircle, action: onOpenAddWasteModal },
+    { name: t("myDeclaredLots"), icon: Package },
+    { name: t("availableDemands"), icon: ShieldCheck },
+    { name: t("navPickup"), icon: Calendar },
+    { name: t("navTracking"), icon: Truck, action: () => setActiveView('tracking') },
+    { name: t("officialRecyclingProof"), icon: Award },
+    { name: t("navRewards"), icon: TrendingUp },
+    { name: t("collectorPortal"), icon: User },
   ];
 
   // Dashboard Summary Numbers
@@ -58,7 +62,7 @@ export default function CollectorDashboard({
             <div>
               <h4 className="text-sm font-bold text-white leading-tight">Apex Logistics</h4>
               <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
-                Verified Collector ✓
+                {t("verifiedCollectorBadge")}
               </span>
             </div>
           </div>
@@ -105,10 +109,10 @@ export default function CollectorDashboard({
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Collector Dashboard
+              {t("collectorPortal")}
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              Manage e-waste manifests, track active pickups, and view certified recycling proofs.
+              {t("wfStep2Desc")}
             </p>
           </div>
 
@@ -117,7 +121,7 @@ export default function CollectorDashboard({
             className="px-5 py-3 text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-md hover:shadow-lg transition flex items-center gap-2 cursor-pointer"
           >
             <PlusCircle className="w-4 h-4" />
-            <span>Add New E-Waste</span>
+            <span>{t("addNewManifest")}</span>
           </button>
         </div>
 
@@ -125,39 +129,39 @@ export default function CollectorDashboard({
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">Total Waste Submitted</span>
+            <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider block">{t("totalLotsCreated")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-slate-900">{totalSubmitted}</span>
               <span className="text-xs text-slate-400 font-mono">Manifests</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">All logged e-waste items</p>
+            <p className="text-xs text-slate-500 font-medium">{t("allCategories", { defaultValue: "All logged e-waste items" })}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider block">Waste Pending</span>
+            <span className="text-xs font-semibold text-amber-600 uppercase tracking-wider block">{t("statusPending")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-amber-600">{wastePending}</span>
               <span className="text-xs text-amber-600/70 font-mono">Awaiting</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Rule matching / pending assignment</p>
+            <p className="text-xs text-slate-500 font-medium">{t("ruleEngineConfig")}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider block">Waste In Transit</span>
+            <span className="text-xs font-semibold text-purple-600 uppercase tracking-wider block">{t("statusInTransit")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-purple-600">{wasteInTransit}</span>
               <span className="text-xs text-purple-600/70 font-mono">En Route</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Freight scheduled or on road</p>
+            <p className="text-xs text-slate-500 font-medium">{t("transportationStep")}</p>
           </div>
 
           <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-2">
-            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">Waste Recycled</span>
+            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider block">{t("statusRecycled")}</span>
             <div className="flex items-baseline justify-between">
               <span className="text-3xl font-black text-emerald-600">{wasteRecycled}</span>
               <span className="text-xs text-emerald-600/70 font-mono">Completed</span>
             </div>
-            <p className="text-xs text-slate-500 font-medium">Verified recycling proof issued</p>
+            <p className="text-xs text-slate-500 font-medium">{t("statusRecycledCertified")}</p>
           </div>
 
         </div>
@@ -168,8 +172,8 @@ export default function CollectorDashboard({
           {/* Table Toolbar */}
           <div className="p-6 border-b border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">E-Waste Collection Manifests</h3>
-              <p className="text-xs text-slate-500">List of registered electronic waste shipments and assigned recyclers</p>
+              <h3 className="text-lg font-bold text-slate-900">{t("collectionHistory")}</h3>
+              <p className="text-xs text-slate-500">{t("trackManifestSubtitle")}</p>
             </div>
 
             <div className="flex items-center gap-3">
@@ -178,7 +182,7 @@ export default function CollectorDashboard({
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
-                  placeholder="Search Tracking ID, waste, recycler..."
+                  placeholder={t("searchDemandsPlaceholder")}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3 py-2 text-xs focus:bg-white focus:border-emerald-500 focus:outline-none"
@@ -192,13 +196,13 @@ export default function CollectorDashboard({
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-slate-50 border-b border-slate-200 text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                  <th className="py-3.5 px-6">Tracking ID</th>
-                  <th className="py-3.5 px-4">Waste Type</th>
-                  <th className="py-3.5 px-4">Weight (kg)</th>
-                  <th className="py-3.5 px-4">Assigned Recycler</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4">Date</th>
-                  <th className="py-3.5 px-6 text-right">Action</th>
+                  <th className="py-3.5 px-6">{t("trackingId")}</th>
+                  <th className="py-3.5 px-4">{t("wasteItemDesc")}</th>
+                  <th className="py-3.5 px-4">{t("weight")} (kg)</th>
+                  <th className="py-3.5 px-4">{t("assignedRecycler")}</th>
+                  <th className="py-3.5 px-4">{t("status")}</th>
+                  <th className="py-3.5 px-4">{t("date")}</th>
+                  <th className="py-3.5 px-6 text-right">{t("actions")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 text-xs text-slate-700">
@@ -213,7 +217,7 @@ export default function CollectorDashboard({
                     {/* Waste Type & Category */}
                     <td className="py-4 px-4">
                       <div className="font-bold text-slate-900">{item.wasteType}</div>
-                      <div className="text-[11px] text-slate-500">{item.category}</div>
+                      <div className="text-[11px] text-slate-500">{tCategory(item.category)}</div>
                     </td>
 
                     {/* Weight */}
@@ -226,10 +230,10 @@ export default function CollectorDashboard({
                       {item.recycler ? (
                         <div>
                           <div className="font-semibold text-slate-900">{item.recycler.name}</div>
-                          <div className="text-[10px] text-emerald-600 font-semibold">Verified Facility ✓</div>
+                          <div className="text-[10px] text-emerald-600 font-semibold">{t("cpcbVerified")} ✓</div>
                         </div>
                       ) : (
-                        <span className="text-slate-400 italic">Rule Matching...</span>
+                        <span className="text-slate-400 italic">{t("ruleEngineConfig")}</span>
                       )}
                     </td>
 
@@ -250,7 +254,7 @@ export default function CollectorDashboard({
                         className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold transition inline-flex items-center gap-1 cursor-pointer"
                       >
                         <Eye className="w-3.5 h-3.5" />
-                        <span>Track</span>
+                        <span>{t("inspectBtn")}</span>
                       </button>
                     </td>
 
@@ -266,3 +270,4 @@ export default function CollectorDashboard({
     </div>
   );
 }
+

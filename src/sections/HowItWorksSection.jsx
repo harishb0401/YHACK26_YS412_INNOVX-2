@@ -3,82 +3,84 @@ import {
   UserPlus, PlusCircle, Sparkles, Truck, PackageCheck, RefreshCw, 
   Award, TrendingUp, Check, ChevronRight, ShieldCheck, ArrowRight 
 } from 'lucide-react';
+import { useTranslation } from '../i18n';
 
 export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }) {
+  const { t } = useTranslation();
   const [activeStep, setActiveStep] = useState(0);
 
   const steps = [
     {
       num: 1,
-      title: "Collector Registers",
-      desc: "The collector creates an account and submits required business & license details for verification.",
+      title: t("verifiedCollector"),
+      desc: t("wfStep2Desc"),
       icon: UserPlus,
       color: "emerald",
-      badge: "Step 1: Onboarding",
+      badge: "Step 1",
       details: ["License ID Verification", "Facility Geocoding", "Verified Collector Badge"]
     },
     {
       num: 2,
-      title: "Collector Adds E-Waste",
-      desc: "Collector records waste parameters: Waste type, Category, Quantity, Weight, Pickup location, Images, & Condition.",
+      title: t("addNewManifest"),
+      desc: t("logWasteSubtitle"),
       icon: PlusCircle,
       color: "teal",
-      badge: "Step 2: Manifest Logging",
+      badge: "Step 2",
       details: ["Category selection", "Weight & unit counts", "Condition reporting"]
     },
     {
       num: 3,
-      title: "Rule-Based Recycler Assignment",
-      desc: "Eligible verified recyclers are matched deterministically based on category, capability, capacity, distance limit & verification status.",
+      title: t("ruleMatchLogic"),
+      desc: t("wfStep3Desc"),
       icon: Sparkles,
       color: "cyan",
-      badge: "Step 3: Matching Engine",
+      badge: "Step 3",
       isHighlight: true,
       details: ["Category Match ✓", "Capacity Limit ✓", "Distance Radius < 50km ✓"]
     },
     {
       num: 4,
-      title: "Waste Pickup & Tracking ID",
-      desc: "Collector schedules transportation and system generates a unique permanent Tracking ID (e.g. EW-2026-001245).",
+      title: t("transportationStep"),
+      desc: t("ruleBasedDispatch"),
       icon: Truck,
       color: "purple",
-      badge: "Step 4: Logistics",
+      badge: "Step 4",
       details: ["Unique Manifest Tracking ID", "Scheduled Freight Pickups", "GPS Dispatch Tracking"]
     },
     {
       num: 5,
-      title: "Recycler Receives Waste",
-      desc: "Recycler dock intake team confirms: Waste received, Actual measured weight, Category & intake condition.",
+      title: t("statusReceived"),
+      desc: t("intakeAndProcessing"),
       icon: PackageCheck,
       color: "blue",
-      badge: "Step 5: Dock Receipt",
+      badge: "Step 5",
       details: ["Weighbridge Verification", "Physical Intake Audit", "Status Badge -> Received"]
     },
     {
       num: 6,
-      title: "Recycling Processing Workflow",
-      desc: "Recycler updates multi-stage processing status: Received -> Sorting -> Dismantling -> Material Recovery -> Recycled.",
+      title: t("statusProcessing"),
+      desc: t("dismantlingSortingExtraction"),
       icon: RefreshCw,
       color: "indigo",
-      badge: "Step 6: Processing",
+      badge: "Step 6",
       details: ["Hazardous Component Isolation", "PCB & Gold Refining", "Plastic Granulation"]
     },
     {
       num: 7,
-      title: "Recycling Proof & Certificate",
-      desc: "Recycler uploads processing evidence, digital recycling certificate, and exact recovered material quantities.",
+      title: t("officialRecyclingProof"),
+      desc: t("statusRecycledCertified"),
       icon: Award,
       color: "emerald",
-      badge: "Step 7: Audit Proof",
+      badge: "Step 7",
       details: ["Digital Certificate Generation", "Photos & Weight Slips", "Verifiable Audit Logs"]
     },
     {
       num: 8,
-      title: "Impact Recorded & Quantified",
-      desc: "Platform automatically calculates e-waste diverted from landfill, metals recovered, and net CO₂ emissions offset.",
+      title: t("quantifiedEcologicalImpact"),
+      desc: t("quantifiedEcologicalDesc"),
       icon: TrendingUp,
       color: "teal",
-      badge: "Step 8: Impact Ledger",
+      badge: "Step 8",
       details: ["Landfill Mass Diverted", "Emissions Reduction Ledger", "ESG Compliance Reports"]
     }
   ];
@@ -90,13 +92,13 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
         {/* Section Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold tracking-wider uppercase mb-3 border border-emerald-200">
-            <ShieldCheck className="w-3.5 h-3.5" /> Transparent 8-Step Journey
+            <ShieldCheck className="w-3.5 h-3.5" /> {t("howItWorksTitle")}
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-            How ECO-Link Connects E-Waste Lifecycle
+            {t("howItWorksTitle")}
           </h2>
           <p className="text-base text-slate-600 mt-3 leading-relaxed">
-            From initial collection logging to verified material recovery and certificate issuance, our deterministic workflow guarantees accountability at every phase.
+            {t("howItWorksSubtitle")}
           </p>
         </div>
 
@@ -154,7 +156,7 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
 
                 {step.isHighlight && (
                   <div className="absolute -top-2.5 -right-2 bg-gradient-to-r from-emerald-600 to-teal-600 text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow">
-                    Rule-Based Matching
+                    {t("ruleMatchLogic")}
                   </div>
                 )}
               </div>
@@ -169,8 +171,8 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
-              <h4 className="text-base font-bold text-slate-900">Ready to submit electronic waste for responsible recycling?</h4>
-              <p className="text-xs text-slate-500">Log a new e-waste manifest in under 2 minutes with instant rule evaluation.</p>
+              <h4 className="text-base font-bold text-slate-900">{t("buildCleanerFuture")}</h4>
+              <p className="text-xs text-slate-500">{t("buildCleanerFutureDesc")}</p>
             </div>
           </div>
 
@@ -179,7 +181,7 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
               onClick={onOpenAddWasteModal}
               className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow transition flex items-center gap-2 cursor-pointer"
             >
-              <span>Add E-Waste Manifest</span>
+              <span>{t("addNewManifest")}</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -189,3 +191,4 @@ export default function HowItWorksSection({ onOpenAddWasteModal, setActiveView }
     </section>
   );
 }
+

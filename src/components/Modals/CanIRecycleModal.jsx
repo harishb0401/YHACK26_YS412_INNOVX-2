@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { X, Search, CheckCircle2, AlertTriangle, ArrowRight, MapPin, Sparkles, RefreshCw } from 'lucide-react';
 import { searchableMaterials } from '../../mockData';
+import { useTranslation, useLanguage } from '../../i18n';
 
 export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
+  const { t } = useTranslation();
+  const { tCategory } = useLanguage();
+
   if (!isOpen) return null;
 
   const [query, setQuery] = useState('pizza box');
@@ -46,8 +50,8 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
               ♻
             </div>
             <div>
-              <h3 className="text-lg font-bold text-white">Can I Recycle This?</h3>
-              <p className="text-xs text-[#DDEBD8]">Instant recycling rules & preparation instructions</p>
+              <h3 className="text-lg font-bold text-white">{t("searchModalTitle")}</h3>
+              <p className="text-xs text-[#DDEBD8]">{t("searchModalSub")}</p>
             </div>
           </div>
           <button
@@ -63,8 +67,8 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
           
           <form onSubmit={handleSearch} className="space-y-4">
             <div className="text-center space-y-1">
-              <h4 className="text-base font-bold text-[#203128]">Tell us what you're throwing away</h4>
-              <p className="text-xs text-[#718078]">Search any item name to get instant sorting advice</p>
+              <h4 className="text-base font-bold text-[#203128]">{t("tellUsWhatYouAreThrowing")}</h4>
+              <p className="text-xs text-[#718078]">{t("searchAnyItemAdvice")}</p>
             </div>
 
             <div className="relative">
@@ -73,14 +77,14 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder='Search: e.g. "pizza box", "batteries"'
+                placeholder={t("searchModalInputPlaceholder")}
                 className="w-full bg-white border border-[#3F7655]/25 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-semibold text-[#203128] focus:border-[#3F7655] focus:outline-none shadow-sm"
               />
             </div>
 
             {/* Quick popular chips */}
             <div className="flex flex-wrap items-center justify-center gap-1.5 pt-1">
-              <span className="text-[11px] font-semibold text-[#718078]">Popular:</span>
+              <span className="text-[11px] font-semibold text-[#718078]">{t("popular")}:</span>
               {popularChips.map((chip, idx) => (
                 <button
                   type="button"
@@ -102,7 +106,7 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
               className="w-full py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white font-bold text-sm rounded-2xl shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <RefreshCw className="w-4 h-4" />
-              <span>Check Item Status</span>
+              <span>{t("checkItemStatus")}</span>
             </button>
           </form>
 
@@ -115,11 +119,11 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
                 <div className="flex items-center gap-2">
                   {result.isRecyclable ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-[#DDEBD8] text-[#244936]">
-                      <CheckCircle2 className="w-4 h-4 text-[#3F7655]" /> ✓ YES — RECYCLABLE
+                      <CheckCircle2 className="w-4 h-4 text-[#3F7655]" /> {t("yesRecyclable")}
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900">
-                      <AlertTriangle className="w-4 h-4 text-amber-600" /> ✕ SPECIAL DISPOSAL REQUIRED
+                      <AlertTriangle className="w-4 h-4 text-amber-600" /> {t("specialDisposalRequired")}
                     </span>
                   )}
                 </div>
@@ -130,13 +134,13 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
               <div>
                 <h4 className="text-lg font-extrabold text-[#203128]">{result.item}</h4>
                 <span className="inline-block text-xs font-semibold text-[#3F7655] bg-[#DDEBD8]/50 px-2.5 py-0.5 rounded-md mt-1">
-                  ♻ {result.badge || result.category}
+                  ♻ {tCategory(result.badge || result.category)}
                 </span>
               </div>
 
               {/* Instructions */}
               <div className="p-3.5 rounded-xl bg-[#F8F5EA] text-xs text-[#203128] space-y-1 font-medium border border-[#3F7655]/10 whitespace-pre-line">
-                <span className="font-bold text-[#244936] block">How to prepare:</span>
+                <span className="font-bold text-[#244936] block">{t("howToPrepare")}</span>
                 {result.prep}
               </div>
 
@@ -150,7 +154,7 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
                   className="px-4 py-2 bg-[#3F7655] hover:bg-[#244936] text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-1.5 cursor-pointer"
                 >
                   <MapPin className="w-3.5 h-3.5" />
-                  <span>Find nearby location →</span>
+                  <span>{t("findNearbyLocation")}</span>
                 </button>
               </div>
 
@@ -162,3 +166,4 @@ export default function CanIRecycleModal({ isOpen, onClose, setActiveView }) {
     </div>
   );
 }
+

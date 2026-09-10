@@ -1,7 +1,10 @@
 import React from 'react';
 import { Clock, CheckCircle2, Truck, Box, RefreshCw, Sparkles, FileCheck } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 export default function StatusBadge({ status, size = "md" }) {
+  const { tStatus } = useLanguage();
+
   const configs = {
     "Pending": {
       bg: "bg-amber-50 border-amber-200 text-amber-700",
@@ -37,6 +40,16 @@ export default function StatusBadge({ status, size = "md" }) {
       bg: "bg-emerald-50 border-emerald-200 text-emerald-700",
       icon: CheckCircle2,
       dot: "bg-emerald-500"
+    },
+    "Handover Pending": {
+      bg: "bg-amber-50 border-amber-200 text-amber-700",
+      icon: Clock,
+      dot: "bg-amber-500"
+    },
+    "Active": {
+      bg: "bg-emerald-50 border-emerald-200 text-emerald-700",
+      icon: CheckCircle2,
+      dot: "bg-emerald-500"
     }
   };
 
@@ -53,7 +66,8 @@ export default function StatusBadge({ status, size = "md" }) {
     <span className={`inline-flex items-center gap-1.5 font-medium border rounded-full transition-colors ${config.bg} ${isSmall ? 'px-2.5 py-0.5 text-xs' : 'px-3 py-1 text-sm'}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${config.dot}`} />
       <IconComponent className={isSmall ? "w-3 h-3" : "w-3.5 h-3.5"} />
-      {status}
+      {tStatus(status)}
     </span>
   );
 }
+

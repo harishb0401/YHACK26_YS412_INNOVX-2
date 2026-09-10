@@ -1,39 +1,42 @@
 import React from 'react';
 import { Weight, RefreshCw, UserCheck, ShieldCheck, ArrowUpRight, Leaf } from 'lucide-react';
+import { useLanguage } from '../i18n';
 
 export default function ImpactStatsSection({ stats }) {
+  const { t } = useLanguage();
+
   const cards = [
     {
-      title: "E-Waste Collected",
+      title: t("ewasteCollectedTitle"),
       value: stats.totalCollected || "12,450 kg",
-      subtitle: "+18% from last month",
+      subtitle: t("statSubCollected"),
       icon: Weight,
       color: "from-emerald-500 to-teal-600",
       bgTint: "bg-emerald-50/60 border-emerald-100",
       iconBg: "bg-emerald-100 text-emerald-700"
     },
     {
-      title: "E-Waste Recycled",
+      title: t("ewasteRecycledTitle"),
       value: stats.totalRecycled || "10,820 kg",
-      subtitle: "Verified closed-loop processing",
+      subtitle: t("statSubRecycled"),
       icon: RefreshCw,
       color: "from-teal-500 to-cyan-600",
       bgTint: "bg-teal-50/60 border-teal-100",
       iconBg: "bg-teal-100 text-teal-700"
     },
     {
-      title: "Verified Collectors",
-      value: `${stats.verifiedCollectors || 128} Collectors`,
-      subtitle: "Active regional pickup hubs",
+      title: t("verifiedCollectorsTitle"),
+      value: `${stats.verifiedCollectors || 128} ${t("verifiedCollectorsTitle")}`,
+      subtitle: t("statSubCollectors"),
       icon: UserCheck,
       color: "from-cyan-500 to-blue-600",
       bgTint: "bg-cyan-50/60 border-cyan-100",
       iconBg: "bg-cyan-100 text-cyan-700"
     },
     {
-      title: "Verified Recyclers",
-      value: `${stats.verifiedRecyclers || 42} Recyclers`,
-      subtitle: "Licensed R2v3 & EPA facilities",
+      title: t("verifiedRecyclersTitle"),
+      value: `${stats.verifiedRecyclers || 42} ${t("verifiedRecyclersTitle")}`,
+      subtitle: t("statSubRecyclers"),
       icon: ShieldCheck,
       color: "from-emerald-600 to-emerald-800",
       bgTint: "bg-emerald-50/60 border-emerald-100",
@@ -47,13 +50,13 @@ export default function ImpactStatsSection({ stats }) {
         
         <div className="text-center max-w-xl mx-auto mb-10">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 text-slate-700 text-xs font-semibold uppercase tracking-wider mb-2">
-            <Leaf className="w-3.5 h-3.5 text-emerald-600" /> Platform Milestones
+            <Leaf className="w-3.5 h-3.5 text-emerald-600" /> {t("platformMilestones")}
           </div>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Measurable Ecosystem Impact
+            {t("measurableEcosystemImpact")}
           </h2>
           <p className="text-sm text-slate-500 mt-1">
-            Real-time aggregate totals recorded across verified collector nodes and recycler facilities.
+            {t("measurableImpactDesc")}
           </p>
         </div>
 

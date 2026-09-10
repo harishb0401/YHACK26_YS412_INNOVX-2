@@ -11,7 +11,7 @@ export default function GeneratorView({
   onViewLotDetails,
   materialLots = [] 
 }) {
-  const { t } = useTranslation();
+  const { t, tStatus } = useTranslation();
   const [lotSearchQuery, setLotSearchQuery] = useState('');
   const [searchedLot, setSearchedLot] = useState(materialLots[0] || null);
   const [disposals, setDisposals] = useState(generatorDisposalsList);
@@ -41,7 +41,7 @@ export default function GeneratorView({
               <div className="flex items-center gap-2">
                 <h1 className="text-2xl font-black">Sundar Rajan</h1>
                 <span className="text-xs font-bold text-[#244936] bg-[#F2C94C] px-2.5 py-0.5 rounded-full">
-                  E-Waste Generator
+                  {t("roleGenerator")}
                 </span>
               </div>
               <p className="text-xs text-[#DDEBD8] mt-0.5">
@@ -92,7 +92,7 @@ export default function GeneratorView({
               💻
             </div>
             <div>
-              <span className="text-xs text-[#718078] font-bold block">Total Recycled</span>
+              <span className="text-xs text-[#718078] font-bold block">{t("recycledKgTotal")}</span>
               <span className="text-2xl font-black text-[#203128]">42.0 kg</span>
             </div>
           </div>
@@ -103,7 +103,7 @@ export default function GeneratorView({
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                TRANSPARENT TRACEABILITY
+                {t("transparentTraceability")}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-1">{t("trackLot")}</h3>
             </div>
@@ -112,7 +112,7 @@ export default function GeneratorView({
             <form onSubmit={handleSearchLot} className="flex items-center gap-2">
               <input
                 type="text"
-                placeholder="Enter Lot ID (e.g. LOT-EL26-TN-00125)"
+                placeholder={t("enterLotIdPlaceholder")}
                 value={lotSearchQuery}
                 onChange={(e) => setLotSearchQuery(e.target.value)}
                 className="text-xs font-bold bg-[#FAF8F2] border border-[#3F7655]/20 rounded-xl px-3.5 py-2.5 focus:outline-none focus:border-[#3F7655]"
@@ -121,7 +121,7 @@ export default function GeneratorView({
                 type="submit"
                 className="px-4 py-2.5 text-xs font-bold text-white bg-[#3F7655] hover:bg-[#244936] rounded-xl transition cursor-pointer"
               >
-                Search
+                {t("searchBtn")}
               </button>
             </form>
           </div>
@@ -142,24 +142,24 @@ export default function GeneratorView({
 
                 <button
                   onClick={() => onViewLotDetails(searchedLot)}
-                  className="px-4 py-2 text-xs font-bold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto"
+                  className="px-4 py-2 text-xs font-bold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-xl transition flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
                 >
                   <QrCode className="w-4 h-4 text-[#3F7655]" />
-                  <span>View Digital Lot QR Certificate</span>
+                  <span>{t("viewDigitalLotQR")}</span>
                 </button>
               </div>
 
               {/* Step indicator */}
               <div className="bg-white p-4 rounded-xl border border-[#3F7655]/15 flex items-center justify-between text-xs overflow-x-auto gap-2">
-                <span className="font-bold text-[#3F7655]">✓ 1. Collected</span>
+                <span className="font-bold text-[#3F7655]">✓ 1. {t("timelineCollected")}</span>
                 <span className="text-[#3F7655]/30">→</span>
-                <span className="font-bold text-[#3F7655]">✓ 2. Classified</span>
+                <span className="font-bold text-[#3F7655]">✓ 2. {t("timelineClassified")}</span>
                 <span className="text-[#3F7655]/30">→</span>
-                <span className="font-bold text-[#3F7655]">✓ 3. Valued</span>
+                <span className="font-bold text-[#3F7655]">✓ 3. {t("timelineValued")}</span>
                 <span className="text-[#3F7655]/30">→</span>
-                <span className="font-bold text-[#3F7655]">✓ 4. Recycler Matched</span>
+                <span className="font-bold text-[#3F7655]">✓ 4. {t("timelineSelected")}</span>
                 <span className="text-[#3F7655]/30">→</span>
-                <span className="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">● 5. Handover Pending</span>
+                <span className="font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">● 5. {t("timelineHandoverPending")}</span>
               </div>
             </div>
           )}
@@ -167,18 +167,18 @@ export default function GeneratorView({
 
         {/* Collection History Table */}
         <div className="bg-white rounded-[28px] border border-[#3F7655]/20 p-6 sm:p-8 shadow-sm space-y-4">
-          <h3 className="text-base font-black text-[#244936]">{t("collectionHistory")} & Green Receipts</h3>
+          <h3 className="text-base font-black text-[#244936]">{t("collectionHistory")} & {t("digitalReceipt")}</h3>
           
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-[#DDEBD8]/50 text-[#244936] font-bold border-b border-[#3F7655]/15">
                 <tr>
-                  <th className="p-3">Disposal ID</th>
-                  <th className="p-3">Device / Item</th>
-                  <th className="p-3 text-right">Weight</th>
-                  <th className="p-3 text-right">Points</th>
-                  <th className="p-3">Assigned Collector</th>
-                  <th className="p-3">Status</th>
+                  <th className="p-3">{t("disposalId")}</th>
+                  <th className="p-3">{t("deviceItem")}</th>
+                  <th className="p-3 text-right">{t("totalWeight")}</th>
+                  <th className="p-3 text-right">{t("pointsCol")}</th>
+                  <th className="p-3">{t("assignedCollector")}</th>
+                  <th className="p-3">{t("status")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#3F7655]/10">
@@ -191,7 +191,7 @@ export default function GeneratorView({
                     <td className="p-3 text-slate-600">{disp.collectorAssigned}</td>
                     <td className="p-3">
                       <span className="text-[11px] font-bold bg-[#DDEBD8] text-[#244936] px-2 py-0.5 rounded-full">
-                        {disp.status}
+                        {tStatus(disp.status)}
                       </span>
                     </td>
                   </tr>
