@@ -1,0 +1,46 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-[#F8F5EA] text-[#203128] antialiased font-sans selection:bg-[#3F7655] selection:text-white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+::-webkit-scrollbar-track {
+  background: #F0EAD6;
+}
+::-webkit-scrollbar-thumb {
+  background: #B8DBAF;
+  border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3F7655;
+}
+
+/* Custom organic animations */
+@keyframes floatSlow {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(2deg); }
+}
+
+.animate-float-slow {
+  animation: floatSlow 6s ease-in-out infinite;
+}
+
+.organic-card {
+  background-color: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid rgba(63, 118, 85, 0.12);
+  transition: all 0.25s ease-in-out;
+}
+
+.organic-card:hover {
+  border-color: rgba(63, 118, 85, 0.3);
+  box-shadow: 0 12px 32px -6px rgba(32, 49, 40, 0.08);
+  transform: translateY(-2px);
+}
