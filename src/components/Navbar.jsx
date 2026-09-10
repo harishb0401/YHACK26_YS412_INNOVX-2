@@ -106,21 +106,41 @@ export default function Navbar({
               </button>
             </div>
 
-            {/* Fast Portal Selector Button */}
+            {/* Fast Portal Selector Buttons */}
             <button
               onClick={() => handleNavClick('collector')}
-              className="px-4 py-2 text-xs font-extrabold text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] rounded-full border border-[#3F7655]/20 transition flex items-center gap-1.5 cursor-pointer"
+              className={`px-3.5 py-2 text-xs font-extrabold rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
+                activeView === 'collector'
+                  ? 'bg-[#3F7655] text-white border-[#3F7655] shadow-md shadow-[#3F7655]/20'
+                  : 'text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] border-[#3F7655]/20'
+              }`}
             >
-              <Truck className="w-3.5 h-3.5 text-[#3F7655]" />
-              <span>Collector</span>
+              <Truck className="w-3.5 h-3.5" />
+              <span>{t("navCollector")}</span>
             </button>
 
             <button
               onClick={() => handleNavClick('recycler')}
-              className="px-4 py-2 text-xs font-extrabold text-white bg-[#3F7655] hover:bg-[#244936] rounded-full shadow-md shadow-[#3F7655]/20 transition flex items-center gap-1.5 cursor-pointer"
+              className={`px-3.5 py-2 text-xs font-extrabold rounded-full transition flex items-center gap-1.5 cursor-pointer ${
+                activeView === 'recycler'
+                  ? 'bg-[#244936] text-white shadow-md shadow-[#244936]/20'
+                  : 'bg-[#3F7655] hover:bg-[#244936] text-white shadow-sm'
+              }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Recycler</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#F2C94C]" />
+              <span>{t("navRecycler")}</span>
+            </button>
+
+            <button
+              onClick={() => handleNavClick('admin')}
+              className={`px-3.5 py-2 text-xs font-extrabold rounded-full transition flex items-center gap-1.5 cursor-pointer ${
+                activeView === 'admin'
+                  ? 'bg-[#14291E] text-[#F2C94C] shadow-md shadow-black/20'
+                  : 'bg-[#244936] hover:bg-[#14291E] text-white shadow-sm'
+              }`}
+            >
+              <Shield className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{t("navAdmin")}</span>
             </button>
 
           </div>

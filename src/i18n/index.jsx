@@ -45,19 +45,28 @@ export const LanguageProvider = ({ children }) => {
   const tCategory = (cat) => {
     if (!cat) return '';
     const keyMap = {
-      "IT Equipment": "catITEquipment",
-      "Consumer Electronics": "catConsumerElectronics",
-      "Components": "catComponents",
+      "PCB / Electronic Components": "catPCB",
+      "Copper": "catCopper",
+      "Aluminium": "catAluminium",
+      "Ferrous Metals": "catFerrous",
+      "Plastics": "catPlastics",
       "Batteries": "catBatteries",
-      "Cables & Wiring": "catCablesWiring",
-      "Large Appliances": "catLargeAppliances",
+      "Cables / Wires": "catCables",
+      "Cables & Wiring": "catCables",
+      "Computer Equipment": "catComputer",
+      "IT Equipment": "catComputer",
+      "IT & Telecommunications": "catComputer",
+      "Mobile / Small Electronics": "catMobile",
+      "Consumer Electronics": "catMobile",
+      "Components": "catPCB",
+      "Other E-Waste": "catOther",
+      "Mixed E-Waste": "catOther",
       "Paper": "catPaper",
-      "Plastic": "catPlastic",
+      "Plastic": "catPlastics",
       "Glass": "catGlass",
-      "Metal": "catMetal",
+      "Metal": "catFerrous",
       "Organic": "catOrganic",
-      "Textiles": "catTextiles",
-      "Mixed E-Waste": "catMixedEWaste"
+      "Textiles": "catTextiles"
     };
     const key = keyMap[cat] || cat;
     return t(key, cat);
@@ -66,9 +75,24 @@ export const LanguageProvider = ({ children }) => {
   const tStatus = (status) => {
     if (!status) return '';
     const keyMap = {
+      // 12 Lot Statuses
+      "DRAFT": "statusDRAFT",
+      "AVAILABLE": "statusAVAILABLE",
+      "MATCHED": "statusMATCHED",
+      "OFFER_RECEIVED": "statusOFFER_RECEIVED",
+      "OFFER_ACCEPTED": "statusOFFER_ACCEPTED",
+      "PICKUP_SCHEDULED": "statusPICKUP_SCHEDULED",
+      "HANDED_OVER": "statusHANDED_OVER",
+      "PAYMENT_COMPLETED": "statusPAYMENT_COMPLETED",
+      "COMPLETED": "statusCOMPLETED",
+      "REJECTED": "statusREJECTED",
+      "CANCELLED": "statusCANCELLED",
+      "UNDER_REVIEW": "statusUNDER_REVIEW",
+
+      // Legacy and UI statuses
       "Pending": "statusPending",
       "Matched": "statusMatched",
-      "Pickup Scheduled": "statusPickupScheduled",
+      "Pickup Scheduled": "statusPICKUP_SCHEDULED",
       "In Transit": "statusInTransit",
       "Received": "statusReceived",
       "Processing": "statusProcessing",
@@ -76,7 +100,7 @@ export const LanguageProvider = ({ children }) => {
       "Sorting": "statusSorting",
       "Material Recovery": "statusMaterialRecovery",
       "Recycled": "statusRecycled",
-      "Recycling Completed": "statusRecycled",
+      "Recycling Completed": "statusCOMPLETED",
       "Collected": "timelineCollected",
       "Classified": "timelineClassified",
       "Valued": "timelineValued",
@@ -87,7 +111,26 @@ export const LanguageProvider = ({ children }) => {
       "In Material Lot": "statusInMaterialLot",
       "Recycled & Certified ✓": "statusRecycledCertified",
       "Normal Range": "statusNormalRange",
-      "Flagged (+Above Ref)": "statusFlaggedAboveRef"
+      "Flagged (+Above Ref)": "statusFlaggedAboveRef",
+
+      // Recycler Verification Statuses
+      "VERIFIED": "recStatusVERIFIED",
+      "PENDING_VERIFICATION": "recStatusPENDING",
+      "SUSPENDED": "recStatusSUSPENDED",
+
+      // Offer Statuses
+      "PENDING": "offerStatusPENDING",
+      "ACCEPTED": "offerStatusACCEPTED",
+      "EXPIRED": "offerStatusEXPIRED",
+      "FLAGGED": "offerStatusFLAGGED",
+
+      // Handover Statuses
+      "IN_TRANSIT": "handoverStatusIN_TRANSIT",
+      "READY_FOR_HANDOVER": "handoverStatusREADY_FOR_HANDOVER",
+
+      // Payment Statuses
+      "PAID": "payStatusPAID",
+      "FAILED": "payStatusFAILED"
     };
     const key = keyMap[status] || status;
     return t(key, status);
@@ -98,6 +141,7 @@ export const LanguageProvider = ({ children }) => {
     const keyMap = {
       "Working / Repairable": "conditionWorking",
       "Non-working / Scrap": "conditionNonWorking",
+      "Scrap": "conditionNonWorking",
       "Mixed Condition": "conditionMixed"
     };
     const key = keyMap[cond] || cond;

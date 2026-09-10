@@ -1,26 +1,35 @@
 import React, { useState } from 'react';
-import { X, QrCode, CheckCircle2, Clock, ShieldCheck, Scale, FileText, ArrowRight, Award, MapPin } from 'lucide-react';
-import { useTranslation } from '../../i18n';
+import { 
+  X, QrCode, CheckCircle2, Clock, ShieldCheck, Scale, FileText, 
+  ArrowRight, Award, MapPin, DollarSign, Truck, AlertTriangle, Layers
+} from 'lucide-react';
+import StatusBadge from '../StatusBadge';
+import { useTranslation, useLanguage } from '../../i18n';
 
-export default function DigitalLotModal({ isOpen, onClose, lot, onUpdateLotStatus }) {
+export default function DigitalLotModal({ 
+  isOpen, 
+  onClose, 
+  lot, 
+  onUpdateLotStatus 
+}) {
   const { t } = useTranslation();
+  const { tCategory, tCondition, tStatus } = useLanguage();
+  const [activeViewMode, setActiveViewMode] = useState('overview'); // 'overview' | 'timeline'
   const [isHandoverSuccess, setIsHandoverSuccess] = useState(false);
 
   if (!isOpen || !lot) return null;
 
-  const timelineSteps = [
-    { key: "Collected", label: t("timelineCollected") },
-    { key: "Classified", label: t("timelineClassified") },
-    { key: "Valued", label: t("timelineValued") },
-    { key: "Recycler Selected", label: t("timelineSelected") },
-    { key: "Handover Pending", label: t("timelineHandoverPending") },
-    { key: "Recycler Received", label: t("timelineReceived") },
-    { key: "Recycling Completed", label: t("timelineCompleted") }
+  const timelineList = lot.timeline || [
+    { id: "1", event: "Phone Verified", timestamp: lot.createdDate, userRole: "Collector", status: "Completed", details: "Phone verified via OTP" },
+    { id: "2", event: "Waste Added", timestamp: lot.createdDate, userRole: "Collector", status: "Completed", details: `${lot.quantity} ${lot.unit || 'kg'} declared` },
+    { id: "3", event: "Waste Classified", timestamp: lot.createdDate, userRole: "Collector", status: "Completed", details: `Category: ${lot.category}` },
+    { id: "4", event: "Digital Lot Created", timestamp: lot.createdDate, userRole: "System", status: "Completed", details: `Lot ID: ${lot.id}` },
+    { id: "5", event: "Fair Price Calculated", timestamp: lot.createdDate, userRole: "Rules Engine", status: "Completed", details: `Benchmark: ₹${lot.benchmarkPrice}/kg | Fair: ₹${lot.lowerLimit}–₹${lot.upperLimit}/kg` }
   ];
 
   const handleConfirmHandover = () => {
     if (onUpdateLotStatus) {
-      onUpdateLotStatus(lot.id, "Recycler Received", 6);
+      onUpdateLotStatus(lot.id, "HANDED_OVER");
     }
     setIsHandoverSuccess(true);
     setTimeout(() => {
@@ -28,15 +37,15 @@ export default function DigitalLotModal({ isOpen, onClose, lot, onUpdateLotStatu
     }, 4000);
   };
 
-  const handleCompleteRecycling = () => {
+  const handleCompleteTransaction = () => {
     if (onUpdateLotStatus) {
-      onUpdateLotStatus(lot.id, "Recycling Completed", 7);
+      onUpdateLotStatus(lot.id, "COMPLETED");
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/60 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-      <div className="bg-[#FAF8F2] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-[#3F7655]/30 space-y-6 my-auto text-[#203128]">
+      <div className="bg-[#FAF8F2] rounded-[32px] max-w-2xl w-full p-6 sm:p-8 shadow-2xl border border-[#3F7655]/30 space-y-5 my-auto text-[#203128] max-h-[92vh] overflow-y-auto">
         
         {/* Modal Top Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#3F7655]/15">
@@ -45,9 +54,12 @@ export default function DigitalLotModal({ isOpen, onClose, lot, onUpdateLotStatu
               EL
             </div>
             <div>
-              <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                DIGITAL MATERIAL LOT
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
+                  DIGITAL MATERIAL LOT
+                </span>
+                <StatusBadge status={lot.status} size="sm" />
+              </div>
               <h3 className="text-xl font-black tracking-tight text-[#244936] mt-0.5">
                 {lot.id}
               </h3>
@@ -56,9 +68,34 @@ export default function DigitalLotModal({ isOpen, onClose, lot, onUpdateLotStatu
 
           <button
             onClick={onClose}
-            className="p-2 rounded-full hover:bg-slate-200/70 text-slate-500 hover:text-slate-800 transition"
+            className="p-2 rounded-full hover:bg-slate-200/70 text-slate-500 hover:text-slate-800 transition cursor-pointer"
           >
             <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* View Switcher: Overview vs Traceability Timeline */}
+        <div className="flex items-center bg-white p-1 rounded-2xl border border-[#3F7655]/15 text-xs font-bold">
+          <button
+            onClick={() => setActiveViewMode('overview')}
+            className={`flex-1 py-2 rounded-xl transition cursor-pointer ${
+              activeViewMode === 'overview'
+                ? 'bg-[#3F7655] text-white shadow-sm'
+                : 'text-slate-600 hover:text-[#244936]'
+            }`}
+          >
+            Lot Overview & QR
+          </button>
+
+          <button
+            onClick={() => setActiveViewMode('timeline')}
+            className={`flex-1 py-2 rounded-xl transition cursor-pointer ${
+              activeViewMode === 'timeline'
+                ? 'bg-[#3F7655] text-white shadow-sm'
+                : 'text-slate-600 hover:text-[#244936]'
+            }`}
+          >
+            {t("traceabilityTimeline")} ({timelineList.length} Events)
           </button>
         </div>
 
@@ -67,195 +104,205 @@ export default function DigitalLotModal({ isOpen, onClose, lot, onUpdateLotStatu
           <div className="p-4 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-900 flex items-center gap-3 animate-fadeIn">
             <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             <div>
-              <h5 className="font-bold text-sm">{t("handoverVerified")}</h5>
-              <p className="text-xs text-emerald-800">Physical QR code scanned and verified. Lot moved to Recycler Intake status.</p>
+              <h5 className="font-bold text-sm">Physical Handover Verified</h5>
+              <p className="text-xs text-emerald-800">Physical QR code scanned and verified at weighbridge. Waste handed over to recycler.</p>
             </div>
           </div>
         )}
 
-        {/* QR Code & Signature Box */}
-        <div className="bg-white rounded-2xl p-5 border border-[#3F7655]/20 shadow-sm flex flex-col sm:flex-row items-center gap-6">
-          <div className="bg-[#F8F5EA] p-3 rounded-2xl border border-[#3F7655]/20 flex flex-col items-center shrink-0">
-            {/* Simulated Clean SVG QR Code */}
-            <svg viewBox="0 0 100 100" className="w-28 h-28 text-[#244936]">
-              <rect width="100" height="100" fill="#FAF8F2" rx="8" />
-              <rect x="10" y="10" width="28" height="28" fill="#244936" rx="4" />
-              <rect x="15" y="15" width="18" height="18" fill="#FAF8F2" />
-              <rect x="19" y="19" width="10" height="10" fill="#244936" />
-              
-              <rect x="62" y="10" width="28" height="28" fill="#244936" rx="4" />
-              <rect x="67" y="15" width="18" height="18" fill="#FAF8F2" />
-              <rect x="71" y="19" width="10" height="10" fill="#244936" />
-              
-              <rect x="10" y="62" width="28" height="28" fill="#244936" rx="4" />
-              <rect x="15" y="67" width="18" height="18" fill="#FAF8F2" />
-              <rect x="19" y="71" width="10" height="10" fill="#244936" />
-              
-              <circle cx="50" cy="50" r="8" fill="#3F7655" />
-              <rect x="45" y="15" width="10" height="15" fill="#244936" />
-              <rect x="45" y="70" width="10" height="15" fill="#244936" />
-              <rect x="65" y="45" width="20" height="10" fill="#244936" />
-              <rect x="15" y="45" width="20" height="10" fill="#244936" />
-            </svg>
-            <span className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
-              Scan at Handover
-            </span>
-          </div>
-
-          <div className="space-y-2 text-center sm:text-left flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-extrabold text-[#3F7655] bg-[#DDEBD8] px-2.5 py-1 rounded-full flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                {lot.cpcbRegistrationNo}
-              </span>
-              <span className="text-xs font-bold text-slate-600 bg-slate-100 px-2.5 py-1 rounded-full">
-                {lot.location}
-              </span>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3 pt-2">
-              <div className="bg-[#F8F5EA] p-2.5 rounded-xl border border-[#3F7655]/15">
-                <span className="text-[11px] text-[#718078] font-bold block">Total Weight</span>
-                <span className="text-lg font-black text-[#244936]">{lot.totalWeightKg} kg</span>
+        {activeViewMode === 'overview' ? (
+          <div className="space-y-4">
+            
+            {/* QR Code & Signature Box */}
+            <div className="bg-white rounded-2xl p-5 border border-[#3F7655]/20 shadow-sm flex flex-col sm:flex-row items-center gap-5">
+              <div className="bg-[#FAF8F2] p-3 rounded-2xl border border-[#3F7655]/20 flex flex-col items-center shrink-0">
+                {/* SVG QR Code */}
+                <svg viewBox="0 0 100 100" className="w-28 h-28 text-[#244936]">
+                  <rect width="100" height="100" fill="#FAF8F2" rx="8" />
+                  <rect x="10" y="10" width="28" height="28" fill="#244936" rx="4" />
+                  <rect x="15" y="15" width="18" height="18" fill="#FAF8F2" />
+                  <rect x="19" y="19" width="10" height="10" fill="#244936" />
+                  
+                  <rect x="62" y="10" width="28" height="28" fill="#244936" rx="4" />
+                  <rect x="67" y="15" width="18" height="18" fill="#FAF8F2" />
+                  <rect x="71" y="19" width="10" height="10" fill="#244936" />
+                  
+                  <rect x="10" y="62" width="28" height="28" fill="#244936" rx="4" />
+                  <rect x="15" y="67" width="18" height="18" fill="#FAF8F2" />
+                  <rect x="19" y="71" width="10" height="10" fill="#244936" />
+                  
+                  <circle cx="50" cy="50" r="8" fill="#3F7655" />
+                  <rect x="45" y="15" width="10" height="15" fill="#244936" />
+                  <rect x="45" y="70" width="10" height="15" fill="#244936" />
+                  <rect x="65" y="45" width="20" height="10" fill="#244936" />
+                  <rect x="15" y="45" width="20" height="10" fill="#244936" />
+                </svg>
+                <span className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
+                  Scan at Handover
+                </span>
               </div>
-              <div className="bg-[#F8F5EA] p-2.5 rounded-xl border border-[#3F7655]/15">
-                <span className="text-[11px] text-[#718078] font-bold block">{t("estimatedLotValue")}</span>
-                <span className="text-lg font-black text-[#3F7655]">₹{lot.estimatedLotValue.toLocaleString()}</span>
-              </div>
-            </div>
 
-            <div className="text-xs text-slate-500 pt-1 space-y-0.5">
-              <div><strong>Collector:</strong> {lot.collectorName} ({lot.collectorPhone})</div>
-              <div><strong>Recycler:</strong> {lot.recyclerName}</div>
-            </div>
-          </div>
-        </div>
+              <div className="space-y-2 text-center sm:text-left flex-1">
+                <div>
+                  <h4 className="text-base font-black text-[#203128]">{tCategory(lot.category)}</h4>
+                  <p className="text-xs text-slate-600 font-semibold">{lot.material}</p>
+                </div>
 
-        {/* Material Items Table */}
-        <div className="space-y-2">
-          <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-            Declared Materials & Reference Calculation
-          </h4>
-          <div className="bg-white rounded-2xl border border-[#3F7655]/15 overflow-hidden">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-[#DDEBD8]/50 text-[#244936] font-bold border-b border-[#3F7655]/15">
-                <tr>
-                  <th className="p-3">Material</th>
-                  <th className="p-3 text-right">Quantity</th>
-                  <th className="p-3 text-right">Ref Rate</th>
-                  <th className="p-3 text-right">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#3F7655]/10">
-                {lot.items.map((item, idx) => (
-                  <tr key={idx} className="hover:bg-slate-50/50">
-                    <td className="p-3 font-semibold text-slate-800">{item.name}</td>
-                    <td className="p-3 text-right font-bold text-slate-700">{item.weightKg} kg</td>
-                    <td className="p-3 text-right text-slate-600">₹{item.referencePrice}/kg</td>
-                    <td className="p-3 text-right font-black text-[#3F7655]">₹{item.subtotal || (item.weightKg * item.referencePrice)}</td>
-                  </tr>
-                ))}
-              </tbody>
-              <tfoot className="bg-[#FAF8F2] font-black border-t border-[#3F7655]/20 text-slate-900">
-                <tr>
-                  <td className="p-3">Total / Average Rate</td>
-                  <td className="p-3 text-right">{lot.totalWeightKg} kg</td>
-                  <td className="p-3 text-right">₹{lot.averageReferenceRate}/kg avg</td>
-                  <td className="p-3 text-right text-base text-[#244936]">₹{lot.estimatedLotValue}</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
-        </div>
-
-        {/* 7-Step Traceable Timeline */}
-        <div className="space-y-2">
-          <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-500">
-            Material Journey Timeline
-          </h4>
-          <div className="bg-white rounded-2xl p-4 border border-[#3F7655]/15">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 overflow-x-auto pb-2">
-              {timelineSteps.map((step, idx) => {
-                const stepNum = idx + 1;
-                const isCompleted = stepNum < lot.timelineStep || (stepNum === 7 && lot.timelineStep === 7);
-                const isCurrent = stepNum === lot.timelineStep && lot.timelineStep !== 7;
-
-                return (
-                  <div key={idx} className="flex items-center gap-2 shrink-0">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                      isCompleted 
-                        ? 'bg-[#3F7655] text-white shadow-sm' 
-                        : isCurrent 
-                          ? 'bg-[#F2C94C] text-[#244936] ring-4 ring-[#F2C94C]/30 font-black animate-pulse' 
-                          : 'bg-slate-100 text-slate-400 border border-slate-300'
-                    }`}>
-                      {isCompleted ? '✓' : stepNum}
-                    </div>
-                    <span className={`text-[11px] font-bold ${
-                      isCompleted ? 'text-[#3F7655]' : isCurrent ? 'text-[#244936] font-black' : 'text-slate-400'
-                    }`}>
-                      {step.label}
-                    </span>
-                    {idx < timelineSteps.length - 1 && (
-                      <div className="hidden sm:block w-4 h-0.5 bg-[#3F7655]/20" />
-                    )}
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div className="bg-[#FAF8F2] p-2.5 rounded-xl border border-[#3F7655]/15">
+                    <span className="text-[10px] text-slate-500 font-bold block">{t("quantityLabel")}</span>
+                    <span className="text-base font-black text-[#244936]">{lot.quantity} {lot.unit || 'kg'}</span>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+                  <div className="bg-[#FAF8F2] p-2.5 rounded-xl border border-[#3F7655]/15">
+                    <span className="text-[10px] text-slate-500 font-bold block">{t("estimatedLotValueLabel")}</span>
+                    <span className="text-base font-black text-[#3F7655]">₹{lot.estimatedLotValue?.toLocaleString()}</span>
+                  </div>
+                </div>
 
-        {/* Recovery Proof Evidence if completed */}
-        {lot.timelineStep >= 6 && lot.proof && (
-          <div className="bg-[#DDEBD8]/40 rounded-2xl p-4 border border-[#3F7655]/20 space-y-2">
-            <div className="flex items-center gap-2 text-xs font-extrabold text-[#244936]">
-              <Award className="w-4 h-4 text-[#3F7655]" />
-              <span>Certified Recovered Material Yield</span>
-              <span className="ml-auto font-mono text-[11px] bg-white px-2 py-0.5 rounded border border-[#3F7655]/20">{lot.proof.certificateId}</span>
+                <div className="text-xs text-slate-500 pt-1 space-y-0.5">
+                  <div><strong>Collector:</strong> {lot.collectorName} ({lot.collectorPhone || '+91 98401 23456'})</div>
+                  <div><strong>Location:</strong> {lot.location}</div>
+                  {lot.selectedRecyclerName && (
+                    <div><strong>Assigned Recycler:</strong> {lot.selectedRecyclerName}</div>
+                  )}
+                </div>
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-              <div className="bg-white p-2 rounded-xl">
-                <span className="text-[10px] text-slate-500 font-bold block">Gold Recovered</span>
-                <span className="text-sm font-black text-amber-600">{lot.proof.recoveredGoldGrams || "0.85 g"}</span>
+
+            {/* Fair Pricing & Benchmark Metric Cards */}
+            <div className="bg-white p-4 rounded-2xl border border-[#3F7655]/20 shadow-sm space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-black text-[#244936] flex items-center gap-1.5">
+                  <Scale className="w-4 h-4 text-[#3F7655]" />
+                  {t("fairPriceRangeLabel")} Details
+                </span>
+                <span className="text-[10px] font-bold text-slate-500 bg-[#FAF8F2] px-2 py-0.5 rounded border">
+                  Tolerance: ±{Math.round((lot.tolerance || 0.25) * 100)}%
+                </span>
               </div>
-              <div className="bg-white p-2 rounded-xl">
-                <span className="text-[10px] text-slate-500 font-bold block">Copper Recovered</span>
-                <span className="text-sm font-black text-rose-600">{lot.proof.recoveredCopperKg || "1.4 kg"}</span>
+
+              <div className="grid grid-cols-3 gap-2 text-center pt-1">
+                <div className="bg-[#FAF8F2] p-2 rounded-xl">
+                  <span className="text-[10px] text-slate-500 font-bold block">{t("benchmarkPriceLabel")}</span>
+                  <span className="text-sm font-black text-[#203128]">₹{lot.benchmarkPrice}/kg</span>
+                </div>
+
+                <div className="bg-[#FAF8F2] p-2 rounded-xl">
+                  <span className="text-[10px] text-slate-500 font-bold block">{t("lowerLimitLabel")}</span>
+                  <span className="text-sm font-black text-emerald-700">₹{lot.lowerLimit}/kg</span>
+                </div>
+
+                <div className="bg-[#FAF8F2] p-2 rounded-xl">
+                  <span className="text-[10px] text-slate-500 font-bold block">{t("upperLimitLabel")}</span>
+                  <span className="text-sm font-black text-[#3F7655]">₹{lot.upperLimit}/kg</span>
+                </div>
               </div>
-              <div className="bg-white p-2 rounded-xl">
-                <span className="text-[10px] text-slate-500 font-bold block">Aluminum</span>
-                <span className="text-sm font-black text-slate-700">{lot.proof.recoveredAluminumKg || "2.1 kg"}</span>
+            </div>
+
+            {/* Agreed Settlement if Accepted */}
+            {lot.agreedPricePerUnit && (
+              <div className="bg-[#DDEBD8]/50 p-4 rounded-2xl border border-[#3F7655]/20 flex items-center justify-between text-xs font-bold text-[#244936]">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-[#3F7655]" />
+                  <div>
+                    <span>Agreed Settlement Rate: <strong>₹{lot.agreedPricePerUnit}/kg</strong></span>
+                    <span className="block text-[11px] text-[#718078] font-normal">Recycler: {lot.selectedRecyclerName}</span>
+                  </div>
+                </div>
+                <span className="text-base font-black text-[#244936]">
+                  Total: ₹{lot.agreedTotalValue?.toLocaleString()}
+                </span>
               </div>
+            )}
+
+            {/* Recovery Proof if completed */}
+            {lot.proof && (
+              <div className="bg-[#DDEBD8]/40 rounded-2xl p-4 border border-[#3F7655]/20 space-y-2">
+                <div className="flex items-center justify-between text-xs font-extrabold text-[#244936]">
+                  <span className="flex items-center gap-1.5">
+                    <Award className="w-4 h-4 text-[#3F7655]" />
+                    Certified Material Yield Certificate
+                  </span>
+                  <span className="font-mono text-[11px] bg-white px-2 py-0.5 rounded border border-[#3F7655]/20">
+                    {lot.proof.certificateId}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center">
+                  <div className="bg-white p-2 rounded-xl">
+                    <span className="text-[10px] text-slate-500 font-bold block">Gold</span>
+                    <span className="text-sm font-black text-amber-600">{lot.proof.recoveredGoldGrams || "0.85 g"}</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl">
+                    <span className="text-[10px] text-slate-500 font-bold block">Copper</span>
+                    <span className="text-sm font-black text-rose-600">{lot.proof.recoveredCopperKg || "1.4 kg"}</span>
+                  </div>
+                  <div className="bg-white p-2 rounded-xl">
+                    <span className="text-[10px] text-slate-500 font-bold block">Aluminum</span>
+                    <span className="text-sm font-black text-slate-700">{lot.proof.recoveredAluminumKg || "2.1 kg"}</span>
+                  </div>
+                </div>
+              </div>
+            )}
+
+          </div>
+        ) : (
+          /* 12-Step Traceability Timeline View */
+          <div className="space-y-3 bg-white p-4 sm:p-5 rounded-2xl border border-[#3F7655]/20 shadow-sm animate-fadeIn">
+            <h4 className="text-xs font-black text-[#203128] uppercase tracking-wider">
+              {t("traceabilityTitle")}
+            </h4>
+
+            <div className="relative pl-6 space-y-4 before:absolute before:left-2.5 before:top-2 before:bottom-2 before:w-0.5 before:bg-[#3F7655]/20">
+              {timelineList.map((item, idx) => (
+                <div key={idx} className="relative">
+                  {/* Step Dot */}
+                  <div className="w-5 h-5 rounded-full bg-[#3F7655] text-white text-[10px] font-black flex items-center justify-center absolute -left-6 top-0 shadow-sm">
+                    ✓
+                  </div>
+
+                  <div className="bg-[#FAF8F2] p-3 rounded-xl border border-[#3F7655]/10 space-y-1">
+                    <div className="flex items-center justify-between text-xs">
+                      <h5 className="font-extrabold text-[#203128]">{item.event}</h5>
+                      <span className="text-[10px] font-bold text-slate-500 font-mono">{item.timestamp}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[11px] text-slate-600">
+                      <span className="font-bold text-[#3F7655] bg-[#DDEBD8] px-2 py-0.2 rounded">
+                        {item.userRole}
+                      </span>
+                      <span>{typeof item.details === 'string' ? item.details : JSON.stringify(item.details)}</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         )}
 
         {/* Modal Actions */}
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-          {lot.timelineStep === 5 && (
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2 border-t border-[#3F7655]/15">
+          {lot.status === 'OFFER_ACCEPTED' || lot.status === 'PICKUP_SCHEDULED' ? (
             <button
               onClick={handleConfirmHandover}
-              className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-[#3F7655] hover:bg-[#244936] text-white shadow-md transition flex items-center justify-center gap-2"
+              className="w-full sm:flex-1 py-3 px-4 rounded-xl text-xs font-extrabold bg-[#3F7655] hover:bg-[#244936] text-white shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
               <QrCode className="w-4 h-4" />
-              <span>{t("confirmHandover")} (Simulate QR Scan)</span>
+              <span>{t("confirmHandoverAction")}</span>
             </button>
-          )}
-
-          {lot.timelineStep === 6 && (
+          ) : lot.status === 'HANDED_OVER' ? (
             <button
-              onClick={handleCompleteRecycling}
-              className="w-full sm:flex-1 py-3 px-4 rounded-xl text-sm font-bold bg-[#244936] hover:bg-[#14291E] text-white shadow-md transition flex items-center justify-center gap-2"
+              onClick={handleCompleteTransaction}
+              className="w-full sm:flex-1 py-3 px-4 rounded-xl text-xs font-extrabold bg-[#244936] hover:bg-[#14291E] text-white shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Award className="w-4 h-4" />
-              <span>{t("issueCertificate")}</span>
+              <CheckCircle2 className="w-4 h-4" />
+              <span>{t("recordPaymentBtn")}</span>
             </button>
-          )}
+          ) : null}
 
           <button
             onClick={onClose}
-            className="w-full sm:w-auto py-3 px-6 rounded-xl text-sm font-bold bg-white border border-[#3F7655]/20 text-slate-700 hover:bg-slate-100 transition"
+            className="w-full sm:w-auto py-3 px-6 rounded-xl text-xs font-bold bg-white border border-[#3F7655]/20 text-slate-700 hover:bg-slate-100 transition cursor-pointer"
           >
             {t("close")}
           </button>

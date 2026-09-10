@@ -1,5 +1,5 @@
-import { referenceScrapPrices } from './data/scrapPrices';
-import { calculateReferenceValue, calculateAverageReferenceRate, checkPriceWarning } from './utils/rulesEngine';
+import { structuredEWasteCategories, referenceScrapPrices } from './data/scrapPrices';
+import { calculateFairPriceRange, createTraceabilityEvent } from './utils/rulesEngine';
 
 /**
  * 1. Community & Platform Aggregate Stats
@@ -15,23 +15,512 @@ export const communityImpactStats = {
 };
 
 /**
- * 2. Active Recycler E-Waste Requirements (Recycler Demand)
+ * 2. Recyclers Master Database (with Verification Statuses)
+ * Verification Statuses: PENDING_VERIFICATION, VERIFIED, REJECTED, SUSPENDED
+ */
+export const initialRecyclers = [
+  {
+    id: "REC-TN-01",
+    companyName: "GreenCycle Material Recovery Ltd",
+    contactPerson: "Dr. K. Senthil Nathan",
+    cpcbRegistrationNo: "TN-EPR-2026-8821 (Verified)",
+    verificationStatus: "VERIFIED",
+    isCpcbVerified: true,
+    isPlatformVerified: true,
+    phone: "+91 94441 23456",
+    email: "procurement@greencycle.in",
+    location: "Chennai - Ambattur Industrial Estate",
+    capacityMonthlyKg: 50000,
+    currentIntakeKg: 28400,
+    acceptedCategories: [
+      "PCB / Electronic Components",
+      "Computer Equipment",
+      "Mobile / Small Electronics",
+      "Copper",
+      "Aluminium"
+    ],
+    rating: 4.95,
+    auditDate: "15 Jan 2026",
+    recoveryTech: "Hydrometallurgy & Mechanical Separation"
+  },
+  {
+    id: "REC-TN-02",
+    companyName: "Madurai CleanMetals Eco-Processing",
+    contactPerson: "A. Muthuvel",
+    cpcbRegistrationNo: "TN-EPR-2026-4412 (Verified)",
+    verificationStatus: "VERIFIED",
+    isCpcbVerified: true,
+    isPlatformVerified: true,
+    phone: "+91 94432 11223",
+    email: "intake@maduraicleanmetals.com",
+    location: "Madurai - Kappalur SIDCO",
+    capacityMonthlyKg: 40000,
+    currentIntakeKg: 19500,
+    acceptedCategories: [
+      "Batteries",
+      "Copper",
+      "Cables / Wires",
+      "Ferrous Metals"
+    ],
+    rating: 4.88,
+    auditDate: "02 Feb 2026",
+    recoveryTech: "Secondary Smelting & Battery Pyrolysis"
+  },
+  {
+    id: "REC-TN-03",
+    companyName: "Kongu Circular Resource Node",
+    contactPerson: "P. Vignesh",
+    cpcbRegistrationNo: "TN-EPR-2026-9055 (Verified)",
+    verificationStatus: "VERIFIED",
+    isCpcbVerified: true,
+    isPlatformVerified: true,
+    phone: "+91 98422 77889",
+    email: "operations@kongucircular.org",
+    location: "Coimbatore - Peelamedu Industrial Corridor",
+    capacityMonthlyKg: 60000,
+    currentIntakeKg: 34100,
+    acceptedCategories: [
+      "PCB / Electronic Components",
+      "Computer Equipment",
+      "Plastics",
+      "Aluminium"
+    ],
+    rating: 4.92,
+    auditDate: "20 Feb 2026",
+    recoveryTech: "Printed Circuit Board Refining & Granulation"
+  },
+  {
+    id: "REC-TN-04",
+    companyName: "Salem Electro-Smelt Solutions",
+    contactPerson: "S. Rajendran",
+    cpcbRegistrationNo: "TN-EPR-2026-PENDING",
+    verificationStatus: "PENDING_VERIFICATION",
+    isCpcbVerified: false,
+    isPlatformVerified: false,
+    phone: "+91 97880 44556",
+    email: "compliance@salemelectrosmelt.com",
+    location: "Salem - Steel Plant Road",
+    capacityMonthlyKg: 25000,
+    currentIntakeKg: 0,
+    acceptedCategories: [
+      "Ferrous Metals",
+      "Copper",
+      "Cables / Wires"
+    ],
+    rating: 4.2,
+    auditDate: "Under Review",
+    recoveryTech: "Thermal Smelting"
+  },
+  {
+    id: "REC-TN-05",
+    companyName: "Tirunelveli Eco-Refining Corp",
+    contactPerson: "G. Paulraj",
+    cpcbRegistrationNo: "TN-EPR-2025-REVOKED",
+    verificationStatus: "SUSPENDED",
+    isCpcbVerified: false,
+    isPlatformVerified: false,
+    phone: "+91 94420 99881",
+    email: "admin@tveco.in",
+    location: "Tirunelveli - Gangaikondan SIPCOT",
+    capacityMonthlyKg: 20000,
+    currentIntakeKg: 0,
+    acceptedCategories: ["Batteries"],
+    rating: 3.1,
+    auditDate: "Suspended 12 Aug 2026",
+    recoveryTech: "Unlicensed Storage"
+  }
+];
+
+/**
+ * 3. Registered Collectors Database (with Phone Verification status)
+ */
+export const initialCollectors = [
+  {
+    id: "COL-TN-101",
+    name: "Ramesh Kumar",
+    company: "Apex Scrap Collection",
+    phone: "+91 98401 23456",
+    phone_verified: true,
+    location: "Chennai - Guindy Industrial Estate",
+    materials: ["PCB / Electronic Components", "Computer Equipment", "Cables / Wires"],
+    availableWeightKg: 45,
+    askingPricePerKg: 650,
+    reliabilityScore: 4.9,
+    lotsCompleted: 28,
+    totalEarnings: 84500
+  },
+  {
+    id: "COL-TN-102",
+    name: "Velu Pandian",
+    company: "Madurai Urban Collectors",
+    phone: "+91 94432 87654",
+    phone_verified: true,
+    location: "Madurai - Kappalur SIDCO",
+    materials: ["Batteries", "Copper", "Ferrous Metals"],
+    availableWeightKg: 60,
+    askingPricePerKg: 450,
+    reliabilityScore: 4.7,
+    lotsCompleted: 14,
+    totalEarnings: 42300
+  },
+  {
+    id: "COL-TN-103",
+    name: "Karthik Raja",
+    company: "Citywide Tech Recyclers",
+    phone: "+91 97890 54321",
+    phone_verified: true,
+    location: "Chennai - Ambattur Industrial Estate",
+    materials: ["Computer Equipment", "Mobile / Small Electronics"],
+    availableWeightKg: 35,
+    askingPricePerKg: 320,
+    reliabilityScore: 4.8,
+    lotsCompleted: 19,
+    totalEarnings: 61200
+  },
+  {
+    id: "COL-TN-104",
+    name: "Murugan Selvam",
+    company: "Trichy Green Scraps",
+    phone: "+91 98940 11223",
+    phone_verified: false, // Demo unverified collector
+    location: "Tiruchirappalli - Thuvakudi SIDCO",
+    materials: ["Other E-Waste", "Plastics"],
+    availableWeightKg: 20,
+    askingPricePerKg: 160,
+    reliabilityScore: 4.3,
+    lotsCompleted: 2,
+    totalEarnings: 3200
+  }
+];
+
+/**
+ * 4. Digital Lots Database (The central entity supporting all 12 statuses)
+ * Statuses:
+ * DRAFT, AVAILABLE, MATCHED, OFFER_RECEIVED, OFFER_ACCEPTED,
+ * PICKUP_SCHEDULED, HANDED_OVER, PAYMENT_COMPLETED, COMPLETED, REJECTED, CANCELLED, UNDER_REVIEW
+ */
+export const initialMaterialLots = [
+  {
+    id: "LOT-EL26-TN-00125",
+    collectorId: "COL-TN-101",
+    collectorName: "Ramesh Kumar (Apex Scrap Collection)",
+    collectorPhone: "+91 98401 23456",
+    category: "PCB / Electronic Components",
+    material: "High-Grade PCB Circuit Boards",
+    quantity: 20,
+    unit: "kg",
+    condition: "Non-working / Scrap",
+    location: "Chennai - Guindy Industrial Estate",
+    collectionDate: "09 Sep 2026",
+    createdDate: "09 Sep 2026, 10:30 AM",
+    imageUrl: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=500&auto=format&fit=crop",
+    notes: "Telecom motherboards and gold-plated server interface cards carefully packed.",
+    benchmarkPrice: 650,
+    tolerance: 0.25,
+    lowerLimit: 488,
+    upperLimit: 813,
+    estimatedLotValue: 13000,
+    minEstimatedValue: 9760,
+    maxEstimatedValue: 16260,
+    status: "OFFER_ACCEPTED",
+    agreedPricePerUnit: 670,
+    agreedTotalValue: 13400,
+    selectedRecyclerId: "REC-TN-01",
+    selectedRecyclerName: "GreenCycle Material Recovery Ltd",
+    qrPayload: "ECOLINK::LOT-EL26-TN-00125::QTY=20KG::CAT=PCB::VAL=13400::RECYCLER=GreenCycle",
+    timeline: [
+      { id: "e-1", event: "Phone Verified", timestamp: "08 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 98401 23456 verified via OTP" },
+      { id: "e-2", event: "Waste Added", timestamp: "09 Sep 2026, 10:15 AM", userRole: "Collector", status: "Completed", details: "20 kg PCB Scrap declared" },
+      { id: "e-3", event: "Waste Classified", timestamp: "09 Sep 2026, 10:20 AM", userRole: "Collector", status: "Completed", details: "Category: PCB / Electronic Components" },
+      { id: "e-4", event: "Digital Lot Created", timestamp: "09 Sep 2026, 10:30 AM", userRole: "System", status: "Completed", details: "Assigned ID LOT-EL26-TN-00125" },
+      { id: "e-5", event: "Fair Price Calculated", timestamp: "09 Sep 2026, 10:30 AM", userRole: "Rules Engine", status: "Completed", details: "Benchmark: ₹650/kg | Fair Range: ₹488–₹813/kg" },
+      { id: "e-6", event: "Recycler Matched", timestamp: "09 Sep 2026, 11:00 AM", userRole: "Rules Engine", status: "Completed", details: "Matched with GreenCycle Material Recovery Ltd" },
+      { id: "e-7", event: "Offer Received", timestamp: "09 Sep 2026, 01:30 PM", userRole: "Recycler", status: "Completed", details: "Offer submitted: ₹670/kg (Total: ₹13,400) - Status: FAIR ✓" },
+      { id: "e-8", event: "Offer Accepted", timestamp: "09 Sep 2026, 03:00 PM", userRole: "Collector", status: "Completed", details: "Collector accepted GreenCycle offer" },
+      { id: "e-9", event: "Pickup Scheduled", timestamp: "10 Sep 2026, 09:00 AM", userRole: "Logistics", status: "Active", details: "Scheduled for 11 Sep 2026 with GreenCycle fleet" }
+    ]
+  },
+  {
+    id: "LOT-EL26-TN-00124",
+    collectorId: "COL-TN-102",
+    collectorName: "Velu Pandian (Madurai Urban Collectors)",
+    collectorPhone: "+91 94432 87654",
+    category: "Batteries",
+    material: "Lithium-Ion Battery Packs",
+    quantity: 25,
+    unit: "kg",
+    condition: "Non-working / Scrap",
+    location: "Madurai - Kappalur SIDCO",
+    collectionDate: "07 Sep 2026",
+    createdDate: "07 Sep 2026, 02:15 PM",
+    imageUrl: "https://images.unsplash.com/photo-1584824486509-112e4181ff6b?w=500&auto=format&fit=crop",
+    notes: "Laptop battery packs with non-conductive insulation on terminals.",
+    benchmarkPrice: 450,
+    tolerance: 0.25,
+    lowerLimit: 338,
+    upperLimit: 563,
+    estimatedLotValue: 11250,
+    minEstimatedValue: 8450,
+    maxEstimatedValue: 14075,
+    status: "COMPLETED",
+    agreedPricePerUnit: 460,
+    agreedTotalValue: 11500,
+    selectedRecyclerId: "REC-TN-02",
+    selectedRecyclerName: "Madurai CleanMetals Eco-Processing",
+    qrPayload: "ECOLINK::LOT-EL26-TN-00124::QTY=25KG::CAT=BATTERIES::VAL=11500::RECYCLER=MaduraiCleanMetals",
+    timeline: [
+      { id: "e-1", event: "Phone Verified", timestamp: "05 Sep 2026, 11:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 94432 87654 verified via OTP" },
+      { id: "e-2", event: "Waste Added", timestamp: "07 Sep 2026, 02:00 PM", userRole: "Collector", status: "Completed", details: "25 kg Battery Scrap declared" },
+      { id: "e-3", event: "Waste Classified", timestamp: "07 Sep 2026, 02:10 PM", userRole: "Collector", status: "Completed", details: "Category: Batteries (Hazardous)" },
+      { id: "e-4", event: "Digital Lot Created", timestamp: "07 Sep 2026, 02:15 PM", userRole: "System", status: "Completed", details: "Assigned ID LOT-EL26-TN-00124" },
+      { id: "e-5", event: "Fair Price Calculated", timestamp: "07 Sep 2026, 02:15 PM", userRole: "Rules Engine", status: "Completed", details: "Benchmark: ₹450/kg | Fair Range: ₹338–₹563/kg" },
+      { id: "e-6", event: "Recycler Matched", timestamp: "07 Sep 2026, 02:45 PM", userRole: "Rules Engine", status: "Completed", details: "Matched with Madurai CleanMetals Eco-Processing" },
+      { id: "e-7", event: "Offer Received", timestamp: "07 Sep 2026, 04:00 PM", userRole: "Recycler", status: "Completed", details: "Offer submitted: ₹460/kg (Total: ₹11,500) - Status: FAIR ✓" },
+      { id: "e-8", event: "Offer Accepted", timestamp: "07 Sep 2026, 04:30 PM", userRole: "Collector", status: "Completed", details: "Collector accepted Madurai CleanMetals offer" },
+      { id: "e-9", event: "Pickup Scheduled", timestamp: "08 Sep 2026, 09:30 AM", userRole: "Logistics", status: "Completed", details: "Scheduled for 08 Sep 2026" },
+      { id: "e-10", event: "Waste Handed Over", timestamp: "08 Sep 2026, 02:00 PM", userRole: "Collector & Recycler", status: "Completed", details: "Physical QR scanned & verified at weighbridge" },
+      { id: "e-11", event: "Payment Recorded", timestamp: "08 Sep 2026, 03:30 PM", userRole: "System", status: "Completed", details: "Transaction TXN-2026-9921 recorded: ₹11,500 settled" },
+      { id: "e-12", event: "Transaction Completed", timestamp: "09 Sep 2026, 05:00 PM", userRole: "Recycler", status: "Completed", details: "Recovery Certificate CERT-TN-2026-0088 issued" }
+    ],
+    proof: {
+      recoveredGoldGrams: "0.0 g",
+      recoveredCopperKg: "4.8 kg",
+      recoveredAluminumKg: "3.2 kg",
+      recoveredLithiumKg: "1.9 kg",
+      certificateId: "CERT-TN-2026-0088"
+    }
+  },
+  {
+    id: "LOT-EL26-TN-00126",
+    collectorId: "COL-TN-101",
+    collectorName: "Ramesh Kumar (Apex Scrap Collection)",
+    collectorPhone: "+91 98401 23456",
+    category: "Copper",
+    material: "Copper Cable & Insulated Wires",
+    quantity: 30,
+    unit: "kg",
+    condition: "Non-working / Scrap",
+    location: "Chennai - Guindy Industrial Estate",
+    collectionDate: "10 Sep 2026",
+    createdDate: "10 Sep 2026, 09:15 AM",
+    imageUrl: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&auto=format&fit=crop",
+    notes: "Clean copper wiring and power cords stripped of heavy connectors.",
+    benchmarkPrice: 720,
+    tolerance: 0.20,
+    lowerLimit: 576,
+    upperLimit: 864,
+    estimatedLotValue: 21600,
+    minEstimatedValue: 17280,
+    maxEstimatedValue: 25920,
+    status: "OFFER_RECEIVED",
+    qrPayload: "ECOLINK::LOT-EL26-TN-00126::QTY=30KG::CAT=COPPER::VAL=21600",
+    timeline: [
+      { id: "e-1", event: "Phone Verified", timestamp: "08 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 98401 23456 verified" },
+      { id: "e-2", event: "Waste Added", timestamp: "10 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "30 kg Copper Scrap declared" },
+      { id: "e-3", event: "Waste Classified", timestamp: "10 Sep 2026, 09:10 AM", userRole: "Collector", status: "Completed", details: "Category: Copper" },
+      { id: "e-4", event: "Digital Lot Created", timestamp: "10 Sep 2026, 09:15 AM", userRole: "System", status: "Completed", details: "Assigned ID LOT-EL26-TN-00126" },
+      { id: "e-5", event: "Fair Price Calculated", timestamp: "10 Sep 2026, 09:15 AM", userRole: "Rules Engine", status: "Completed", details: "Benchmark: ₹720/kg | Fair Range: ₹576–₹864/kg" },
+      { id: "e-6", event: "Recycler Matched", timestamp: "10 Sep 2026, 09:30 AM", userRole: "Rules Engine", status: "Completed", details: "Matched with GreenCycle & Madurai CleanMetals" },
+      { id: "e-7", event: "Offer Received", timestamp: "10 Sep 2026, 11:45 AM", userRole: "Recycler", status: "Active", details: "2 Offers Received from GreenCycle (₹740/kg) & Madurai CleanMetals (₹710/kg)" }
+    ]
+  },
+  {
+    id: "LOT-EL26-TN-00127",
+    collectorId: "COL-TN-103",
+    collectorName: "Karthik Raja (Citywide Tech Recyclers)",
+    collectorPhone: "+91 97890 54321",
+    category: "Computer Equipment",
+    material: "Complete Laptops & Enterprise Towers",
+    quantity: 15,
+    unit: "kg",
+    condition: "Mixed Condition",
+    location: "Chennai - Ambattur Industrial Estate",
+    collectionDate: "10 Sep 2026",
+    createdDate: "10 Sep 2026, 11:30 AM",
+    imageUrl: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&auto=format&fit=crop",
+    notes: "Core i5 & i7 enterprise laptops with power adapters.",
+    benchmarkPrice: 320,
+    tolerance: 0.25,
+    lowerLimit: 240,
+    upperLimit: 400,
+    estimatedLotValue: 4800,
+    minEstimatedValue: 3600,
+    maxEstimatedValue: 6000,
+    status: "AVAILABLE",
+    qrPayload: "ECOLINK::LOT-EL26-TN-00127::QTY=15KG::CAT=COMPUTERS::VAL=4800",
+    timeline: [
+      { id: "e-1", event: "Phone Verified", timestamp: "09 Sep 2026, 10:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 97890 54321 verified" },
+      { id: "e-2", event: "Waste Added", timestamp: "10 Sep 2026, 11:20 AM", userRole: "Collector", status: "Completed", details: "15 kg Computer Equipment declared" },
+      { id: "e-3", event: "Waste Classified", timestamp: "10 Sep 2026, 11:25 AM", userRole: "Collector", status: "Completed", details: "Category: Computer Equipment" },
+      { id: "e-4", event: "Digital Lot Created", timestamp: "10 Sep 2026, 11:30 AM", userRole: "System", status: "Completed", details: "Assigned ID LOT-EL26-TN-00127" },
+      { id: "e-5", event: "Fair Price Calculated", timestamp: "10 Sep 2026, 11:30 AM", userRole: "Rules Engine", status: "Completed", details: "Benchmark: ₹320/kg | Fair Range: ₹240–₹400/kg" },
+      { id: "e-6", event: "Recycler Matched", timestamp: "10 Sep 2026, 11:35 AM", userRole: "Rules Engine", status: "Completed", details: "Open for offers from verified recyclers" }
+    ]
+  }
+];
+
+/**
+ * 5. Recycler Offers Database
+ * Statuses: PENDING, ACCEPTED, REJECTED, EXPIRED, FLAGGED
+ */
+export const initialOffers = [
+  {
+    id: "OFF-2026-0881",
+    lotId: "LOT-EL26-TN-00126",
+    recyclerId: "REC-TN-01",
+    recyclerName: "GreenCycle Material Recovery Ltd",
+    recyclerVerified: true,
+    pricePerUnit: 740, // within fair range (₹576-₹864)
+    totalPrice: 22200,
+    fairPriceStatus: "FAIR",
+    fairPriceBadge: "FAIR ✓",
+    status: "PENDING",
+    timestamp: "10 Sep 2026, 11:45 AM",
+    proposedPickupDate: "12 Sep 2026",
+    location: "Chennai - Ambattur Industrial Estate",
+    distanceKm: 8.4,
+    notes: "Direct factory pickup arranged with certified weighing scales."
+  },
+  {
+    id: "OFF-2026-0882",
+    lotId: "LOT-EL26-TN-00126",
+    recyclerId: "REC-TN-02",
+    recyclerName: "Madurai CleanMetals Eco-Processing",
+    recyclerVerified: true,
+    pricePerUnit: 710, // within fair range
+    totalPrice: 21300,
+    fairPriceStatus: "FAIR",
+    fairPriceBadge: "FAIR ✓",
+    status: "PENDING",
+    timestamp: "10 Sep 2026, 12:10 PM",
+    proposedPickupDate: "13 Sep 2026",
+    location: "Madurai - Kappalur SIDCO",
+    distanceKm: 14.2,
+    notes: "Will dispatch secondary logistics crate with advance payment."
+  },
+  {
+    id: "OFF-2026-0879",
+    lotId: "LOT-EL26-TN-00125",
+    recyclerId: "REC-TN-01",
+    recyclerName: "GreenCycle Material Recovery Ltd",
+    recyclerVerified: true,
+    pricePerUnit: 670,
+    totalPrice: 13400,
+    fairPriceStatus: "FAIR",
+    fairPriceBadge: "FAIR ✓",
+    status: "ACCEPTED",
+    timestamp: "09 Sep 2026, 01:30 PM",
+    proposedPickupDate: "11 Sep 2026",
+    location: "Chennai - Ambattur Industrial Estate",
+    distanceKm: 8.4,
+    notes: "Accepted offer for enterprise telecom PCB scrap lot."
+  },
+  {
+    id: "OFF-2026-0875",
+    lotId: "LOT-EL26-TN-00127",
+    recyclerId: "REC-TN-03",
+    recyclerName: "Kongu Circular Resource Node",
+    recyclerVerified: true,
+    pricePerUnit: 190, // BELOW fair range (₹240-₹400) -> FLAGGED
+    totalPrice: 2850,
+    fairPriceStatus: "BELOW_FAIR_RANGE",
+    fairPriceBadge: "BELOW FAIR RANGE ⚠️",
+    status: "FLAGGED",
+    timestamp: "10 Sep 2026, 01:00 PM",
+    proposedPickupDate: "14 Sep 2026",
+    location: "Coimbatore - Peelamedu",
+    distanceKm: 22.0,
+    notes: "Bulk price quotation (Flagged 21% below minimum benchmark)."
+  }
+];
+
+/**
+ * 6. Handovers & Pickups Database
+ * Statuses: PICKUP_SCHEDULED, IN_TRANSIT, READY_FOR_HANDOVER, HANDED_OVER
+ */
+export const initialHandovers = [
+  {
+    id: "HND-2026-0041",
+    lotId: "LOT-EL26-TN-00125",
+    collectorId: "COL-TN-101",
+    collectorName: "Ramesh Kumar",
+    collectorPhone: "+91 98401 23456",
+    recyclerId: "REC-TN-01",
+    recyclerName: "GreenCycle Material Recovery Ltd",
+    quantity: 20,
+    unit: "kg",
+    agreedPrice: 670,
+    totalValue: 13400,
+    pickupDate: "11 Sep 2026, 10:00 AM",
+    location: "Guindy Scrap Yard Node #4, Chennai",
+    status: "PICKUP_SCHEDULED",
+    qrCode: "ECOLINK-HANDOVER-LOT-00125",
+    notes: "GreenCycle driver assigned: K. Vijay (+91 98840 99881)"
+  },
+  {
+    id: "HND-2026-0038",
+    lotId: "LOT-EL26-TN-00124",
+    collectorId: "COL-TN-102",
+    collectorName: "Velu Pandian",
+    collectorPhone: "+91 94432 87654",
+    recyclerId: "REC-TN-02",
+    recyclerName: "Madurai CleanMetals Eco-Processing",
+    quantity: 25,
+    unit: "kg",
+    agreedPrice: 460,
+    totalValue: 11500,
+    pickupDate: "08 Sep 2026, 02:00 PM",
+    location: "Kappalur SIDCO Drop Node, Madurai",
+    status: "HANDED_OVER",
+    qrCode: "ECOLINK-HANDOVER-LOT-00124",
+    notes: "Handover successfully completed and verified at weighbridge."
+  }
+];
+
+/**
+ * 7. Recorded Transactions Database
+ * Payment Statuses: PENDING, PAID, FAILED, COMPLETED
+ * Transaction Statuses: PENDING, COMPLETED
+ */
+export const initialTransactions = [
+  {
+    id: "TXN-2026-0091",
+    lotId: "LOT-EL26-TN-00124",
+    collectorId: "COL-TN-102",
+    collectorName: "Velu Pandian",
+    recyclerId: "REC-TN-02",
+    recyclerName: "Madurai CleanMetals Eco-Processing",
+    quantity: 25,
+    unit: "kg",
+    category: "Batteries",
+    acceptedPrice: 460,
+    totalValue: 11500, // 25kg * ₹460 = ₹11,500
+    date: "08 Sep 2026, 03:30 PM",
+    paymentStatus: "PAID",
+    transactionStatus: "COMPLETED",
+    paymentMethod: "Platform Recorded Settlement (Direct NEFT Ref: TN-2026-8812)",
+    receiptId: "REC-EPR-2026-0091"
+  }
+];
+
+/**
+ * 8. Active Recycler E-Waste Requirements (Marketplace Demand Posting)
  */
 export const initialRecyclerRequirements = [
   {
     id: "REQ-2026-081",
     recyclerId: "REC-TN-01",
     recyclerName: "GreenCycle Material Recovery Ltd",
-    cpcbRegistrationNo: "TN-EPR-2026-8821 (Demo)",
+    cpcbRegistrationNo: "TN-EPR-2026-8821 (Verified)",
     isCpcbVerified: true,
     isPlatformVerified: true,
-    category: "IT Equipment",
+    category: "PCB / Electronic Components",
     requiredQuantityKg: 50,
     currentReceivedKg: 20,
-    preferredCondition: "Mixed Condition",
-    targetPricePerKg: 300,
-    referenceMin: 280,
-    referenceMax: 330,
+    preferredCondition: "Non-working / Scrap",
+    targetPricePerKg: 650,
+    referenceMin: 488,
+    referenceMax: 813,
     location: "Chennai - Ambattur Industrial Estate",
     postedDate: "08 Sep 2026",
     expiresInDays: 3,
@@ -42,16 +531,16 @@ export const initialRecyclerRequirements = [
     id: "REQ-2026-082",
     recyclerId: "REC-TN-02",
     recyclerName: "Madurai CleanMetals Eco-Processing",
-    cpcbRegistrationNo: "TN-EPR-2026-4412 (Demo)",
+    cpcbRegistrationNo: "TN-EPR-2026-4412 (Verified)",
     isCpcbVerified: true,
     isPlatformVerified: true,
     category: "Batteries",
     requiredQuantityKg: 100,
     currentReceivedKg: 45,
     preferredCondition: "Non-working / Scrap",
-    targetPricePerKg: 460,
-    referenceMin: 400,
-    referenceMax: 500,
+    targetPricePerKg: 450,
+    referenceMin: 338,
+    referenceMax: 563,
     location: "Madurai - Kappalur SIDCO",
     postedDate: "09 Sep 2026",
     expiresInDays: 5,
@@ -61,320 +550,69 @@ export const initialRecyclerRequirements = [
   {
     id: "REQ-2026-083",
     recyclerId: "REC-TN-03",
-    recyclerName: "Kongu Eco-Refinery & Circular Solutions",
-    cpcbRegistrationNo: "TN-EPR-2026-9055 (Demo)",
+    recyclerName: "Kongu Circular Resource Node",
+    cpcbRegistrationNo: "TN-EPR-2026-9055 (Verified)",
     isCpcbVerified: true,
     isPlatformVerified: true,
-    category: "Components",
-    requiredQuantityKg: 30,
+    category: "Computer Equipment",
+    requiredQuantityKg: 40,
     currentReceivedKg: 0,
-    preferredCondition: "Non-working / Scrap",
-    targetPricePerKg: 650,
-    referenceMin: 600,
-    referenceMax: 720,
-    location: "Coimbatore - Peelamedu",
+    preferredCondition: "Mixed Condition",
+    targetPricePerKg: 320,
+    referenceMin: 240,
+    referenceMax: 400,
+    location: "Coimbatore - Peelamedu Industrial Corridor",
     postedDate: "10 Sep 2026",
     expiresInDays: 4,
     status: "Active",
-    notes: "Specialized in telecom grade PCBs and server interface boards."
+    notes: "Enterprise servers, workstations, and network equipment."
   }
 ];
 
 /**
- * 3. Informal Collectors Database
- */
-export const initialCollectors = [
-  {
-    id: "COL-TN-101",
-    name: "Ramesh Kumar (Apex Scrap Collection)",
-    location: "Chennai - Guindy",
-    materials: ["IT Equipment", "Components", "Cables & Wiring"],
-    availableWeightKg: 15,
-    askingPricePerKg: 310, // normal range
-    reliabilityScore: 4.9,
-    lotsCompleted: 28,
-    phone: "+91 98401 23456",
-    declaredItems: [
-      { id: "i-1", material: "Laptop / Notebook", weightKg: 8, referencePrice: 300 },
-      { id: "i-2", material: "Mobile Phones & Tablets", weightKg: 3, referencePrice: 500 },
-      { id: "i-3", material: "Printers & Scanners", weightKg: 4, referencePrice: 200 }
-    ]
-  },
-  {
-    id: "COL-TN-102",
-    name: "Velu Pandian (Madurai Urban Collectors)",
-    location: "Madurai - Goripalayam",
-    materials: ["Batteries", "IT Equipment"],
-    availableWeightKg: 25,
-    askingPricePerKg: 420, // slightly high for IT, normal for battery
-    reliabilityScore: 4.7,
-    lotsCompleted: 14,
-    phone: "+91 94432 87654",
-    declaredItems: [
-      { id: "i-4", material: "Lithium-Ion Battery Packs", weightKg: 20, referencePrice: 450 },
-      { id: "i-5", material: "Copper Cable & Insulated Wires", weightKg: 5, referencePrice: 220 }
-    ]
-  },
-  {
-    id: "COL-TN-103",
-    name: "Karthik Raja (Citywide Tech Recyclers)",
-    location: "Chennai - Ambattur",
-    materials: ["IT Equipment", "Components"],
-    availableWeightKg: 20,
-    askingPricePerKg: 440, // EXCEEDS normal range! Triggers Price Warning demo
-    reliabilityScore: 4.8,
-    lotsCompleted: 19,
-    phone: "+91 97890 54321",
-    declaredItems: [
-      { id: "i-6", material: "High-Grade PCB Circuit Boards", weightKg: 12, referencePrice: 650 },
-      { id: "i-7", material: "Laptop / Notebook", weightKg: 8, referencePrice: 300 }
-    ]
-  }
-];
-
-/**
- * 4. Digital Material Lots (The central signature traceability entity)
- */
-export const initialMaterialLots = [
-  {
-    id: "LOT-EL26-TN-00125",
-    requirementId: "REQ-2026-081",
-    collectorId: "COL-TN-101",
-    collectorName: "Ramesh Kumar (Apex Scrap Collection)",
-    collectorPhone: "+91 98401 23456",
-    recyclerId: "REC-TN-01",
-    recyclerName: "GreenCycle Material Recovery Ltd",
-    cpcbRegistrationNo: "TN-EPR-2026-8821 (Demo)",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00125::WEIGHT=10KG::EST_VAL=3100::RECYCLER=GreenCycle",
-    items: [
-      { id: "item-1", name: "Laptop", weightKg: 5, referencePrice: 300, subtotal: 1500 },
-      { id: "item-2", name: "Mobile", weightKg: 2, referencePrice: 500, subtotal: 1000 },
-      { id: "item-3", name: "Printer", weightKg: 3, referencePrice: 200, subtotal: 600 }
-    ],
-    totalWeightKg: 10,
-    estimatedLotValue: 3100, // ₹3,100
-    averageReferenceRate: 333, // ₹333/kg
-    agreedAskingRatePerKg: 310, // ₹310/kg
-    agreedTotalValue: 3100,
-    priceWarningStatus: "Normal Range",
-    location: "Chennai - Ambattur Industrial Estate",
-    createdDate: "09 Sep 2026, 11:30 AM",
-    timelineStep: 5, // 1: Collected, 2: Classified, 3: Valued, 4: Recycler Selected, 5: Handover Pending, 6: Recycler Received, 7: Recycling Completed
-    status: "Handover Pending",
-    processingStages: [
-      { stage: "Collected", completed: true, timestamp: "09 Sep 2026, 09:15 AM" },
-      { stage: "Classified", completed: true, timestamp: "09 Sep 2026, 10:00 AM" },
-      { stage: "Valued", completed: true, timestamp: "09 Sep 2026, 10:45 AM" },
-      { stage: "Recycler Selected", completed: true, timestamp: "09 Sep 2026, 11:30 AM" },
-      { stage: "Handover Pending", completed: true, timestamp: "09 Sep 2026, 02:00 PM" },
-      { stage: "Recycler Received", completed: false, timestamp: null },
-      { stage: "Recycling Completed", completed: false, timestamp: null }
-    ],
-    proof: {
-      recoveredGoldGrams: "0.85 g",
-      recoveredCopperKg: "1.4 kg",
-      recoveredAluminumKg: "2.1 kg",
-      certificateId: "CERT-TN-2026-0091"
-    }
-  },
-  {
-    id: "LOT-EL26-TN-00124",
-    requirementId: "REQ-2026-082",
-    collectorId: "COL-TN-102",
-    collectorName: "Velu Pandian (Madurai Urban Collectors)",
-    collectorPhone: "+91 94432 87654",
-    recyclerId: "REC-TN-02",
-    recyclerName: "Madurai CleanMetals Eco-Processing",
-    cpcbRegistrationNo: "TN-EPR-2026-4412 (Demo)",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00124::WEIGHT=25KG::EST_VAL=10100::RECYCLER=MaduraiCleanMetals",
-    items: [
-      { id: "item-4", name: "Lithium-Ion Battery Packs", weightKg: 20, referencePrice: 450, subtotal: 9000 },
-      { id: "item-5", name: "Copper Cable & Insulated Wires", weightKg: 5, referencePrice: 220, subtotal: 1100 }
-    ],
-    totalWeightKg: 25,
-    estimatedLotValue: 10100,
-    averageReferenceRate: 335,
-    agreedAskingRatePerKg: 420,
-    agreedTotalValue: 10500,
-    priceWarningStatus: "Normal Range",
-    location: "Madurai - Kappalur SIDCO",
-    createdDate: "07 Sep 2026, 04:15 PM",
-    timelineStep: 7, // Recycling Completed
-    status: "Recycling Completed",
-    processingStages: [
-      { stage: "Collected", completed: true, timestamp: "07 Sep 2026, 02:00 PM" },
-      { stage: "Classified", completed: true, timestamp: "07 Sep 2026, 03:00 PM" },
-      { stage: "Valued", completed: true, timestamp: "07 Sep 2026, 03:45 PM" },
-      { stage: "Recycler Selected", completed: true, timestamp: "07 Sep 2026, 04:15 PM" },
-      { stage: "Handover Pending", completed: true, timestamp: "08 Sep 2026, 10:00 AM" },
-      { stage: "Recycler Received", completed: true, timestamp: "08 Sep 2026, 01:30 PM" },
-      { stage: "Recycling Completed", completed: true, timestamp: "09 Sep 2026, 05:00 PM" }
-    ],
-    proof: {
-      recoveredGoldGrams: "0.0 g",
-      recoveredCopperKg: "4.8 kg",
-      recoveredAluminumKg: "3.2 kg",
-      recoveredLithiumKg: "1.9 kg",
-      certificateId: "CERT-TN-2026-0088"
-    }
-  }
-];
-
-/**
- * 5. Generator User Disposals & Receipts
- */
-export const generatorDisposalsList = [
-  {
-    id: "DISP-2026-301",
-    date: "10 Sep 2026",
-    deviceType: "Old Dell Laptop & Power Adapter",
-    weightKg: 3.2,
-    pointsAwarded: 180,
-    collectorAssigned: "Ramesh Kumar (Apex Scrap Collection)",
-    lotId: "LOT-EL26-TN-00125",
-    status: "In Material Lot",
-    co2SavedKg: 4.8
-  },
-  {
-    id: "DISP-2026-288",
-    date: "02 Sep 2026",
-    deviceType: "2 Broken Android Phones & Charger",
-    weightKg: 0.8,
-    pointsAwarded: 90,
-    collectorAssigned: "Velu Pandian",
-    lotId: "LOT-EL26-TN-00124",
-    status: "Recycled & Certified ✓",
-    co2SavedKg: 1.2
-  }
-];
-
-/**
- * 6. Admin Platform Audit Logs & Health
+ * 9. Admin Platform Audit Logs
  */
 export const adminAuditLogs = [
-  { id: "log-1", timestamp: "10 Sep 2026, 19:42", action: "CPCB Audit Verified", entity: "REC-TN-01 (GreenCycle)", status: "Success" },
-  { id: "log-2", timestamp: "10 Sep 2026, 17:15", action: "Price Warning Triggered", entity: "COL-TN-103 (Karthik Raja)", status: "Flagged (+33% above ref)" },
-  { id: "log-3", timestamp: "10 Sep 2026, 14:00", action: "Digital Lot Created", entity: "LOT-EL26-TN-00125 (10 kg)", status: "Active" },
-  { id: "log-4", timestamp: "09 Sep 2026, 17:00", action: "Certificate Issued", entity: "LOT-EL26-TN-00124 (Madurai CleanMetals)", status: "Completed" }
+  { id: "log-1", timestamp: "10 Sep 2026, 13:00", action: "Offer Flagged (Below Fair Range)", entity: "OFF-2026-0875 (Kongu Circular ₹190/kg)", status: "Flagged" },
+  { id: "log-2", timestamp: "10 Sep 2026, 11:30", action: "Digital Lot Created", entity: "LOT-EL26-TN-00127 (15 kg Computers)", status: "Active" },
+  { id: "log-3", timestamp: "10 Sep 2026, 09:15", action: "Digital Lot Created", entity: "LOT-EL26-TN-00126 (30 kg Copper)", status: "Active" },
+  { id: "log-4", timestamp: "09 Sep 2026, 15:00", action: "Recycler Offer Accepted", entity: "LOT-EL26-TN-00125 (GreenCycle)", status: "Completed" },
+  { id: "log-5", timestamp: "08 Sep 2026, 15:30", action: "Payment Recorded & Settled", entity: "TXN-2026-0091 (₹11,500)", status: "Completed" },
+  { id: "log-6", timestamp: "08 Sep 2026, 09:00", action: "Collector Phone Verified", entity: "COL-TN-101 (+91 98401 23456)", status: "Verified" }
 ];
 
 /**
- * 7. Public Educational Guides & Locations
+ * 10. Public Educational Guides & Locations (Preserved)
  */
-export const recyclingCategories = [
-  {
-    id: "it-telecom",
-    name: "IT & Telecommunications",
-    icon: "💻",
-    color: "bg-indigo-100/70 text-indigo-900 border-indigo-200",
-    description: "Laptops, desktop servers, routers, motherboards, CRT/LED monitors.",
-    status: "Formal Recovery Only ⚡",
-    referenceRate: "₹300/kg",
-    prepSteps: [
-      "Wipe sensitive personal data / factory reset",
-      "Keep internal components and motherboards intact",
-      "Pack power adapters and charging leads together"
-    ],
-    dontRecycle: [
-      "Items with swollen or punctured battery packs",
-      "Burnt or acid-leaked internal assemblies"
-    ]
-  },
-  {
-    id: "consumer-elec",
-    name: "Consumer Electronics",
-    icon: "📱",
-    color: "bg-emerald-100/70 text-emerald-900 border-emerald-200",
-    description: "Smartphones, tablets, audio systems, smartwatches, cameras.",
-    status: "High Precious Metal Yield ✨",
-    referenceRate: "₹500/kg",
-    prepSteps: [
-      "Remove SIM and external SD storage cards",
-      "Do not manually smash or burn casing",
-      "Separate detachable covers from main chassis"
-    ],
-    dontRecycle: [
-      "Water-submerged corroded battery compartments in domestic bins"
-    ]
-  },
-  {
-    id: "batteries",
-    name: "Batteries & Energy Storage",
-    icon: "🔋",
-    color: "bg-yellow-100/70 text-yellow-900 border-yellow-200",
-    description: "Lithium-Ion cells, laptop battery packs, UPS lead-acid units.",
-    status: "Hazardous / CPCB Regulated ⚠️",
-    referenceRate: "₹450/kg",
-    prepSteps: [
-      "Insulate electrode terminals with non-conductive tape",
-      "Store in a dry, ventilated, shock-resistant crate",
-      "Keep away from heat or open sparks"
-    ],
-    dontRecycle: [
-      "Punctured smoking cells - seek emergency disposal"
-    ]
-  },
-  {
-    id: "components",
-    name: "Circuit Boards & Components",
-    icon: "🔌",
-    color: "bg-amber-100/70 text-amber-900 border-amber-200",
-    description: "High-grade telecom PCBs, gold-plated connectors, IC chips, RAM modules.",
-    status: "Refinery Grade 🥇",
-    referenceRate: "₹650/kg",
-    prepSteps: [
-      "Avoid abrasive chemical washing",
-      "Keep boards flat to prevent trace cracking"
-    ],
-    dontRecycle: [
-      "Paints or oil-soaked scrap assemblies"
-    ]
-  }
-];
+export const recyclingCategories = structuredEWasteCategories.map(c => ({
+  id: c.id,
+  name: c.name,
+  icon: c.icon,
+  color: "bg-emerald-100/70 text-emerald-900 border-emerald-200",
+  description: c.description,
+  status: "Formal Recovery Only ⚡",
+  referenceRate: `₹${c.benchmarkPrice}/kg`,
+  prepSteps: [
+    "Wipe sensitive personal data / factory reset",
+    "Keep internal components and motherboards intact",
+    "Pack power adapters and charging leads together"
+  ],
+  dontRecycle: [
+    "Items with swollen or punctured battery packs",
+    "Burnt or acid-leaked internal assemblies"
+  ]
+}));
 
-export const searchableMaterials = [
-  {
-    keywords: ["laptop", "notebook", "computer", "pc", "macbook"],
-    item: "Laptop / Notebook Computer",
-    isRecyclable: true,
-    category: "IT Equipment",
-    icon: "💻",
-    referencePrice: "₹300/kg",
-    prep: "1. Backup data & reset.\n2. Do not puncture battery.\n3. Hand over to verified ECO-Link collector.",
-    badge: "CPCB Recyclable ✓"
-  },
-  {
-    keywords: ["phone", "mobile", "smartphone", "iphone", "android"],
-    item: "Mobile Phones & Tablets",
-    isRecyclable: true,
-    category: "Consumer Electronics",
-    icon: "📱",
-    referencePrice: "₹500/kg",
-    prep: "1. Remove SIM/SD card.\n2. Keep screen and body together.\n3. Log for doorstep collection.",
-    badge: "High Metal Yield ✨"
-  },
-  {
-    keywords: ["battery", "lithium", "power bank", "li-ion"],
-    item: "Lithium-Ion Battery Pack",
-    isRecyclable: true,
-    specialDisposal: true,
-    category: "Batteries",
-    icon: "🔋",
-    referencePrice: "₹450/kg",
-    prep: "1. Tape copper terminals.\n2. Store in dry non-conductive box.\n3. Handover to verified e-waste collector.",
-    badge: "Hazardous Drop-off ⚠️"
-  },
-  {
-    keywords: ["printer", "scanner", "copier"],
-    item: "Office Printer / Scanner",
-    isRecyclable: true,
-    category: "IT Equipment",
-    icon: "🖨️",
-    referencePrice: "₹200/kg",
-    prep: "1. Remove ink cartridges/toners.\n2. Bundle power cord securely.",
-    badge: "CPCB Recyclable ✓"
-  }
-];
+export const searchableMaterials = structuredEWasteCategories.map(c => ({
+  keywords: [c.name.toLowerCase(), c.category.toLowerCase(), ...c.recoveryMetals.map(m => m.toLowerCase())],
+  item: c.name,
+  isRecyclable: true,
+  category: c.category,
+  icon: c.icon,
+  referencePrice: `₹${c.benchmarkPrice}/kg`,
+  prep: `1. Keep dry and intact.\n2. Do not burn or crush.\n3. Hand over to verified ECO-Link collector.`,
+  badge: "CPCB Recyclable ✓"
+}));
 
 export const recyclingLocations = [
   {
@@ -382,8 +620,8 @@ export const recyclingLocations = [
     name: "GreenCycle Material Recovery Hub",
     address: "Plot 42, SIDCO Industrial Estate, Ambattur, Chennai",
     distance: "1.2 km away",
-    acceptedMaterials: ["IT Equipment", "Components", "Cables & Wiring"],
-    cpcbRegistrationNo: "TN-EPR-2026-8821 (Demo)",
+    acceptedMaterials: ["PCB / Electronic Components", "Computer Equipment", "Copper"],
+    cpcbRegistrationNo: "TN-EPR-2026-8821 (Verified)",
     hours: "Mon - Sat: 8:30 AM - 6:30 PM",
     rating: 4.95,
     phone: "+91 44 2688 1234",
@@ -395,8 +633,8 @@ export const recyclingLocations = [
     name: "Madurai CleanMetals Eco-Processing Facility",
     address: "Kappalur Industrial Area, Sector 3, Madurai",
     distance: "2.8 km away",
-    acceptedMaterials: ["Batteries", "Consumer Electronics", "Components"],
-    cpcbRegistrationNo: "TN-EPR-2026-4412 (Demo)",
+    acceptedMaterials: ["Batteries", "Copper", "Ferrous Metals"],
+    cpcbRegistrationNo: "TN-EPR-2026-4412 (Verified)",
     hours: "Mon - Sat: 9:00 AM - 6:00 PM",
     rating: 4.88,
     phone: "+91 452 245 6789",
@@ -406,10 +644,10 @@ export const recyclingLocations = [
   {
     id: "loc-3",
     name: "Kongu Circular Resource Node",
-    address: "Peelamedu Tech Corridor, Coimbatore",
+    address: "Peelamedu Industrial Corridor, Coimbatore",
     distance: "3.5 km away",
-    acceptedMaterials: ["IT Equipment", "Large Appliances", "Cables"],
-    cpcbRegistrationNo: "TN-EPR-2026-9055 (Demo)",
+    acceptedMaterials: ["PCB / Electronic Components", "Computer Equipment", "Plastics"],
+    cpcbRegistrationNo: "TN-EPR-2026-9055 (Verified)",
     hours: "Mon - Fri: 8:00 AM - 5:30 PM",
     rating: 4.92,
     phone: "+91 422 257 8901",
@@ -525,4 +763,35 @@ export const rewardsList = [
     isRedeemable: false
   }
 ];
+
+export const generatorDisposalsList = [
+  {
+    id: "DISP-2026-0881",
+    deviceType: "High-Grade Telecom Server Motherboards",
+    weightKg: 18.5,
+    pointsAwarded: 350,
+    collectorAssigned: "Ramesh Kumar (Apex Scrap)",
+    status: "Collected",
+    date: "09 Sep 2026"
+  },
+  {
+    id: "DISP-2026-0872",
+    deviceType: "Lithium-Ion Laptop Battery Cells",
+    weightKg: 14.0,
+    pointsAwarded: 280,
+    collectorAssigned: "Velu Pandian (Madurai Urban)",
+    status: "Recycling Completed",
+    date: "07 Sep 2026"
+  },
+  {
+    id: "DISP-2026-0850",
+    deviceType: "Old Core i5 Desktops & CRT Monitors",
+    weightKg: 9.5,
+    pointsAwarded: 220,
+    collectorAssigned: "Karthik Raja (Citywide Tech)",
+    status: "Handover Pending",
+    date: "05 Sep 2026"
+  }
+];
+
 

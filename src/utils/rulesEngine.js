@@ -1,55 +1,214 @@
-import { referenceScrapPrices } from '../data/scrapPrices';
+import { structuredEWasteCategories, referenceScrapPrices } from '../data/scrapPrices';
 
 /**
  * ECO-Link Rule-Based Deterministic Engine
- * All calculations and matching algorithms are transparent, rule-driven, and reproducible.
- * (No non-deterministic AI claims).
+ * Transparent, deterministic, auditable rules for e-waste classification,
+ * fair pricing limits, recycler matching, offer evaluation, and traceability.
  */
 
 /**
- * 1. classifyEWaste: Assigns material category, hazard class, and default reference rates based on keywords/properties.
+ * 1. calculateFairPriceRange:
+ * Formula:
+ * Lower Limit = Benchmark Price × (1 - Tolerance)
+ * Upper Limit = Benchmark Price × (1 + Tolerance)
+ * Estimated Value = Quantity × Benchmark Price
  */
-export function classifyEWaste(itemTitleOrKeywords) {
-  const query = (itemTitleOrKeywords || '').toLowerCase();
-  
-  const match = referenceScrapPrices.find(p => 
-    query.includes(p.material.toLowerCase()) || 
-    query.includes(p.category.toLowerCase()) ||
-    p.material.toLowerCase().split(' ').some(word => word.length > 3 && query.includes(word))
-  );
+export function calculateFairPriceRange(benchmarkPrice, tolerance = 0.25, quantity = 1) {
+  const benchmark = parseFloat(benchmarkPrice) || 0;
+  const tol = parseFloat(tolerance) || 0.25;
+  const qty = parseFloat(quantity) || 0;
 
-  if (match) {
-    return {
-      matched: true,
-      category: match.category,
-      material: match.material,
-      referencePrice: match.referencePrice,
-      referenceMin: match.referenceMin,
-      referenceMax: match.referenceMax,
-      hazardLevel: match.hazardLevel,
-      recoveryMetals: match.recoveryMetals,
-      unit: match.unit
-    };
-  }
+  const lowerLimit = Math.round(benchmark * (1 - tol));
+  const upperLimit = Math.round(benchmark * (1 + tol));
+  const minEstimatedValue = Math.round(qty * lowerLimit);
+  const maxEstimatedValue = Math.round(qty * upperLimit);
+  const estimatedLotValue = Math.round(qty * benchmark);
 
-  // Fallback default rule
   return {
-    matched: false,
-    category: "Mixed E-Waste",
-    material: itemTitleOrKeywords || "General E-Waste",
-    referencePrice: 250,
-    referenceMin: 220,
-    referenceMax: 290,
-    hazardLevel: "Low",
-    recoveryMetals: ["Copper", "Steel"],
-    unit: "₹/kg"
+    benchmarkPrice: benchmark,
+    tolerance: tol,
+    tolerancePercent: Math.round(tol * 100),
+    lowerLimit,
+    upperLimit,
+    rangeLabel: `₹${lowerLimit}–₹${upperLimit}/kg`,
+    estimatedLotValue,
+    minEstimatedValue,
+    maxEstimatedValue
   };
 }
 
 /**
- * 2. calculateReferenceValue:
- * Estimated Lot Value = sum of (quantityKg × category reference price)
- * e.g., Laptop (5kg × ₹300) + Mobile (2kg × ₹500) + Printer (3kg × ₹200) = ₹3,100
+ * 2. evaluateOfferFairPrice:
+ * Evaluates recycler offer against fair price limits.
+ * Returns: { status: 'FAIR' | 'BELOW_FAIR_RANGE' | 'ABOVE_FAIR_RANGE', isFlagged: boolean, label: string, diffPercent: number }
+ */
+export function evaluateOfferFairPrice(offeredPricePerUnit, benchmarkPrice, tolerance = 0.25) {
+  const offer = parseFloat(offeredPricePerUnit) || 0;
+  const benchmark = parseFloat(benchmarkPrice) || 0;
+  const tol = parseFloat(tolerance) || 0.25;
+
+  const lowerLimit = Math.round(benchmark * (1 - tol));
+  const upperLimit = Math.round(benchmark * (1 + tol));
+
+  if (offer < lowerLimit) {
+    const diffPercent = Math.round(((lowerLimit - offer) / lowerLimit) * 100);
+    return {
+      status: "BELOW_FAIR_RANGE",
+      isFlagged: true,
+      label: "BELOW FAIR RANGE ⚠️",
+      badgeClass: "bg-rose-50 text-rose-700 border-rose-200",
+      diffPercent,
+      lowerLimit,
+      upperLimit,
+      benchmarkPrice: benchmark,
+      message: `Offer of ₹${offer}/kg is ${diffPercent}% below the minimum fair limit of ₹${lowerLimit}/kg.`
+    };
+  }
+
+  if (offer > upperLimit) {
+    const diffPercent = Math.round(((offer - upperLimit) / upperLimit) * 100);
+    return {
+      status: "ABOVE_FAIR_RANGE",
+      isFlagged: true,
+      label: "ABOVE FAIR RANGE ⚠️",
+      badgeClass: "bg-amber-50 text-amber-700 border-amber-200",
+      diffPercent,
+      lowerLimit,
+      upperLimit,
+      benchmarkPrice: benchmark,
+      message: `Offer of ₹${offer}/kg is ${diffPercent}% above the maximum fair limit of ₹${upperLimit}/kg.`
+    };
+  }
+
+  return {
+    status: "FAIR",
+    isFlagged: false,
+    label: "FAIR ✓",
+    badgeClass: "bg-emerald-50 text-emerald-700 border-emerald-200",
+    diffPercent: 0,
+    lowerLimit,
+    upperLimit,
+    benchmarkPrice: benchmark,
+    message: `Offer of ₹${offer}/kg is within the fair reference range (₹${lowerLimit}–₹${upperLimit}/kg).`
+  };
+}
+
+/**
+ * 3. classifyEWaste:
+ * Assigns structured material category, benchmark price, hazard level, and recovery metals.
+ */
+export function classifyEWaste(itemTitleOrKeywords) {
+  const query = (itemTitleOrKeywords || '').toLowerCase();
+  
+  const match = structuredEWasteCategories.find(c => 
+    query.includes(c.name.toLowerCase()) || 
+    query.includes(c.category.toLowerCase()) ||
+    c.name.toLowerCase().split(' ').some(w => w.length > 3 && query.includes(w))
+  );
+
+  if (match) {
+    const range = calculateFairPriceRange(match.benchmarkPrice, match.tolerance, 1);
+    return {
+      matched: true,
+      category: match.category,
+      material: match.name,
+      benchmarkPrice: match.benchmarkPrice,
+      referencePrice: match.benchmarkPrice,
+      tolerance: match.tolerance,
+      lowerLimit: range.lowerLimit,
+      upperLimit: range.upperLimit,
+      referenceMin: range.lowerLimit,
+      referenceMax: range.upperLimit,
+      hazardLevel: match.hazardLevel,
+      recoveryMetals: match.recoveryMetals,
+      unit: match.unit,
+      icon: match.icon
+    };
+  }
+
+  // Default fallback category: Other E-Waste
+  const defaultCat = structuredEWasteCategories[structuredEWasteCategories.length - 1];
+  const defaultRange = calculateFairPriceRange(defaultCat.benchmarkPrice, defaultCat.tolerance, 1);
+  return {
+    matched: false,
+    category: defaultCat.category,
+    material: itemTitleOrKeywords || defaultCat.name,
+    benchmarkPrice: defaultCat.benchmarkPrice,
+    referencePrice: defaultCat.benchmarkPrice,
+    tolerance: defaultCat.tolerance,
+    lowerLimit: defaultRange.lowerLimit,
+    upperLimit: defaultRange.upperLimit,
+    referenceMin: defaultRange.lowerLimit,
+    referenceMax: defaultRange.upperLimit,
+    hazardLevel: defaultCat.hazardLevel,
+    recoveryMetals: defaultCat.recoveryMetals,
+    unit: defaultCat.unit,
+    icon: defaultCat.icon
+  };
+}
+
+/**
+ * 4. matchLotsToRecycler:
+ * Matches available lots with a verified recycler based on:
+ * - Recycler Verification Status (Must be 'VERIFIED')
+ * - Material Category compatibility
+ * - Capacity / Quantity fit
+ * - Proximity / Location
+ */
+export function matchLotsToRecycler(lots = [], recycler) {
+  if (!recycler || recycler.verificationStatus !== 'VERIFIED') {
+    return [];
+  }
+
+  const acceptedCats = recycler.acceptedCategories || recycler.supportedCategories || [];
+
+  return lots.filter(lot => {
+    // Only available, matched or offer received lots
+    const isLotOpen = ['AVAILABLE', 'MATCHED', 'OFFER_RECEIVED', 'DRAFT'].includes(lot.status) || 
+                      ['Available', 'Matched', 'Pending'].includes(lot.status);
+    if (!isLotOpen) return false;
+
+    // Check category match
+    const categoryMatches = acceptedCats.length === 0 || acceptedCats.some(cat => 
+      cat.toLowerCase().includes((lot.category || '').toLowerCase()) ||
+      (lot.category || '').toLowerCase().includes(cat.toLowerCase())
+    );
+
+    return categoryMatches;
+  }).map(lot => {
+    let matchScore = 70;
+    if ((recycler.location || '').toLowerCase().includes((lot.location || '').split('-')[0].trim().toLowerCase())) {
+      matchScore += 20;
+    }
+    return {
+      ...lot,
+      matchScore: Math.min(matchScore, 98)
+    };
+  });
+}
+
+/**
+ * 5. createTraceabilityEvent:
+ * Creates standard milestone timestamp entry for lot traceability ledger
+ */
+export function createTraceabilityEvent(event, userRole, status, details = {}) {
+  const now = new Date();
+  const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
+                 now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+  return {
+    id: `EVT-${Date.now()}-${Math.floor(100 + Math.random() * 900)}`,
+    event,
+    timestamp: timeStr,
+    isoTimestamp: now.toISOString(),
+    userRole,
+    status,
+    details
+  };
+}
+
+/**
+ * Backward compatibility helpers
  */
 export function calculateReferenceValue(items = []) {
   if (!items || items.length === 0) return 0;
@@ -62,10 +221,6 @@ export function calculateReferenceValue(items = []) {
   }, 0);
 }
 
-/**
- * 3. calculateAverageReferenceRate:
- * Average of the applicable category reference rates (in ₹/kg)
- */
 export function calculateAverageReferenceRate(items = []) {
   if (!items || items.length === 0) return 250;
   const rates = items.map(item => {
@@ -77,20 +232,11 @@ export function calculateAverageReferenceRate(items = []) {
   return Math.round(sum / rates.length);
 }
 
-/**
- * 4. calculateLotValue:
- * Total Agreed / Asking Value = Total Weight × Asking Price
- */
 export function calculateLotValue(items = [], askingPricePerKg = 0) {
   const totalWeight = items.reduce((total, item) => total + parseFloat(item.weightKg || item.quantity || 0), 0);
   return Math.round(totalWeight * (parseFloat(askingPricePerKg) || 0));
 }
 
-/**
- * 5. checkPriceWarning:
- * Evaluates whether asking price is significantly above the reference range (> +15% above max or reference).
- * Returns { isWarning: boolean, percentAbove: number, referenceMin: number, referenceMax: number, message: string }
- */
 export function checkPriceWarning(askingPrice, referenceMin = 280, referenceMax = 330) {
   const price = parseFloat(askingPrice) || 0;
   const maxRange = parseFloat(referenceMax) || 330;
@@ -104,7 +250,7 @@ export function checkPriceWarning(askingPrice, referenceMin = 280, referenceMax 
       referenceMin: minRange,
       referenceMax: maxRange,
       askingPrice: price,
-      message: `Your asking price (₹${price}/kg) is ${percentAbove}% above the current reference range (₹${minRange}–₹${maxRange}/kg).`
+      message: `Your asking price (₹${price}/kg) is ${percentAbove}% above the reference range (₹${minRange}–₹${maxRange}/kg).`
     };
   }
 
@@ -118,33 +264,20 @@ export function checkPriceWarning(askingPrice, referenceMin = 280, referenceMax 
   };
 }
 
-/**
- * 6. matchCollectorsToRequirement:
- * Matches collectors with active requirements based on:
- * - Material Category compatibility
- * - Available Quantity
- * - Geographic proximity / City match
- * - Asking price vs Recycler Budget
- * - Reliability score
- */
 export function matchCollectorsToRequirement(collectors = [], requirement) {
   if (!requirement) return [];
 
   return collectors.map(collector => {
-    let matchScore = 50; // baseline
-
-    // Rule 1: Category Match
+    let matchScore = 50;
     const categoryMatches = (collector.materials || []).some(
       m => m.toLowerCase().includes(requirement.category.toLowerCase()) || requirement.category.toLowerCase().includes(m.toLowerCase())
     );
     if (categoryMatches) matchScore += 25;
 
-    // Rule 2: Quantity Sufficiency
     const weight = parseFloat(collector.availableWeightKg || 0);
     const reqQty = parseFloat(requirement.requiredQuantityKg || 0);
     if (weight >= reqQty * 0.8) matchScore += 15;
 
-    // Rule 3: Price within budget
     const asking = parseFloat(collector.askingPricePerKg || 0);
     const budget = parseFloat(requirement.targetPricePerKg || 0);
     if (asking <= budget) {
@@ -153,7 +286,6 @@ export function matchCollectorsToRequirement(collectors = [], requirement) {
       matchScore -= 10;
     }
 
-    // Check price warning status for this collector
     const priceCheck = checkPriceWarning(
       collector.askingPricePerKg, 
       requirement.referenceMin || 280, 
@@ -169,21 +301,18 @@ export function matchCollectorsToRequirement(collectors = [], requirement) {
   }).sort((a, b) => b.matchScore - a.matchScore);
 }
 
-/**
- * 7. verifyRecyclerStatus:
- * Validates CPCB/EPR government registration status layer vs ECO-Link platform status layer.
- */
 export function verifyRecyclerStatus(recycler) {
+  const isVerified = recycler?.verificationStatus === 'VERIFIED' || Boolean(recycler?.isPlatformVerified);
   const hasCpcb = Boolean(recycler?.cpcbRegistrationNo && recycler?.cpcbRegistrationNo.trim().length > 5);
-  const isPlatformActive = Boolean(recycler?.isPlatformVerified);
 
   return {
     cpcbVerified: hasCpcb,
     cpcbRegistrationNo: recycler?.cpcbRegistrationNo || "TN-EPR-DEMO-2026",
     cpcbAuditDate: recycler?.cpcbAuditDate || "15 Jan 2026",
-    platformVerified: isPlatformActive,
-    statusBadgeText: hasCpcb ? "✓ CPCB/EPR Registration Verified" : "CPCB Registration Pending",
+    platformVerified: isVerified,
+    statusBadgeText: isVerified ? "✓ Verified Recycler" : (recycler?.verificationStatus || "Pending Verification"),
     tier: recycler?.tier || "Tier-1 Certified Recovery Unit",
-    complianceScore: hasCpcb ? "100% Verified" : "Audit In Progress"
+    complianceScore: isVerified ? "100% Verified" : "Audit In Progress"
   };
 }
+
