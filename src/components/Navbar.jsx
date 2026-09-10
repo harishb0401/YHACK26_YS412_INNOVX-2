@@ -18,12 +18,10 @@ export default function Navbar({
 
   const navLinks = [
     { name: t("navHome"), view: 'landing' },
-    { name: t("navCollector"), view: 'collector' },
-    { name: t("navRecycler"), view: 'recycler' },
-    { name: t("navGenerator"), view: 'generator' },
+    { name: "How It Works", view: 'how-it-works' },
     { name: t("navGuide"), view: 'guide' },
     { name: t("navLocations"), view: 'locations' },
-    { name: t("navAdmin"), view: 'admin' },
+    { name: "About", view: 'about' },
   ];
 
   const handleNavClick = (viewName) => {
@@ -45,7 +43,7 @@ export default function Navbar({
               <span className="text-xl font-black">♻</span>
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-[#244936]">
-              ECO-<span className="text-[#3F7655]">Link</span>
+              Eco-<span className="text-[#3F7655]">Link</span>
             </span>
           </div>
 
@@ -69,24 +67,23 @@ export default function Navbar({
             })}
           </nav>
 
-          {/* Right Action Tools: Search, Language, Role Selector */}
-          <div className="hidden sm:flex items-center gap-3">
+          {/* Right Action Tools: Search, Language, Auth & Dashboard Links */}
+          <div className="hidden sm:flex items-center gap-2">
             
             {/* Search Trigger */}
             <button
               onClick={onOpenSearchModal}
               title="Search e-waste materials & reference rates"
-              className="p-2.5 rounded-full text-[#203128] hover:text-[#3F7655] hover:bg-[#DDEBD8]/60 transition border border-[#3F7655]/10 flex items-center gap-1.5 text-xs font-semibold"
+              className="p-2 rounded-full text-[#203128] hover:text-[#3F7655] hover:bg-[#DDEBD8]/60 transition border border-[#3F7655]/10 flex items-center gap-1.5 text-xs font-semibold"
             >
               <Search className="w-4 h-4 text-[#3F7655]" />
-              <span className="hidden md:inline text-[#718078]">{t("navSearchPlaceholder")}</span>
             </button>
 
             {/* Language Switcher: EN | தமிழ் */}
             <div className="flex items-center bg-white border border-[#3F7655]/20 rounded-full p-1 shadow-sm">
               <button
                 onClick={() => setLang('en')}
-                className={`px-2.5 py-1 text-xs font-bold rounded-full transition cursor-pointer ${
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition cursor-pointer ${
                   lang === 'en' 
                     ? 'bg-[#3F7655] text-white' 
                     : 'text-[#203128] hover:text-[#3F7655]'
@@ -96,7 +93,7 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setLang('ta')}
-                className={`px-2.5 py-1 text-xs font-bold rounded-full transition cursor-pointer ${
+                className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition cursor-pointer ${
                   lang === 'ta' 
                     ? 'bg-[#3F7655] text-white' 
                     : 'text-[#203128] hover:text-[#3F7655]'
@@ -106,41 +103,77 @@ export default function Navbar({
               </button>
             </div>
 
-            {/* Fast Portal Selector Buttons */}
+            {/* Login & Sign Up Buttons (Section 1) */}
             <button
-              onClick={() => handleNavClick('collector')}
-              className={`px-3.5 py-2 text-xs font-extrabold rounded-full border transition flex items-center gap-1.5 cursor-pointer ${
-                activeView === 'collector'
-                  ? 'bg-[#3F7655] text-white border-[#3F7655] shadow-md shadow-[#3F7655]/20'
-                  : 'text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] border-[#3F7655]/20'
+              onClick={() => handleNavClick('login')}
+              className={`px-3.5 py-1.5 text-xs font-extrabold rounded-full transition cursor-pointer border ${
+                activeView === 'login'
+                  ? 'bg-[#3F7655] text-white border-[#3F7655]'
+                  : 'bg-white text-[#203128] border-[#3F7655]/20 hover:bg-[#DDEBD8]/50'
               }`}
             >
-              <Truck className="w-3.5 h-3.5" />
-              <span>{t("navCollector")}</span>
+              Login
+            </button>
+
+            <button
+              onClick={() => handleNavClick('signup')}
+              className={`px-3.5 py-1.5 text-xs font-extrabold rounded-full transition cursor-pointer ${
+                activeView === 'signup'
+                  ? 'bg-[#244936] text-white shadow-md'
+                  : 'bg-[#3F7655] text-white hover:bg-[#244936]'
+              }`}
+            >
+              Sign Up
+            </button>
+
+            {/* Portal / Role Switcher Quick Links */}
+            <button
+              onClick={() => handleNavClick('collector')}
+              className={`p-2 rounded-full border transition cursor-pointer ${
+                activeView === 'collector'
+                  ? 'bg-[#3F7655] text-white border-[#3F7655]'
+                  : 'text-[#244936] bg-[#DDEBD8] hover:bg-[#c9e0c1] border-[#3F7655]/20'
+              }`}
+              title="Collector Dashboard"
+            >
+              <Truck className="w-4 h-4" />
             </button>
 
             <button
               onClick={() => handleNavClick('recycler')}
-              className={`px-3.5 py-2 text-xs font-extrabold rounded-full transition flex items-center gap-1.5 cursor-pointer ${
+              className={`p-2 rounded-full transition cursor-pointer ${
                 activeView === 'recycler'
-                  ? 'bg-[#244936] text-white shadow-md shadow-[#244936]/20'
-                  : 'bg-[#3F7655] hover:bg-[#244936] text-white shadow-sm'
+                  ? 'bg-[#244936] text-white'
+                  : 'bg-[#3F7655] text-white hover:bg-[#244936]'
               }`}
+              title="Recycler Dashboard"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#F2C94C]" />
-              <span>{t("navRecycler")}</span>
+              <ShieldCheck className="w-4 h-4 text-[#F2C94C]" />
             </button>
 
             <button
               onClick={() => handleNavClick('admin')}
-              className={`px-3.5 py-2 text-xs font-extrabold rounded-full transition flex items-center gap-1.5 cursor-pointer ${
+              className={`p-2 rounded-full transition cursor-pointer ${
                 activeView === 'admin'
-                  ? 'bg-[#14291E] text-[#F2C94C] shadow-md shadow-black/20'
-                  : 'bg-[#244936] hover:bg-[#14291E] text-white shadow-sm'
+                  ? 'bg-[#14291E] text-[#F2C94C]'
+                  : 'bg-[#244936] text-white hover:bg-[#14291E]'
               }`}
+              title="Admin Dashboard"
             >
-              <Shield className="w-3.5 h-3.5 text-emerald-400" />
-              <span>{t("navAdmin")}</span>
+              <Shield className="w-4 h-4 text-emerald-400" />
+            </button>
+
+            {/* Profile Link */}
+            <button
+              onClick={() => handleNavClick('profile')}
+              className={`p-2 rounded-full transition cursor-pointer border ${
+                activeView === 'profile'
+                  ? 'bg-[#3F7655] text-white border-[#3F7655]'
+                  : 'bg-white text-[#203128] border-[#3F7655]/20 hover:bg-[#DDEBD8]'
+              }`}
+              title="User Profile"
+            >
+              <User className="w-4 h-4 text-[#3F7655]" />
             </button>
 
           </div>
@@ -198,7 +231,49 @@ export default function Navbar({
             ))}
           </div>
 
+          <div className="pt-2 border-t border-[#3F7655]/10 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleNavClick('login')}
+              className="py-2.5 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/20 rounded-xl"
+            >
+              Login
+            </button>
+            <button
+              onClick={() => handleNavClick('signup')}
+              className="py-2.5 text-xs font-bold text-white bg-[#3F7655] rounded-xl"
+            >
+              Sign Up
+            </button>
+          </div>
+
           <div className="pt-2 border-t border-[#3F7655]/10 flex flex-col gap-2">
+            <div className="grid grid-cols-4 gap-2">
+              <button
+                onClick={() => handleNavClick('collector')}
+                className="py-2 text-[11px] font-bold bg-[#DDEBD8] text-[#244936] rounded-xl text-center"
+              >
+                Collector
+              </button>
+              <button
+                onClick={() => handleNavClick('recycler')}
+                className="py-2 text-[11px] font-bold bg-[#244936] text-white rounded-xl text-center"
+              >
+                Recycler
+              </button>
+              <button
+                onClick={() => handleNavClick('admin')}
+                className="py-2 text-[11px] font-bold bg-[#14291E] text-[#F2C94C] rounded-xl text-center"
+              >
+                Admin
+              </button>
+              <button
+                onClick={() => handleNavClick('profile')}
+                className="py-2 text-[11px] font-bold bg-white text-[#203128] border border-[#3F7655]/20 rounded-xl text-center"
+              >
+                Profile
+              </button>
+            </div>
+
             <button
               onClick={onOpenSearchModal}
               className="w-full py-2.5 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/20 rounded-xl flex items-center justify-center gap-2"

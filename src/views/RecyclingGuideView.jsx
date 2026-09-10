@@ -1,19 +1,192 @@
 import React, { useState } from 'react';
-import { Search, CheckCircle2, XCircle, MapPin, ArrowRight, BookOpen, ShieldAlert, Sparkles } from 'lucide-react';
+import { Search, CheckCircle2, XCircle, MapPin, ArrowRight, BookOpen, ShieldAlert, Cpu, Smartphone, Laptop, Monitor, Tv, Printer, Battery, Cable, HardDrive, Layers } from 'lucide-react';
 import { useTranslation } from '../i18n';
-import { recyclingCategories } from '../mockData';
 
 export default function RecyclingGuideView({ setActiveView, onOpenSearchModal }) {
-  const { t, tCategory } = useTranslation();
-  const [activeCategory, setActiveCategory] = useState(recyclingCategories[0].id);
+  const { t } = useTranslation();
   const [guideSearch, setGuideSearch] = useState('');
+  const [selectedCatId, setSelectedCatId] = useState('mobiles');
 
-  const selectedCat = recyclingCategories.find(c => c.id === activeCategory) || recyclingCategories[0];
+  // Exact 10 Categories from Section 3 Specification
+  const guideCategories = [
+    {
+      id: 'mobiles',
+      name: 'Mobile phones',
+      icon: <Smartphone className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Old, unused, or damaged mobile phones, smartphones, and cellular devices.',
+      components: ['Printed Circuit Boards (PCBs)', 'Precious Metals (Gold, Silver, Copper)', 'Polycarbonate Plastics', 'Lithium-ion Battery'],
+      dos: [
+        'Remove all personal data and perform a factory reset',
+        'Keep batteries safely separated where applicable',
+        'Hand over to authorized recycling channels'
+      ],
+      donts: [
+        'Do not throw electronics into regular waste bins',
+        'Do not puncture or damage lithium batteries',
+        'Do not burn electronic components or wires'
+      ]
+    },
+    {
+      id: 'laptops',
+      name: 'Laptops',
+      icon: <Laptop className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Portable notebook computers, ultrabooks, and laptop chargers.',
+      components: ['Motherboards & RAM Chips', 'Aluminum & Magnesium Alloy Casing', 'LCD/OLED Display Panels', 'Lithium-Polymer Batteries'],
+      dos: [
+        'Back up and erase hard disk drive data prior to disposal',
+        'Detach external chargers and cables for separate processing',
+        'Hand over intact to CPCB verified recyclers'
+      ],
+      donts: [
+        'Do not dismantle display screens manually',
+        'Do not expose damaged laptop batteries to heat',
+        'Do not crush or incinerate laptop bodies'
+      ]
+    },
+    {
+      id: 'computers',
+      name: 'Computers',
+      icon: <HardDrive className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Desktop PC towers, workstations, power supply units (PSUs), and internal drives.',
+      components: ['High-Grade Motherboards', 'Copper Heat Sinks & Wiring', 'Steel/Iron Chassis', 'Power Transformers'],
+      dos: [
+        'Remove data drives or execute cryptographic wipe',
+        'Keep metal casing intact during aggregation',
+        'Separate power cords for copper recovery'
+      ],
+      donts: [
+        'Do not open power supply capacitors without safety tools',
+        'Do not discard heavy metal computer cases in municipal dumps',
+        'Do not burn wire insulation'
+      ]
+    },
+    {
+      id: 'batteries',
+      name: 'Batteries',
+      icon: <Battery className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Lithium-ion, Lead-acid, NiMH, and button cell batteries from electronics.',
+      components: ['Lithium & Cobalt Oxides', 'Lead & Sulfuric Acid', 'Nickel & Cadmium Compounds', 'Copper/Aluminum Foils'],
+      dos: [
+        'Tape battery terminals to prevent accidental short-circuiting',
+        'Store in cool, dry, non-conductive containers',
+        'Deliver directly to authorized battery recyclers'
+      ],
+      donts: [
+        'Do not crush, puncture, or submerge batteries in water',
+        'Do not mix leaking lead-acid batteries with household trash',
+        'Do not incinerate or expose to open flame'
+      ]
+    },
+    {
+      id: 'tvs',
+      name: 'TVs',
+      icon: <Tv className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Television sets including CRT, LED, LCD, and Plasma screens.',
+      components: ['Leaded CRT Glass (Legacy TVs)', 'LED Backlight Strips', 'Main System Boards', 'Plastic Enclosures'],
+      dos: [
+        'Handle CRT glass with extreme care to prevent implosion',
+        'Keep internal circuit boards intact',
+        'Transport upright to authorized processing centers'
+      ],
+      donts: [
+        'Do not smash CRT tubes to avoid toxic lead dust release',
+        'Do not dump television units in open fields',
+        'Do not burn plastic TV frames'
+      ]
+    },
+    {
+      id: 'monitors',
+      name: 'Monitors',
+      icon: <Monitor className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Computer display monitors, flat-panel screens, and touch monitors.',
+      components: ['Indium Tin Oxide Glass', 'CCFL/LED Backlights', 'Control Logic PCBA', 'Plastic/Metal Stands'],
+      dos: [
+        'Keep glass panels face-protected during transit',
+        'Recycle power adapters along with the monitor',
+        'Hand over to certified IT asset disposition centers'
+      ],
+      donts: [
+        'Do not break mercury-containing CCFL backlight tubes',
+        'Do not drop or crush display panels',
+        'Do not mix with construction debris'
+      ]
+    },
+    {
+      id: 'printers',
+      name: 'Printers',
+      icon: <Printer className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Inkjet printers, laserjet units, scanners, and multifunction fax devices.',
+      components: ['Copper Stepper Motors', 'Toner Cartridges', 'Logic Boards', 'Engineered ABS Plastics'],
+      dos: [
+        'Remove ink or toner cartridges prior to e-waste handover',
+        'Keep paper trays and accessories bundled together',
+        'Recycle toner cartridges through manufacturer take-back schemes'
+      ],
+      donts: [
+        'Do not spill toxic toner powder into waterways or drains',
+        'Do not incinerate plastic printer shells',
+        'Do not throw raw cartridges into domestic trash'
+      ]
+    },
+    {
+      id: 'cables',
+      name: 'Cables',
+      icon: <Cable className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Power cords, USB cables, LAN Ethernet wires, and HDMI connections.',
+      components: ['99.9% Pure Copper Strands', 'Aluminum Shielding Foil', 'PVC/Rubber Insulation Sheathing'],
+      dos: [
+        'Bundle wires neatly into coils for easy weighing',
+        'Hand over directly to mechanical granulation recyclers',
+        'Keep metal connectors attached'
+      ],
+      donts: [
+        'Do not open-burn cables to strip PVC plastic insulation',
+        'Do not dump wire scrap in drain channels',
+        'Do not expose PVC to fire due to toxic dioxin release'
+      ]
+    },
+    {
+      id: 'circuit-boards',
+      name: 'Circuit boards',
+      icon: <Cpu className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Printed Circuit Boards (PCBs) from servers, telecom gear, and household appliances.',
+      components: ['Gold, Palladium & Silver Contacts', 'Fiberglass Substrate (FR-4)', 'IC Chips & Microprocessors', 'Solder (Tin/Lead/Copper)'],
+      dos: [
+        'Store high-grade motherboard scrap separately from low-grade boards',
+        'Protect gold-plated contact fingers from abrasion',
+        'Transfer to hydrometallurgical refining facilities'
+      ],
+      donts: [
+        'Do not use crude acid baths in unventilated informal yards',
+        'Do not burn circuit boards over open fires',
+        'Do not discard shredded PCB dust in open air'
+      ]
+    },
+    {
+      id: 'other-electronics',
+      name: 'Other electronics',
+      icon: <Layers className="w-6 h-6 text-[#3F7655]" />,
+      whatIsIt: 'Microwaves, gaming consoles, smart home gadgets, and audio equipment.',
+      components: ['Transformers & Coils', 'Steel & Aluminum Frames', 'Control Circuitry', 'Synthetic Polymers'],
+      dos: [
+        'Check device category & material grade on Eco-Link',
+        'Separate heavy transformers from light electronics',
+        'Deliver to CPCB registered authorized recyclers'
+      ],
+      donts: [
+        'Do not discard mixed electronic gadgets in landfill waste',
+        'Do not dismantle hazardous high-voltage components',
+        'Do not burn any electronic housings'
+      ]
+    }
+  ];
 
-  const filteredCategories = recyclingCategories.filter(cat => {
-    return cat.name.toLowerCase().includes(guideSearch.toLowerCase()) ||
-           cat.description.toLowerCase().includes(guideSearch.toLowerCase());
-  });
+  const activeCategory = guideCategories.find(c => c.id === selectedCatId) || guideCategories[0];
+
+  const filteredCategories = guideCategories.filter(cat => 
+    cat.name.toLowerCase().includes(guideSearch.toLowerCase()) ||
+    cat.whatIsIt.toLowerCase().includes(guideSearch.toLowerCase())
+  );
 
   return (
     <div className="min-h-screen bg-[#F8F5EA] py-12 text-[#203128]">
@@ -21,145 +194,142 @@ export default function RecyclingGuideView({ setActiveView, onOpenSearchModal })
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-bold uppercase tracking-wider">
-            <BookOpen className="w-3.5 h-3.5" /> {t("guideDirectoryTitle")}
+          <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-extrabold uppercase tracking-wider border border-[#3F7655]/20">
+            <BookOpen className="w-3.5 h-3.5" /> RECYCLING GUIDE DIRECTORY
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#203128] tracking-tight">
-            {t("guideMainHeading")}
+            E-Waste Classification & Recycling Protocol
           </h1>
-          <p className="text-base text-[#718078]">
-            {t("guideSubHeading")}
+          <p className="text-base text-[#718078] font-medium">
+            Learn what materials can be recovered, key components, and vital Do's and Don'ts for responsible handling.
           </p>
         </div>
 
-        {/* Search Bar & Category Chips */}
-        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/15 shadow-sm space-y-5">
-          
-          <div className="relative max-w-2xl mx-auto">
+        {/* Search Bar */}
+        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/15 shadow-sm space-y-4">
+          <div className="relative max-w-xl mx-auto">
             <Search className="w-5 h-5 text-[#3F7655] absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               value={guideSearch}
               onChange={(e) => setGuideSearch(e.target.value)}
-              placeholder={t("searchGuidePlaceholder")}
-              className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-12 pr-4 py-3.5 text-sm font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
+              placeholder="Search category (e.g. Mobile phones, Batteries, Laptops)..."
+              className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-12 pr-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
             />
           </div>
-
-          {/* Category Filter Chips */}
-          <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-            <span className="text-xs font-bold text-[#718078] mr-1">{t("categoriesLabel")}:</span>
-            {recyclingCategories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
-                  activeCategory === cat.id 
-                    ? 'bg-[#3F7655] text-white shadow-md' 
-                    : 'bg-[#F8F5EA] text-[#203128] border border-[#3F7655]/15 hover:bg-[#DDEBD8]'
-                }`}
-              >
-                <span>{cat.icon}</span>
-                <span>{tCategory(cat.name)}</span>
-              </button>
-            ))}
-          </div>
-
         </div>
 
-        {/* Material Detail Panel */}
-        {selectedCat && (
-          <div className="bg-white rounded-[28px] border border-[#3F7655]/20 shadow-md p-6 sm:p-10 space-y-8">
+        {/* 10 Category Cards Grid (Section 3) */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+          {filteredCategories.map((cat) => {
+            const isSelected = selectedCatId === cat.id;
+            return (
+              <button
+                key={cat.id}
+                onClick={() => setSelectedCatId(cat.id)}
+                className={`p-4 rounded-2xl border transition-all cursor-pointer text-center flex flex-col items-center justify-center gap-2 ${
+                  isSelected
+                    ? 'bg-[#3F7655] text-white border-[#3F7655] shadow-md scale-105'
+                    : 'bg-white text-[#203128] border-[#3F7655]/20 hover:bg-[#DDEBD8]/50'
+                }`}
+              >
+                <div className={`p-2 rounded-xl ${isSelected ? 'bg-white/20' : 'bg-[#DDEBD8]'}`}>
+                  {cat.icon}
+                </div>
+                <span className="text-xs font-extrabold">{cat.name}</span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected Category Detail View (Section 3 Specification) */}
+        {activeCategory && (
+          <div className="bg-white rounded-[32px] border border-[#3F7655]/20 shadow-lg p-6 sm:p-10 space-y-8 animate-fadeIn">
             
-            {/* Top Material Title & Status */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-[#3F7655]/10 pb-6">
-              <div className="flex items-center gap-4">
-                <div className={`w-16 h-16 rounded-2xl ${selectedCat.color} flex items-center justify-center text-3xl shrink-0 shadow-inner`}>
-                  {selectedCat.icon}
-                </div>
-                <div>
-                  <h2 className="text-2xl sm:text-3xl font-extrabold text-[#203128]">{tCategory(selectedCat.name)}</h2>
-                  <p className="text-sm text-[#718078] mt-1">{selectedCat.description}</p>
-                </div>
+            {/* Category Header */}
+            <div className="flex items-center gap-4 pb-6 border-b border-[#3F7655]/15">
+              <div className="w-14 h-14 rounded-2xl bg-[#DDEBD8] text-[#3F7655] flex items-center justify-center shadow-inner">
+                {activeCategory.icon}
               </div>
-
-              <div className="flex flex-col items-start sm:items-end gap-1">
-                <span className="px-4 py-1.5 rounded-full text-xs font-extrabold bg-[#DDEBD8] text-[#244936] border border-[#3F7655]/20">
-                  {selectedCat.status}
+              <div>
+                <span className="text-[10px] font-extrabold uppercase text-[#3F7655] tracking-widest block">
+                  CATEGORY DETAILS
                 </span>
-                <span className="text-xs font-bold text-[#3F7655]">Ref: {selectedCat.referenceRate || "₹300/kg"}</span>
+                <h2 className="text-2xl sm:text-3xl font-black text-[#203128]">{activeCategory.name}</h2>
               </div>
             </div>
 
-            {/* 2-Column: HOW TO PREPARE vs DON'T RECYCLE */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* What is it? */}
+            <div className="bg-[#FAF8F2] p-5 rounded-2xl border border-[#3F7655]/15 space-y-1">
+              <h3 className="text-xs font-black uppercase text-[#3F7655] tracking-wider">What is it?</h3>
+              <p className="text-sm font-semibold text-[#203128] leading-relaxed">
+                {activeCategory.whatIsIt}
+              </p>
+            </div>
+
+            {/* Common Recyclable Components */}
+            <div className="space-y-3">
+              <h3 className="text-xs font-black uppercase text-[#203128] tracking-wider">
+                Common Recyclable Components
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {activeCategory.components.map((comp, idx) => (
+                  <div key={idx} className="p-3 bg-[#F8F5EA] rounded-xl border border-[#3F7655]/10 flex items-center gap-2 text-xs font-bold text-[#203128]">
+                    <div className="w-2 h-2 rounded-full bg-[#3F7655]" />
+                    <span>{comp}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 2-Column Grid: DO vs DON'T */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               
-              {/* HOW TO PREPARE */}
-              <div className="space-y-4 bg-[#F8F5EA] p-6 rounded-2xl border border-[#3F7655]/10">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-[#244936] flex items-center gap-2">
-                  <CheckCircle2 className="w-5 h-5 text-[#3F7655]" />
-                  {t("howToPrepareHeading")}
+              {/* DO SECTION */}
+              <div className="p-6 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-3">
+                <h3 className="text-sm font-black text-emerald-900 uppercase tracking-wider flex items-center gap-2">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-600" />
+                  <span>Do</span>
                 </h3>
-
-                <div className="space-y-3">
-                  {selectedCat.prepSteps.map((step, sIdx) => (
-                    <div key={sIdx} className="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-[#3F7655]/10">
-                      <span className="w-6 h-6 rounded-full bg-[#3F7655] text-white font-extrabold text-xs flex items-center justify-center shrink-0">
-                        0{sIdx + 1}
-                      </span>
-                      <p className="text-xs font-semibold text-[#203128] leading-relaxed pt-0.5">
-                        {step}
-                      </p>
-                    </div>
+                <ul className="space-y-2.5">
+                  {activeCategory.dos.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-xs font-bold text-emerald-950">
+                      <span className="w-4 h-4 rounded-full bg-emerald-200 text-emerald-800 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">✓</span>
+                      <span>{item}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
-              {/* DON'T RECYCLE */}
-              <div className="space-y-4 bg-rose-50/60 p-6 rounded-2xl border border-rose-200/80">
-                <h3 className="text-sm font-bold uppercase tracking-wider text-rose-900 flex items-center gap-2">
+              {/* DON'T SECTION */}
+              <div className="p-6 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-3">
+                <h3 className="text-sm font-black text-rose-900 uppercase tracking-wider flex items-center gap-2">
                   <XCircle className="w-5 h-5 text-rose-600" />
-                  {t("dontRecycleHeading")}
+                  <span>Don't</span>
                 </h3>
-
-                <div className="space-y-3">
-                  {selectedCat.dontRecycle.map((dont, dIdx) => (
-                    <div key={dIdx} className="flex items-start gap-3 bg-white p-3.5 rounded-xl border border-rose-100">
-                      <span className="w-6 h-6 rounded-full bg-rose-100 text-rose-700 font-extrabold text-xs flex items-center justify-center shrink-0">
-                        ✕
-                      </span>
-                      <p className="text-xs font-semibold text-[#203128] leading-relaxed pt-0.5">
-                        {dont}
-                      </p>
-                    </div>
+                <ul className="space-y-2.5">
+                  {activeCategory.donts.map((item, idx) => (
+                    <li key={idx} className="flex items-start gap-2 text-xs font-bold text-rose-950">
+                      <span className="w-4 h-4 rounded-full bg-rose-200 text-rose-800 text-[10px] font-black flex items-center justify-center shrink-0 mt-0.5">✕</span>
+                      <span>{item}</span>
+                    </li>
                   ))}
-                </div>
+                </ul>
               </div>
 
             </div>
 
-            {/* Action Bar */}
+            {/* Footer Action */}
             <div className="pt-4 border-t border-[#3F7655]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="text-xs text-[#718078]">
-                {t("instantCheckerDesc")}
-              </div>
-
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={onOpenSearchModal}
-                  className="px-4 py-2.5 bg-white border border-[#3F7655]/20 text-[#203128] text-xs font-bold rounded-xl hover:bg-[#DDEBD8] transition cursor-pointer"
-                >
-                  {t("searchEWasteNow")}
-                </button>
-
-                <button
-                  onClick={() => setActiveView('locations')}
-                  className="px-5 py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white text-xs font-bold rounded-xl shadow transition flex items-center gap-2 cursor-pointer"
-                >
-                  <MapPin className="w-4 h-4" />
-                  <span>{t("navLocations")} →</span>
-                </button>
-              </div>
+              <span className="text-xs text-[#718078] font-semibold">
+                Have e-waste of this category to dispose? Register a digital lot to get benchmark prices.
+              </span>
+              <button
+                onClick={() => setActiveView('collector')}
+                className="px-6 py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer"
+              >
+                Register E-Waste Lot →
+              </button>
             </div>
 
           </div>

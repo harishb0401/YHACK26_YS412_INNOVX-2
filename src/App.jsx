@@ -16,6 +16,11 @@ import CompareOffersModal from './components/Modals/CompareOffersModal';
 
 // Views
 import LandingView from './views/LandingView';
+import HowItWorksView from './views/HowItWorksView';
+import AboutView from './views/AboutView';
+import LoginView from './views/LoginView';
+import SignUpView from './views/SignUpView';
+import ProfileView from './views/ProfileView';
 import CollectorView from './views/CollectorView';
 import RecyclerView from './views/RecyclerView';
 import GeneratorView from './views/GeneratorView';
@@ -519,6 +524,54 @@ export default function App() {
             <LandingView 
               setActiveView={setActiveView}
               onOpenSearchModal={() => setIsSearchModalOpen(true)}
+            />
+          )}
+
+          {activeView === 'how-it-works' && (
+            <HowItWorksView 
+              setActiveView={setActiveView}
+              onOpenSignUp={() => setActiveView('signup')}
+            />
+          )}
+
+          {activeView === 'about' && (
+            <AboutView 
+              setActiveView={setActiveView}
+            />
+          )}
+
+          {activeView === 'login' && (
+            <LoginView 
+              setActiveView={setActiveView}
+              onLoginSuccess={(authData) => {
+                setCurrentRole(authData.role);
+                if (authData.role === 'collector') {
+                  setCollectorProfile(prev => ({ ...prev, name: authData.name || prev.name }));
+                }
+              }}
+            />
+          )}
+
+          {activeView === 'signup' && (
+            <SignUpView 
+              setActiveView={setActiveView}
+              onSignUpSuccess={(newUserData) => {
+                setCurrentRole(newUserData.role);
+                if (newUserData.role === 'collector') {
+                  setCollectorProfile(prev => ({ ...prev, ...newUserData.user }));
+                  setCollectors(prev => [newUserData.user, ...prev]);
+                } else if (newUserData.role === 'recycler') {
+                  setRecyclers(prev => [newUserData.user, ...prev]);
+                }
+              }}
+            />
+          )}
+
+          {activeView === 'profile' && (
+            <ProfileView 
+              currentRole={currentRole}
+              userProfile={currentRole === 'collector' ? collectorProfile : activeRecycler}
+              onOpenPhoneVerificationModal={() => setIsPhoneModalOpen(true)}
             />
           )}
 
