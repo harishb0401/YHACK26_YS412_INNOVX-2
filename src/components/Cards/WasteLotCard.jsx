@@ -48,11 +48,11 @@ export default function WasteLotCard({ lot, onViewDetails, onOpenOffers }) {
 
       <div className="flex items-center gap-2 pt-2 border-t border-[#3F7655]/10">
         <Link
-          to={`/collector/waste-lots/${lot.id}`}
+          to={`/collector/requests/${lot.id}`}
           className="flex-1 py-2 text-center text-xs font-bold text-[#244936] bg-[#DDEBD8]/50 hover:bg-[#DDEBD8] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
         >
           <QrCode className="w-3.5 h-3.5" />
-          <span>Lot Details</span>
+          <span>Request Details</span>
         </Link>
 
         {onOpenOffers && (

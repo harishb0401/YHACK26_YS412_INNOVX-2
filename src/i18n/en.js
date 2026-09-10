@@ -586,11 +586,14 @@ export const en = {
   smartClassifyBtn: "Smart Auto-Classify (AI Assistant)",
   createDigitalLotBtn: "Create Digital Lot & Calculate Fair Price",
   
-  // Lot Statuses (12)
+  // Lot & Request Statuses
   statusDRAFT: "Draft",
+  statusSUBMITTED: "Submitted",
+  statusAWAITING_OFFERS: "Awaiting Offers",
   statusAVAILABLE: "Available",
   statusMATCHED: "Matched",
   statusOFFER_RECEIVED: "Offer Received",
+  statusOFFERS_RECEIVED: "Offers Received",
   statusOFFER_ACCEPTED: "Offer Accepted",
   statusPICKUP_SCHEDULED: "Pickup Scheduled",
   statusHANDED_OVER: "Handed Over",

@@ -15,7 +15,8 @@ import { structuredEWasteCategories, referenceScrapPrices } from '../data/scrapP
  */
 export function calculateFairPriceRange(benchmarkPrice, tolerance = 0.25, quantity = 1) {
   const benchmark = parseFloat(benchmarkPrice) || 0;
-  const tol = parseFloat(tolerance) || 0.25;
+  const rawTol = parseFloat(tolerance) !== undefined ? parseFloat(tolerance) : 0.25;
+  const tol = rawTol > 1 ? rawTol / 100 : rawTol;
   const qty = parseFloat(quantity) || 0;
 
   const lowerLimit = Math.round(benchmark * (1 - tol));
@@ -30,6 +31,8 @@ export function calculateFairPriceRange(benchmarkPrice, tolerance = 0.25, quanti
     tolerancePercent: Math.round(tol * 100),
     lowerLimit,
     upperLimit,
+    minPrice: lowerLimit,
+    maxPrice: upperLimit,
     rangeLabel: `₹${lowerLimit}–₹${upperLimit}/kg`,
     estimatedLotValue,
     minEstimatedValue,
@@ -45,10 +48,12 @@ export function calculateFairPriceRange(benchmarkPrice, tolerance = 0.25, quanti
 export function evaluateOfferFairPrice(offeredPricePerUnit, benchmarkPrice, tolerance = 0.25) {
   const offer = parseFloat(offeredPricePerUnit) || 0;
   const benchmark = parseFloat(benchmarkPrice) || 0;
-  const tol = parseFloat(tolerance) || 0.25;
+  const rawTol = parseFloat(tolerance) !== undefined ? parseFloat(tolerance) : 0.25;
+  const tol = rawTol > 1 ? rawTol / 100 : rawTol;
 
   const lowerLimit = Math.round(benchmark * (1 - tol));
   const upperLimit = Math.round(benchmark * (1 + tol));
+
 
   if (offer < lowerLimit) {
     const diffPercent = Math.round(((lowerLimit - offer) / lowerLimit) * 100);
@@ -313,6 +318,93 @@ export function verifyRecyclerStatus(recycler) {
     statusBadgeText: isVerified ? "✓ Verified Recycler" : (recycler?.verificationStatus || "Pending Verification"),
     tier: recycler?.tier || "Tier-1 Certified Recovery Unit",
     complianceScore: isVerified ? "100% Verified" : "Audit In Progress"
+  };
+}
+
+/**
+ * 6. calculateQuoteValidation:
+ * Backend validation logic for recycler quoted price against allowed benchmark price range.
+ * Returns benchmark rate, allowed range, estimated total, clearance status ("PRE-CLEARED ✅" vs "NOT CLEARED ❌"),
+ * and detailed direction indicator (Below allowed range vs Above allowed range).
+ */
+export function calculateQuoteValidation({
+  lotWeight = 0,
+  quantity = 0,
+  quotedPrice = 0,
+  benchmarkPrice = 350,
+  tolerance = 0.25,
+  unit = 'kg',
+  category = '',
+  material = ''
+}) {
+  const benchmark = parseFloat(benchmarkPrice) || 350;
+  const rawTol = tolerance !== undefined ? parseFloat(tolerance) : 0.25;
+  const tol = rawTol > 1 ? rawTol / 100 : rawTol;
+  const weight = parseFloat(lotWeight || quantity) || 0;
+  const quote = parseFloat(quotedPrice) || 0;
+
+  const lowerLimit = Math.round(benchmark * (1 - tol));
+  const upperLimit = Math.round(benchmark * (1 + tol));
+  const estimatedTotalAmount = Math.round(weight * quote);
+  const tolerancePercent = Math.round(tol * 100);
+
+  let isCleared = false;
+  let status = 'PRE_CLEARED'; // 'PRE_CLEARED' | 'NOT_CLEARED_BELOW' | 'NOT_CLEARED_ABOVE'
+  let badgeText = 'PRE-CLEARED ✅';
+  let position = 'IN_RANGE'; // 'IN_RANGE' | 'BELOW_RANGE' | 'ABOVE_RANGE'
+  let diffPercent = 0;
+  let message = '';
+
+  if (quote < lowerLimit) {
+    isCleared = false;
+    status = 'NOT_CLEARED_BELOW';
+    badgeText = 'NOT CLEARED ❌';
+    position = 'BELOW_RANGE';
+    diffPercent = lowerLimit > 0 ? Math.round(((lowerLimit - quote) / lowerLimit) * 100) : 0;
+    message = `Quoted price (₹${quote}/${unit}) is BELOW the allowed fair range (₹${lowerLimit} – ₹${upperLimit}/${unit}) by ${diffPercent}%.`;
+  } else if (quote > upperLimit) {
+    isCleared = false;
+    status = 'NOT_CLEARED_ABOVE';
+    badgeText = 'NOT CLEARED ❌';
+    position = 'ABOVE_RANGE';
+    diffPercent = upperLimit > 0 ? Math.round(((quote - upperLimit) / upperLimit) * 100) : 0;
+    message = `Quoted price (₹${quote}/${unit}) is ABOVE the allowed fair range (₹${lowerLimit} – ₹${upperLimit}/${unit}) by ${diffPercent}%.`;
+  } else {
+    isCleared = true;
+    status = 'PRE_CLEARED';
+    badgeText = 'PRE-CLEARED ✅';
+    position = 'IN_RANGE';
+    diffPercent = 0;
+    message = `Quoted price (₹${quote}/${unit}) is within the allowed fair benchmark range (₹${lowerLimit} – ₹${upperLimit}/${unit}).`;
+  }
+
+  return {
+    category,
+    material,
+    benchmarkRate: benchmark,
+    tolerancePercent,
+    allowedPriceRange: {
+      minPrice: lowerLimit,
+      maxPrice: upperLimit,
+      rangeLabel: `₹${lowerLimit} – ₹${upperLimit} / ${unit}`
+    },
+    quotedPrice: quote,
+    lotWeight: weight,
+    unit,
+    estimatedTotalAmount,
+    validation: {
+      isCleared,
+      status,
+      badgeText,
+      position,
+      diffPercent,
+      message,
+      explanation: isCleared 
+        ? `Quoted price of ₹${quote}/${unit} is fully compliant and pre-cleared without manual approval barriers.`
+        : position === 'BELOW_RANGE'
+          ? `Quoted price of ₹${quote}/${unit} is ${diffPercent}% below the minimum allowed limit (₹${lowerLimit}/${unit}).`
+          : `Quoted price of ₹${quote}/${unit} is ${diffPercent}% above the maximum allowed limit (₹${upperLimit}/${unit}).`
+    }
   };
 }
 

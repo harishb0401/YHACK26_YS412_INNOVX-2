@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 // Layouts
 import PublicLayout from '../components/Layout/PublicLayout';
@@ -18,10 +18,8 @@ import Login from '../pages/public/Login';
 // Collector Pages
 import CollectorDashboard from '../pages/collector/CollectorDashboard';
 import RegisterWaste from '../pages/collector/RegisterWaste';
-import MyWasteLots from '../pages/collector/MyWasteLots';
-import WasteLotDetails from '../pages/collector/WasteLotDetails';
-import RecyclerMatches from '../pages/collector/RecyclerMatches';
-import RecyclerMatchDetails from '../pages/collector/RecyclerMatchDetails';
+import MyRequests from '../pages/collector/MyRequests';
+import RequestDetails from '../pages/collector/RequestDetails';
 import Transactions from '../pages/collector/Transactions';
 import TransactionDetails from '../pages/collector/TransactionDetails';
 import CollectorProfile from '../pages/collector/CollectorProfile';
@@ -30,11 +28,11 @@ import CollectorNotifications from '../pages/collector/CollectorNotifications';
 // Recycler Pages
 import RecyclerDashboard from '../pages/recycler/RecyclerDashboard';
 import WasteRequests from '../pages/recycler/WasteRequests';
-import MyMatches from '../pages/recycler/MyMatches';
 import RecyclerTransactions from '../pages/recycler/RecyclerTransactions';
 import Compliance from '../pages/recycler/Compliance';
 import RecyclerProfile from '../pages/recycler/RecyclerProfile';
 import RecyclerNotifications from '../pages/recycler/RecyclerNotifications';
+
 
 // Admin Pages
 import AdminDashboard from '../pages/admin/AdminDashboard';
@@ -54,7 +52,10 @@ export default function AppRoutes({
   onLoginSuccess,
   onLogout,
   materialLots,
+  offers,
   onLotCreated,
+  onSubmitOffer,
+  onAcceptOffer,
   transactions,
   collectors,
   recyclers
@@ -75,14 +76,18 @@ export default function AppRoutes({
         <Route path="*" element={<NotFound />} />
       </Route>
 
-      {/* 2. COLLECTOR ROUTES */}
+      {/* 2. COLLECTOR ROUTES (Request-Driven Flow) */}
       <Route path="/collector" element={<CollectorLayout currentUser={currentUser} onLogout={onLogout} />}>
-        <Route path="dashboard" element={<CollectorDashboard materialLots={materialLots} transactions={transactions} />} />
+        <Route path="dashboard" element={<CollectorDashboard materialLots={materialLots} offers={offers} transactions={transactions} />} />
         <Route path="register-waste" element={<RegisterWaste onLotCreated={onLotCreated} />} />
-        <Route path="waste-lots" element={<MyWasteLots materialLots={materialLots} />} />
-        <Route path="waste-lots/:lotId" element={<WasteLotDetails materialLots={materialLots} />} />
-        <Route path="recycler-matches" element={<RecyclerMatches />} />
-        <Route path="recycler-matches/:matchId" element={<RecyclerMatchDetails />} />
+        <Route path="create-request" element={<RegisterWaste onLotCreated={onLotCreated} />} />
+        <Route path="requests" element={<MyRequests materialLots={materialLots} offers={offers} />} />
+        <Route path="my-requests" element={<MyRequests materialLots={materialLots} offers={offers} />} />
+        <Route path="waste-lots" element={<MyRequests materialLots={materialLots} offers={offers} />} />
+        <Route path="requests/:requestId" element={<RequestDetails materialLots={materialLots} offers={offers} onAcceptOffer={onAcceptOffer} />} />
+        <Route path="waste-lots/:lotId" element={<RequestDetails materialLots={materialLots} offers={offers} onAcceptOffer={onAcceptOffer} />} />
+        <Route path="recycler-matches" element={<Navigate to="/collector/requests" replace />} />
+        <Route path="recycler-matches/:matchId" element={<Navigate to="/collector/requests" replace />} />
         <Route path="transactions" element={<Transactions transactions={transactions} />} />
         <Route path="transactions/:transactionId" element={<TransactionDetails transactions={transactions} />} />
         <Route path="profile" element={<CollectorProfile />} />
@@ -92,13 +97,15 @@ export default function AppRoutes({
       {/* 3. RECYCLER ROUTES */}
       <Route path="/recycler" element={<RecyclerLayout currentUser={currentUser} onLogout={onLogout} />}>
         <Route path="dashboard" element={<RecyclerDashboard materialLots={materialLots} />} />
-        <Route path="waste-requests" element={<WasteRequests materialLots={materialLots} />} />
-        <Route path="matches" element={<MyMatches materialLots={materialLots} />} />
+
+        <Route path="waste-requests" element={<WasteRequests materialLots={materialLots} onSubmitOffer={onSubmitOffer} />} />
+        <Route path="matches" element={<Navigate to="/recycler/waste-requests" replace />} />
         <Route path="transactions" element={<RecyclerTransactions transactions={transactions} />} />
         <Route path="compliance" element={<Compliance />} />
         <Route path="profile" element={<RecyclerProfile />} />
         <Route path="notifications" element={<RecyclerNotifications />} />
       </Route>
+
 
       {/* 4. ADMIN ROUTES */}
       <Route path="/admin" element={<AdminLayout currentUser={currentUser} onLogout={onLogout} />}>

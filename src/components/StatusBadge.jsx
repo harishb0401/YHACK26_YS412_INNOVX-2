@@ -9,11 +9,36 @@ export default function StatusBadge({ status, size = "md" }) {
   const { tStatus } = useLanguage();
 
   const configs = {
-    // 12 Lot Statuses
+    // Request & Lot Statuses
     "DRAFT": {
       bg: "bg-slate-100 border-slate-300 text-slate-700",
       icon: Package,
       dot: "bg-slate-400"
+    },
+    "Draft": {
+      bg: "bg-slate-100 border-slate-300 text-slate-700",
+      icon: Package,
+      dot: "bg-slate-400"
+    },
+    "SUBMITTED": {
+      bg: "bg-blue-50 border-blue-300 text-blue-800",
+      icon: Sparkles,
+      dot: "bg-blue-500"
+    },
+    "Submitted": {
+      bg: "bg-blue-50 border-blue-300 text-blue-800",
+      icon: Sparkles,
+      dot: "bg-blue-500"
+    },
+    "AWAITING_OFFERS": {
+      bg: "bg-amber-50 border-amber-300 text-amber-800",
+      icon: Clock,
+      dot: "bg-amber-500 animate-pulse"
+    },
+    "Awaiting Offers": {
+      bg: "bg-amber-50 border-amber-300 text-amber-800",
+      icon: Clock,
+      dot: "bg-amber-500 animate-pulse"
     },
     "AVAILABLE": {
       bg: "bg-emerald-50 border-emerald-300 text-emerald-800",
@@ -25,13 +50,28 @@ export default function StatusBadge({ status, size = "md" }) {
       icon: Sparkles,
       dot: "bg-indigo-500"
     },
+    "OFFERS_RECEIVED": {
+      bg: "bg-amber-50 border-amber-300 text-amber-800 font-bold",
+      icon: Clock,
+      dot: "bg-amber-500 animate-pulse"
+    },
+    "Offers Received": {
+      bg: "bg-amber-50 border-amber-300 text-amber-800 font-bold",
+      icon: Clock,
+      dot: "bg-amber-500 animate-pulse"
+    },
     "OFFER_RECEIVED": {
       bg: "bg-amber-50 border-amber-300 text-amber-800",
       icon: Clock,
       dot: "bg-amber-500 animate-pulse"
     },
     "OFFER_ACCEPTED": {
-      bg: "bg-teal-50 border-teal-300 text-teal-800",
+      bg: "bg-teal-50 border-teal-300 text-teal-800 font-bold",
+      icon: CheckCircle2,
+      dot: "bg-teal-500"
+    },
+    "Offer Accepted": {
+      bg: "bg-teal-50 border-teal-300 text-teal-800 font-bold",
       icon: CheckCircle2,
       dot: "bg-teal-500"
     },
@@ -40,7 +80,17 @@ export default function StatusBadge({ status, size = "md" }) {
       icon: Clock,
       dot: "bg-sky-500"
     },
+    "Pickup Scheduled": {
+      bg: "bg-sky-50 border-sky-300 text-sky-800",
+      icon: Clock,
+      dot: "bg-sky-500"
+    },
     "HANDED_OVER": {
+      bg: "bg-purple-50 border-purple-300 text-purple-800",
+      icon: Truck,
+      dot: "bg-purple-500"
+    },
+    "Handed Over": {
       bg: "bg-purple-50 border-purple-300 text-purple-800",
       icon: Truck,
       dot: "bg-purple-500"
@@ -51,6 +101,11 @@ export default function StatusBadge({ status, size = "md" }) {
       dot: "bg-emerald-600"
     },
     "COMPLETED": {
+      bg: "bg-emerald-100 border-emerald-300 text-emerald-900 font-extrabold",
+      icon: CheckCircle2,
+      dot: "bg-emerald-600"
+    },
+    "Completed": {
       bg: "bg-emerald-100 border-emerald-300 text-emerald-900 font-extrabold",
       icon: CheckCircle2,
       dot: "bg-emerald-600"

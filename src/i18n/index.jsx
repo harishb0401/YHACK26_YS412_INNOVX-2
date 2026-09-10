@@ -75,16 +75,26 @@ export const LanguageProvider = ({ children }) => {
   const tStatus = (status) => {
     if (!status) return '';
     const keyMap = {
-      // 12 Lot Statuses
+      // 12 Lot & Request Statuses
       "DRAFT": "statusDRAFT",
+      "Draft": "statusDRAFT",
+      "SUBMITTED": "statusSUBMITTED",
+      "Submitted": "statusSUBMITTED",
+      "AWAITING_OFFERS": "statusAWAITING_OFFERS",
+      "Awaiting Offers": "statusAWAITING_OFFERS",
       "AVAILABLE": "statusAVAILABLE",
       "MATCHED": "statusMATCHED",
       "OFFER_RECEIVED": "statusOFFER_RECEIVED",
+      "OFFERS_RECEIVED": "statusOFFERS_RECEIVED",
+      "Offers Received": "statusOFFERS_RECEIVED",
       "OFFER_ACCEPTED": "statusOFFER_ACCEPTED",
+      "Offer Accepted": "statusOFFER_ACCEPTED",
       "PICKUP_SCHEDULED": "statusPICKUP_SCHEDULED",
       "HANDED_OVER": "statusHANDED_OVER",
+      "Handed Over": "statusHANDED_OVER",
       "PAYMENT_COMPLETED": "statusPAYMENT_COMPLETED",
       "COMPLETED": "statusCOMPLETED",
+      "Completed": "statusCOMPLETED",
       "REJECTED": "statusREJECTED",
       "CANCELLED": "statusCANCELLED",
       "UNDER_REVIEW": "statusUNDER_REVIEW",

@@ -1,17 +1,28 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Plus, ArrowRight, Package, DollarSign, Scale, ShieldCheck, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import { 
+  Plus, ArrowRight, Package, DollarSign, Scale, ShieldCheck, 
+  CheckCircle2, Clock, Sparkles, Inbox, Award
+} from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
-import WasteLotCard from '../../components/Cards/WasteLotCard';
-import { mockWasteLots, mockTransactions, mockCollector } from '../../data/mockData';
+import StatusBadge from '../../components/StatusBadge';
+import { mockWasteLots, mockOffers, mockTransactions, mockCollector } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
 
-export default function CollectorDashboard({ materialLots = mockWasteLots, transactions = mockTransactions, collectorProfile = mockCollector }) {
+export default function CollectorDashboard({ 
+  materialLots = mockWasteLots, 
+  offers = mockOffers,
+  transactions = mockTransactions, 
+  collectorProfile = mockCollector 
+}) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
   const myLots = materialLots || mockWasteLots;
-  const activeLots = myLots.filter(l => !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(l.status));
+  const allOffers = offers || mockOffers;
+
+  const activeRequests = myLots.filter(l => !['COMPLETED', 'CANCELLED', 'REJECTED'].includes(l.status));
+  const awaitingOffersCount = myLots.filter(l => ['AWAITING_OFFERS', 'SUBMITTED', 'AVAILABLE', 'REGISTERED'].includes(l.status)).length;
   const totalWeight = myLots.reduce((acc, l) => acc + (parseFloat(l.quantity || l.totalWeightKg) || 0), 0);
   const totalEarnings = (transactions || []).reduce((acc, tx) => acc + (tx.totalValue || 0), 0) + 
                         myLots.filter(l => l.status === 'COMPLETED').reduce((s, l) => s + (l.agreedTotalValue || l.estimatedLotValue || 0), 0);
@@ -36,101 +47,72 @@ export default function CollectorDashboard({ materialLots = mockWasteLots, trans
             Welcome back, {collectorProfile?.name || "Ramesh Kumar"}!
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
-            Manage your digital e-waste lots, review transparent recycler bids, and monitor payouts.
+            Create authenticated e-waste requests, receive transparent recycler bids, and track secure escrow payouts.
           </p>
         </div>
 
         <div className="flex items-center gap-3">
           <button
             onClick={() => navigate('/collector/register-waste')}
-            className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#244936] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
+            className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#244936] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>Register E-Waste Lot</span>
+            <span>Create E-Waste Request</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Active Declared Lots"
-          value={activeLots.length}
-          subtitle="Waiting for Recycler Match"
-          icon={Package}
-          color="emerald"
-        />
-        <StatCard
-          title="Total Weight Collected"
-          value={`${totalWeight.toLocaleString()} kg`}
-          subtitle="Cumulative verified volume"
-          icon={Scale}
-          color="emerald"
-        />
-        <StatCard
-          title="Settled Payouts"
-          value={`₹${totalEarnings.toLocaleString()}`}
-          subtitle="Direct UPI & Escrow payouts"
-          icon={DollarSign}
-          color="amber"
-        />
-        <StatCard
-          title="Compliance Score"
-          value="98.4%"
-          subtitle="CPCB EPR Traceability"
-          icon={ShieldCheck}
-          color="blue"
-        />
-      </div>
-
-      {/* Quick Action Cards */}
+      {/* Quick Action Cards (Request-Driven Flow) */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
+        {/* Card 1: Create Request */}
+        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between hover:border-[#3F7655]/40 transition">
           <div>
             <div className="w-10 h-10 rounded-xl bg-[#DDEBD8] text-[#244936] flex items-center justify-center font-bold mb-3">
               <Plus className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Register E-Waste</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">Create E-Waste Request</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Create a new authenticated digital waste lot with automated pricing bounds.
+              Declare material category, weight, and condition with automated benchmark price bounds.
             </p>
           </div>
           <Link
             to="/collector/register-waste"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Register Now</span>
+            <span>Create Request Now</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
+        {/* Card 2: My Requests */}
+        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between hover:border-[#3F7655]/40 transition">
           <div>
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold mb-3">
-              <ShieldCheck className="w-5 h-5" />
+              <Inbox className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Recycler Matches</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">My Requests</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Review incoming bids from verified recyclers with fair-rate rule tags.
+              View active requests, review incoming offers from verified recyclers, and accept fair rates.
             </p>
           </div>
           <Link
-            to="/collector/recycler-matches"
+            to="/collector/requests"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>View Matches</span>
+            <span>View All Requests</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
-        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
+        {/* Card 3: Transactions */}
+        <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between hover:border-[#3F7655]/40 transition">
           <div>
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold mb-3">
-              <DollarSign className="w-5 h-5" />
+              <Award className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Transactions</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">Transactions & Invoices</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Review invoices, escrow releases, and download digital weight receipts.
+              Review settled payments, escrow releases, and download digital weight receipts.
             </p>
           </div>
           <Link
@@ -143,15 +125,15 @@ export default function CollectorDashboard({ materialLots = mockWasteLots, trans
         </div>
       </div>
 
-      {/* Recent Declared Lots Section */}
+      {/* Recent E-Waste Requests Section */}
       <div className="bg-white p-6 sm:p-8 rounded-[32px] border border-[#3F7655]/20 shadow-md space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-black text-[#203128]">Recent Declared Lots</h2>
-            <p className="text-xs text-[#718078]">Latest material lots in verification & matching pipeline.</p>
+            <h2 className="text-xl font-black text-[#203128]">Recent E-Waste Requests</h2>
+            <p className="text-xs text-[#718078]">Latest material requests in offer review and dispatch pipeline.</p>
           </div>
           <Link
-            to="/collector/waste-lots"
+            to="/collector/requests"
             className="text-xs font-black text-[#3F7655] hover:underline flex items-center gap-1"
           >
             <span>View All ({myLots.length})</span>
@@ -160,13 +142,57 @@ export default function CollectorDashboard({ materialLots = mockWasteLots, trans
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {myLots.slice(0, 3).map((lot) => (
-            <WasteLotCard
-              key={lot.id}
-              lot={lot}
-              onViewDetails={() => navigate(`/collector/waste-lots/${lot.id}`)}
-            />
-          ))}
+          {myLots.slice(0, 3).map((lot) => {
+            const reqOffers = allOffers.filter(o => o.lotId === lot.id);
+            const qty = lot.quantity || lot.totalWeightKg || 1;
+            const unit = lot.unit || 'kg';
+
+            return (
+              <div
+                key={lot.id}
+                className="p-5 bg-white rounded-3xl border border-[#3F7655]/20 shadow-sm hover:shadow-md hover:border-[#3F7655]/40 transition flex flex-col justify-between space-y-3"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-2 border-b border-[#3F7655]/10 pb-2.5">
+                    <div>
+                      <span className="text-[10px] font-extrabold uppercase text-[#3F7655] bg-[#DDEBD8] px-2 py-0.5 rounded-full">
+                        {lot.category}
+                      </span>
+                      <h4 className="text-sm font-black text-[#203128] mt-1">{lot.material}</h4>
+                      <span className="text-[11px] font-mono text-[#718078] font-bold">{lot.id}</span>
+                    </div>
+                    <StatusBadge status={lot.status} size="sm" />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-[#718078]">
+                    <div>
+                      <span className="text-[10px] block uppercase font-bold">Quantity</span>
+                      <strong className="text-[#203128]">{qty} {unit}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] block uppercase font-bold">Offers</span>
+                      <strong className={reqOffers.length > 0 ? "text-emerald-700" : "text-amber-700"}>
+                        {reqOffers.length > 0 ? `${reqOffers.length} Received` : "Awaiting"}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="pt-2.5 border-t border-[#3F7655]/10 flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-[#3F7655]">
+                    Benchmark: ₹{lot.benchmarkPrice || 350}/{unit}
+                  </span>
+                  <button
+                    onClick={() => navigate(`/collector/requests/${lot.id}`)}
+                    className="px-3 py-1.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>View</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

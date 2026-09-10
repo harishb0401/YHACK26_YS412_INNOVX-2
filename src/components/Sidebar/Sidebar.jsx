@@ -14,8 +14,7 @@ export default function Sidebar({ role = 'collector', userProfile }) {
   const collectorLinks = [
     { to: '/collector/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/collector/register-waste', label: 'Register E-Waste', icon: PlusCircle },
-    { to: '/collector/waste-lots', label: 'My Waste Lots', icon: Package },
-    { to: '/collector/recycler-matches', label: 'Recycler Matches', icon: DollarSign },
+    { to: '/collector/requests', label: 'My Requests', icon: Package },
     { to: '/collector/transactions', label: 'Transactions', icon: Award },
     { to: '/collector/profile', label: 'Profile', icon: User },
     { to: '/collector/notifications', label: 'Notifications', icon: Bell },
@@ -24,12 +23,12 @@ export default function Sidebar({ role = 'collector', userProfile }) {
   const recyclerLinks = [
     { to: '/recycler/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { to: '/recycler/waste-requests', label: 'Waste Requests', icon: Layers },
-    { to: '/recycler/matches', label: 'My Matches', icon: DollarSign },
     { to: '/recycler/transactions', label: 'Transactions', icon: Award },
     { to: '/recycler/compliance', label: 'Compliance', icon: ShieldCheck },
     { to: '/recycler/profile', label: 'Profile', icon: User },
     { to: '/recycler/notifications', label: 'Notifications', icon: Bell },
   ];
+
 
   const adminLinks = [
     { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },

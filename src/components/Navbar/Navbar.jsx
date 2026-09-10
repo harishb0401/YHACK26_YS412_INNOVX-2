@@ -162,11 +162,8 @@ export default function Navbar({
               <Link to="/collector/register-waste" className={getNavLinkClass('/collector/register-waste')}>
                 Register E-Waste
               </Link>
-              <Link to="/collector/waste-lots" className={getNavLinkClass('/collector/waste-lots')}>
-                My Waste Lots
-              </Link>
-              <Link to="/collector/recycler-matches" className={getNavLinkClass('/collector/recycler-matches')}>
-                Recycler Matches
+              <Link to="/collector/requests" className={getNavLinkClass('/collector/requests')}>
+                My Requests
               </Link>
               <Link to="/collector/transactions" className={getNavLinkClass('/collector/transactions')}>
                 Transactions
@@ -185,9 +182,6 @@ export default function Navbar({
               <Link to="/recycler/waste-requests" className={getNavLinkClass('/recycler/waste-requests')}>
                 Waste Requests
               </Link>
-              <Link to="/recycler/matches" className={getNavLinkClass('/recycler/matches')}>
-                My Matches
-              </Link>
               <Link to="/recycler/transactions" className={getNavLinkClass('/recycler/transactions')}>
                 Transactions
               </Link>
@@ -196,6 +190,7 @@ export default function Navbar({
               </Link>
             </nav>
           )}
+
 
           {/* ========================================================= */}
           {/* 4. ADMIN LOGGED-IN DESKTOP NAVIGATION                     */}
@@ -498,11 +493,8 @@ export default function Navbar({
               <Link to="/collector/register-waste" className={getMobileNavLinkClass('/collector/register-waste')}>
                 Register E-Waste
               </Link>
-              <Link to="/collector/waste-lots" className={getMobileNavLinkClass('/collector/waste-lots')}>
-                My Waste Lots
-              </Link>
-              <Link to="/collector/recycler-matches" className={getMobileNavLinkClass('/collector/recycler-matches')}>
-                Recycler Matches
+              <Link to="/collector/requests" className={getMobileNavLinkClass('/collector/requests')}>
+                My Requests
               </Link>
               <Link to="/collector/transactions" className={getMobileNavLinkClass('/collector/transactions')}>
                 Transactions
@@ -540,9 +532,6 @@ export default function Navbar({
               <Link to="/recycler/waste-requests" className={getMobileNavLinkClass('/recycler/waste-requests')}>
                 Waste Requests
               </Link>
-              <Link to="/recycler/matches" className={getMobileNavLinkClass('/recycler/matches')}>
-                My Matches
-              </Link>
               <Link to="/recycler/transactions" className={getMobileNavLinkClass('/recycler/transactions')}>
                 Transactions
               </Link>
@@ -552,6 +541,7 @@ export default function Navbar({
               <Link to="/recycler/notifications" className={getMobileNavLinkClass('/recycler/notifications')}>
                 Notifications ({unreadCount})
               </Link>
+
 
               <div className="pt-2 border-t border-[#3F7655]/10">
                 <button

@@ -51,38 +51,6 @@ export default function AdminDashboard({
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Registered Collectors"
-          value={`${verifiedCollectors} / ${totalCollectors}`}
-          subtitle="OTP Verified Accounts"
-          icon={Users}
-          color="emerald"
-        />
-        <StatCard
-          title="Authorized Recyclers"
-          value={`${verifiedRecyclers} / ${totalRecyclers}`}
-          subtitle="CPCB License Cleared"
-          icon={ShieldCheck}
-          color="blue"
-        />
-        <StatCard
-          title="Total Regulated Material"
-          value={`${totalWasteKg.toLocaleString()} kg`}
-          subtitle="Tracked with QR hashes"
-          icon={Scale}
-          color="amber"
-        />
-        <StatCard
-          title="Gross Escrow Settlement"
-          value={`₹${totalTxValue.toLocaleString()}`}
-          subtitle="Direct UPI disbursements"
-          icon={DollarSign}
-          color="emerald"
-        />
-      </div>
-
       {/* Management Navigation Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">

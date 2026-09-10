@@ -586,11 +586,14 @@ export const ta = {
   smartClassifyBtn: "AI தானியங்கி வகைப்பாடு",
   createDigitalLotBtn: "டிஜிட்டல் லாட்டை உருவாக்கி நியாயமான விலையைக் கணக்கிடு",
   
-  // Lot Statuses (12)
+  // Lot & Request Statuses
   statusDRAFT: "வரைவு",
+  statusSUBMITTED: "சமர்ப்பிக்கப்பட்டது",
+  statusAWAITING_OFFERS: "சலுகைகளுக்காக காத்திருக்கிறது",
   statusAVAILABLE: "கிடைக்கக்கூடியது",
   statusMATCHED: "பொருந்தியது",
   statusOFFER_RECEIVED: "விலை சலுகை பெறப்பட்டது",
+  statusOFFERS_RECEIVED: "சலுகைகள் பெறப்பட்டன",
   statusOFFER_ACCEPTED: "சலுகை ஏற்றுக்கொள்ளப்பட்டது",
   statusPICKUP_SCHEDULED: "சேகரிப்பு திட்டமிடப்பட்டது",
   statusHANDED_OVER: "ஒப்படைக்கப்பட்டது",

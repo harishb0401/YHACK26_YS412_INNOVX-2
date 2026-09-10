@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Package, ShoppingBag, DollarSign, Scale, RefreshCw, ArrowRight, CheckCircle2, Clock } from 'lucide-react';
+import { ShieldCheck, Package, ShoppingBag, DollarSign, Scale, RefreshCw, ArrowRight, CheckCircle2, Clock, Award } from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
 import WasteLotCard from '../../components/Cards/WasteLotCard';
 import { mockWasteLots, mockRecycler, mockTransactions } from '../../data/mockData';
@@ -8,12 +8,12 @@ import { mockWasteLots, mockRecycler, mockTransactions } from '../../data/mockDa
 export default function RecyclerDashboard({ recyclerProfile = mockRecycler, materialLots = mockWasteLots }) {
   const navigate = useNavigate();
 
-  const availableLots = (materialLots || mockWasteLots).filter(l => ['REGISTERED', 'MATCHED'].includes(l.status));
-  const activeProcessing = (materialLots || mockWasteLots).filter(l => ['ACCEPTED', 'DISPATCHED'].includes(l.status));
+  const availableLots = (materialLots || mockWasteLots).filter(l => ['REGISTERED', 'MATCHED', 'AWAITING_OFFERS', 'AVAILABLE'].includes(l.status));
+  const activeProcessing = (materialLots || mockWasteLots).filter(l => ['ACCEPTED', 'DISPATCHED', 'OFFER_ACCEPTED'].includes(l.status));
   const recycledLots = (materialLots || mockWasteLots).filter(l => l.status === 'COMPLETED');
 
   const totalProcuredKg = (materialLots || mockWasteLots)
-    .filter(l => ['ACCEPTED', 'DISPATCHED', 'COMPLETED'].includes(l.status))
+    .filter(l => ['ACCEPTED', 'DISPATCHED', 'COMPLETED', 'OFFER_ACCEPTED'].includes(l.status))
     .reduce((sum, l) => sum + (parseFloat(l.quantity || l.totalWeightKg) || 0), 0);
 
   return (
@@ -49,37 +49,6 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
         </div>
       </div>
 
-      {/* KPI Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard
-          title="Available Verified Lots"
-          value={availableLots.length}
-          subtitle="Ready for procurement bids"
-          icon={ShoppingBag}
-          color="emerald"
-        />
-        <StatCard
-          title="In Transit / Processing"
-          value={activeProcessing.length}
-          subtitle="En-route to facility"
-          icon={RefreshCw}
-          color="blue"
-        />
-        <StatCard
-          title="Total Material Procured"
-          value={`${totalProcuredKg.toLocaleString()} kg`}
-          subtitle="Cumulative throughput"
-          icon={Scale}
-          color="amber"
-        />
-        <StatCard
-          title="CPCB EPR Targets Met"
-          value="88.2%"
-          subtitle="TNPCB annual quota: 50T"
-          icon={ShieldCheck}
-          color="emerald"
-        />
-      </div>
 
       {/* Quick Action Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -105,21 +74,22 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
         <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
           <div>
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold mb-3">
-              <ShieldCheck className="w-5 h-5" />
+              <Award className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">My Matches & Offers</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">Transactions & Invoices</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Track submitted price bids, accepted manifests, and weighbridge QR validations.
+              Track settled lot payouts, escrow releases, and download digital weight receipts.
             </p>
           </div>
           <Link
-            to="/recycler/matches"
+            to="/recycler/transactions"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>View Active Matches</span>
+            <span>View Transactions</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
+
 
         <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
           <div>
