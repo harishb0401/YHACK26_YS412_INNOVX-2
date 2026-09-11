@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Lock, ArrowRight, Truck, ShieldCheck, Shield, AlertCircle } from 'lucide-react';
+import { Phone, Lock, ArrowRight, Truck, ShieldCheck, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import authService from '../../services/authService';
 
 export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
   const navigate = useNavigate();
@@ -9,8 +10,9 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!identifier.trim() || !password.trim()) {
       setErrorMessage('Please enter your phone number/email and password.');
@@ -18,40 +20,57 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
     }
 
     setErrorMessage('');
-    const userPayload = {
-      role: selectedRole,
-      identifier,
-      name: selectedRole === 'collector' ? 'Ramesh Kumar' : selectedRole === 'recycler' ? 'GreenCycle Recovery' : 'System Admin'
-    };
+    setIsLoading(true);
 
-    if (onLoginSuccess) {
-      onLoginSuccess(userPayload);
-    }
+    try {
+      const user = await authService.login(identifier, password, selectedRole);
+      if (onLoginSuccess) {
+        onLoginSuccess(user);
+      }
 
-    if (selectedRole === 'collector') {
-      navigate('/collector/dashboard');
-    } else if (selectedRole === 'recycler') {
-      navigate('/recycler/dashboard');
-    } else if (selectedRole === 'admin') {
-      navigate('/admin/dashboard');
+      if (user.role === 'collector') {
+        navigate('/collector/dashboard');
+      } else if (user.role === 'recycler') {
+        navigate('/recycler/dashboard');
+      } else if (user.role === 'admin') {
+        navigate('/admin/dashboard');
+      }
+    } catch (err) {
+      setErrorMessage(err.message || 'Login failed. Please check your credentials.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleQuickRoleLogin = (role) => {
+  const handleQuickRoleLogin = async (role) => {
     setSelectedRole(role);
-    const userPayload = {
-      role,
-      identifier: role === 'collector' ? '+91 98401 23456' : role === 'recycler' ? 'procurement@greencycle.in' : 'admin@ecolink.gov.in',
-      name: role === 'collector' ? 'Ramesh Kumar' : role === 'recycler' ? 'GreenCycle Recovery' : 'System Admin'
+    setErrorMessage('');
+    setIsLoading(true);
+
+    const demoCredentials = {
+      collector: { id: 'demo.collector@example.com', pass: 'EcoLink@2026' },
+      recycler: { id: 'demo.recycler@example.com', pass: 'EcoLink@2026' },
+      admin: { id: 'demo.admin@example.com', pass: 'EcoLink@2026' }
     };
 
-    if (onLoginSuccess) {
-      onLoginSuccess(userPayload);
-    }
+    const creds = demoCredentials[role];
+    setIdentifier(creds.id);
+    setPassword(creds.pass);
 
-    if (role === 'collector') navigate('/collector/dashboard');
-    else if (role === 'recycler') navigate('/recycler/dashboard');
-    else if (role === 'admin') navigate('/admin/dashboard');
+    try {
+      const user = await authService.login(creds.id, creds.pass, role);
+      if (onLoginSuccess) {
+        onLoginSuccess(user);
+      }
+      if (role === 'collector') navigate('/collector/dashboard');
+      else if (role === 'recycler') navigate('/recycler/dashboard');
+      else if (role === 'admin') navigate('/admin/dashboard');
+    } catch (err) {
+      // If server is not yet populated with seed data or offline fallback
+      setErrorMessage(err.message || `Could not log in as ${role}. Please check server.`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -72,7 +91,10 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
-            onClick={() => setSelectedRole('collector')}
+            onClick={() => {
+              setSelectedRole('collector');
+              setIdentifier('');
+            }}
             className={`py-2 px-2 text-xs font-extrabold rounded-xl border transition flex items-center justify-center gap-1.5 cursor-pointer ${
               selectedRole === 'collector'
                 ? 'bg-[#3F7655] text-white border-[#3F7655] shadow-sm'
@@ -85,7 +107,10 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
 
           <button
             type="button"
-            onClick={() => setSelectedRole('recycler')}
+            onClick={() => {
+              setSelectedRole('recycler');
+              setIdentifier('');
+            }}
             className={`py-2 px-2 text-xs font-extrabold rounded-xl border transition flex items-center justify-center gap-1.5 cursor-pointer ${
               selectedRole === 'recycler'
                 ? 'bg-[#244936] text-white border-[#244936] shadow-sm'
@@ -98,7 +123,10 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
 
           <button
             type="button"
-            onClick={() => setSelectedRole('admin')}
+            onClick={() => {
+              setSelectedRole('admin');
+              setIdentifier('');
+            }}
             className={`py-2 px-2 text-xs font-extrabold rounded-xl border transition flex items-center justify-center gap-1.5 cursor-pointer ${
               selectedRole === 'admin'
                 ? 'bg-[#14291E] text-[#F2C94C] border-[#14291E] shadow-sm'
@@ -129,9 +157,10 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
             <Phone className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
+              required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder={selectedRole === 'collector' ? "+91 98401 23456" : selectedRole === 'recycler' ? "procurement@greencycle.in" : "admin@ecolink.gov.in"}
+              placeholder={selectedRole === 'collector' ? "demo.collector@example.com" : selectedRole === 'recycler' ? "demo.recycler@example.com" : "demo.admin@example.com"}
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
             />
           </div>
@@ -145,6 +174,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
             <Lock className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
             <input
               type="password"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
@@ -166,7 +196,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
 
           <button
             type="button"
-            onClick={() => alert("Password reset instructions sent to your registered phone/email.")}
+            onClick={() => alert("Demo Password: EcoLink@2026. For existing accounts, please contact administrator.")}
             className="font-bold text-[#3F7655] hover:underline cursor-pointer"
           >
             Forgot Password?
@@ -175,10 +205,20 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
 
         <button
           type="submit"
-          className="w-full py-3.5 rounded-2xl bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-2"
+          disabled={isLoading}
+          className="w-full py-3.5 rounded-2xl bg-[#3F7655] hover:bg-[#244936] disabled:opacity-60 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-2"
         >
-          <span>Login</span>
-          <ArrowRight className="w-4 h-4" />
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Authenticating...</span>
+            </>
+          ) : (
+            <>
+              <span>Login</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       </form>
 
@@ -190,6 +230,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
         <div className="grid grid-cols-3 gap-2">
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => handleQuickRoleLogin('collector')}
             className="py-1.5 px-2 bg-[#DDEBD8] hover:bg-[#c6dfc0] text-[#244936] rounded-xl text-[10px] font-black cursor-pointer transition text-center"
           >
@@ -197,6 +238,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
           </button>
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => handleQuickRoleLogin('recycler')}
             className="py-1.5 px-2 bg-[#244936] hover:bg-[#183225] text-white rounded-xl text-[10px] font-black cursor-pointer transition text-center"
           >
@@ -204,6 +246,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
           </button>
           <button
             type="button"
+            disabled={isLoading}
             onClick={() => handleQuickRoleLogin('admin')}
             className="py-1.5 px-2 bg-[#14291E] hover:bg-black text-[#F2C94C] rounded-xl text-[10px] font-black cursor-pointer transition text-center"
           >

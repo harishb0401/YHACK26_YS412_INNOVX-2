@@ -1,9 +1,22 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import Navbar from '../Navbar/Navbar';
 import Footer from '../Footer/Footer';
 
 export default function RecyclerLayout({ currentUser, onLogout, onOpenSearchModal }) {
+  // 1. Unauthenticated -> redirect to login
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // 2. Role check -> Recycler or Admin only
+  if (currentUser.role !== 'recycler' && currentUser.role !== 'admin') {
+    if (currentUser.role === 'collector') {
+      return <Navigate to="/collector/dashboard" replace />;
+    }
+    return <Navigate to="/login" replace />;
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F5EA] text-[#203128] antialiased font-sans">
       <Navbar 

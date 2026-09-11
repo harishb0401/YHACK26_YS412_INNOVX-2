@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { User, Phone, Mail, Lock, ArrowRight, Truck, ShieldCheck, Check, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { User, Phone, Mail, Lock, ArrowRight, Truck, ShieldCheck, Check, AlertCircle, CheckCircle2, Loader2, Building } from 'lucide-react';
+import authService from '../../services/authService';
 
 export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
   const navigate = useNavigate();
   const [signupRole, setSignupRole] = useState('collector'); // 'collector' | 'recycler'
   const [fullName, setFullName] = useState('');
+  const [organizationName, setOrganizationName] = useState('');
   const [signupPhone, setSignupPhone] = useState('');
   const [signupEmail, setSignupEmail] = useState('');
   const [signupPassword, setSignupPassword] = useState('');
@@ -13,11 +15,17 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
   
   const [errorMessage, setErrorMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!fullName.trim() || !signupPhone.trim() || !signupEmail.trim() || !signupPassword.trim()) {
       setErrorMessage('Please fill out all required fields.');
+      return;
+    }
+
+    if (signupPassword.length < 6) {
+      setErrorMessage('Password must be at least 6 characters long.');
       return;
     }
 
@@ -27,26 +35,37 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
     }
 
     setErrorMessage('');
-    setSuccessMessage('Account created successfully! Redirecting...');
+    setIsLoading(true);
 
-    const userPayload = {
-      role: signupRole,
-      identifier: signupPhone || signupEmail,
-      name: fullName,
-      phone_verified: true
-    };
+    try {
+      const user = await authService.register({
+        fullName: fullName.trim(),
+        email: signupEmail.trim(),
+        phone: signupPhone.trim(),
+        password: signupPassword,
+        role: signupRole,
+        organizationName: signupRole === 'recycler' ? (organizationName.trim() || fullName.trim()) : undefined,
+        locationText: 'Chennai Hub'
+      });
 
-    if (onSignupSuccess) {
-      onSignupSuccess(userPayload);
-    }
+      setSuccessMessage('Account created successfully! Redirecting...');
 
-    setTimeout(() => {
-      if (signupRole === 'collector') {
-        navigate('/collector/dashboard');
-      } else {
-        navigate('/recycler/dashboard');
+      if (onSignupSuccess) {
+        onSignupSuccess(user);
       }
-    }, 1000);
+
+      setTimeout(() => {
+        if (signupRole === 'collector') {
+          navigate('/collector/dashboard');
+        } else {
+          navigate('/recycler/dashboard');
+        }
+      }, 800);
+    } catch (err) {
+      setErrorMessage(err.message || 'Registration failed. Please check your information.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -132,7 +151,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
       <form onSubmit={handleSubmit} className="space-y-3.5">
         <div>
           <label className="text-xs font-extrabold text-[#203128] block mb-1">
-            Full Name *
+            {signupRole === 'recycler' ? 'Contact Person Name *' : 'Full Name *'}
           </label>
           <div className="relative">
             <User className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -146,6 +165,25 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
             />
           </div>
         </div>
+
+        {signupRole === 'recycler' && (
+          <div>
+            <label className="text-xs font-extrabold text-[#203128] block mb-1">
+              Company / Facility Name *
+            </label>
+            <div className="relative">
+              <Building className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <input
+                type="text"
+                required
+                value={organizationName}
+                onChange={(e) => setOrganizationName(e.target.value)}
+                placeholder="e.g. GreenCycle Recovery Ltd"
+                className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
@@ -221,10 +259,20 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
 
         <button
           type="submit"
-          className="w-full py-3.5 rounded-2xl bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-3"
+          disabled={isLoading}
+          className="w-full py-3.5 rounded-2xl bg-[#3F7655] hover:bg-[#244936] disabled:opacity-60 text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-3"
         >
-          <span>Create Account</span>
-          <ArrowRight className="w-4 h-4" />
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              <span>Creating Account...</span>
+            </>
+          ) : (
+            <>
+              <span>Create Account</span>
+              <ArrowRight className="w-4 h-4" />
+            </>
+          )}
         </button>
       </form>
 
