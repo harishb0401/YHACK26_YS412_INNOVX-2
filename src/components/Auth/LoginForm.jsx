@@ -1,21 +1,51 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Phone, Lock, ArrowRight, Truck, ShieldCheck, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { Phone, Lock, ArrowRight, Truck, ShieldCheck, Shield, AlertCircle, Loader2, WifiOff, RefreshCw } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 import authService from '../../services/authService';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus';
+import { getOfflineCollectorSession } from '../../services/offline/offlineSession';
 
 export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { online } = useOnlineStatus();
   const [selectedRole, setSelectedRole] = useState('collector');
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [offlineCollector, setOfflineCollector] = useState(null);
+
+  // Check if device already has a validated offline collector session
+  useEffect(() => {
+    if (!online) {
+      getOfflineCollectorSession().then((res) => {
+        const isAuthOffline = res?.state === 'AUTHENTICATED_OFFLINE' || res?.status === 'AUTHENTICATED_OFFLINE';
+        if (isAuthOffline && res?.user) {
+          setOfflineCollector(res.user);
+        }
+      });
+    } else {
+      setOfflineCollector(null);
+    }
+  }, [online]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // If offline, check for existing collector session
+    if (!online) {
+      if (offlineCollector) {
+        if (onLoginSuccess) onLoginSuccess(offlineCollector);
+        navigate('/collector/dashboard');
+        return;
+      }
+      setErrorMessage('Internet connection is required for your first login.');
+      return;
+    }
+
     if (!identifier.trim() || !password.trim()) {
       setErrorMessage(t('enterEmailPhonePassword') || 'Please enter your phone number/email and password.');
       return;
@@ -84,6 +114,50 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
           {t('loginSubtitleText')}
         </p>
       </div>
+
+      {/* OFFLINE STATUS NOTICES */}
+      {!online && offlineCollector && (
+        <div className="p-4 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-2">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-600 animate-pulse" />
+            <span className="text-xs font-black text-emerald-950">Active Collector Session Detected</span>
+          </div>
+          <p className="text-xs text-emerald-900 font-medium">
+            Welcome back, <strong>{offlineCollector.name || 'Collector'}</strong>! You can continue offline on this device.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              if (onLoginSuccess) onLoginSuccess(offlineCollector);
+              navigate('/collector/dashboard');
+            }}
+            className="w-full py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+          >
+            <span>Open Collector Dashboard (Offline)</span>
+            <ArrowRight className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {!online && !offlineCollector && (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl space-y-2 text-center">
+          <div className="flex items-center justify-center gap-2 text-amber-900 font-black text-xs">
+            <WifiOff className="w-4 h-4 text-amber-700" />
+            <span>Offline Mode</span>
+          </div>
+          <p className="text-xs text-amber-950 font-bold leading-relaxed">
+            Internet connection is required for your first login.
+          </p>
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="w-full py-2 bg-amber-200 hover:bg-amber-300 text-amber-950 font-black text-xs rounded-xl transition flex items-center justify-center gap-2 cursor-pointer"
+          >
+            <RefreshCw className="w-3.5 h-3.5" />
+            <span>Retry Connection</span>
+          </button>
+        </div>
+      )}
 
       {/* Role Selector Tabs */}
       <div className="space-y-1.5">

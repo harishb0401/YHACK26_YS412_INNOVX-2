@@ -1,13 +1,32 @@
 import api from './api';
+import { 
+  saveCollectorSession, 
+  getOfflineCollectorSession, 
+  clearOfflineCollectorSession 
+} from './offline/offlineSession';
+import { isOnline } from './offline/networkStatus';
 
 const TOKEN_KEY = 'ecolink_auth_token';
 const USER_KEY = 'ecolink_user';
 
+/**
+ * SECURITY LIMITATIONS & ARCHITECTURE OF OFFLINE AUTHENTICATION:
+ * 1. Passwords are NEVER stored locally in localStorage or IndexedDB.
+ * 2. Initial authentication MUST happen online against the authoritative backend server.
+ * 3. Offline sessions are permitted only for verified collectors with a valid prior session.
+ * 4. Offline session validity is capped at a 7-day expiration window with version tracking.
+ * 5. Logout explicitly purges both online tokens and offline session keys.
+ */
+
 export const authService = {
   /**
-   * Log in user
+   * Log in user online and initialize offline session for collectors
    */
   async login(identifier, password, role = null) {
+    if (!isOnline()) {
+      throw new Error('Internet connection is required for initial login.');
+    }
+
     const payload = {
       identifier: identifier.trim(),
       password,
@@ -20,6 +39,14 @@ export const authService = {
       const { token, user } = response.data;
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      // Cache offline collector session if role is collector
+      if (user.role === 'collector') {
+        saveCollectorSession(user, token).catch((err) => {
+          console.warn('Failed to cache collector offline session:', err);
+        });
+      }
+
       return user;
     }
 
@@ -30,12 +57,23 @@ export const authService = {
    * Register new user (Collector or Recycler)
    */
   async register(registrationData) {
+    if (!isOnline()) {
+      throw new Error('Internet connection is required to register an account.');
+    }
+
     const response = await api.post('/auth/register', registrationData);
 
     if (response?.success && response?.data?.token) {
       const { token, user } = response.data;
       localStorage.setItem(TOKEN_KEY, token);
       localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+      if (user.role === 'collector') {
+        saveCollectorSession(user, token).catch((err) => {
+          console.warn('Failed to cache collector offline session:', err);
+        });
+      }
+
       return user;
     }
 
@@ -55,36 +93,89 @@ export const authService = {
   },
 
   /**
-   * Fetch authenticated user identity from backend
+   * Fetch authenticated user identity from backend or fallback to offline collector session
    */
   async fetchCurrentUser() {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) return null;
+
+    // If offline, check IndexedDB collector session before abandoning
+    if (!isOnline()) {
+      const offlineSession = await getOfflineCollectorSession();
+      const isAuthOffline = offlineSession?.state === 'AUTHENTICATED_OFFLINE' || offlineSession?.status === 'AUTHENTICATED_OFFLINE';
+      if (isAuthOffline && offlineSession?.user) {
+        return {
+          ...offlineSession.user,
+          isOfflineSession: true
+        };
+      }
+      return this.getCurrentUser();
+    }
+
+    if (!token) {
+      // Check if collector has a valid offline session stored in IndexedDB
+      const offlineSession = await getOfflineCollectorSession();
+      const isAuthOffline = offlineSession?.state === 'AUTHENTICATED_OFFLINE' || offlineSession?.status === 'AUTHENTICATED_OFFLINE';
+      if (isAuthOffline && offlineSession?.user) {
+        return {
+          ...offlineSession.user,
+          isOfflineSession: true
+        };
+      }
+      return null;
+    }
 
     try {
       const response = await api.get('/auth/me');
       if (response?.success && response?.data?.user) {
         const user = response.data.user;
         localStorage.setItem(USER_KEY, JSON.stringify(user));
+
+        if (user.role === 'collector') {
+          saveCollectorSession(user, token).catch(console.error);
+        }
+
         return user;
       }
     } catch (err) {
       console.warn('Could not verify session with server:', err.message);
-      this.clearSession();
+
+      // Check if network is offline or unreachable
+      const offlineSession = await getOfflineCollectorSession();
+      const isAuthOffline = offlineSession?.state === 'AUTHENTICATED_OFFLINE' || offlineSession?.status === 'AUTHENTICATED_OFFLINE';
+      if (isAuthOffline && offlineSession?.user) {
+        return {
+          ...offlineSession.user,
+          isOfflineSession: true
+        };
+      }
+
+      // If strictly 401 Unauthorized from server, wipe invalid session
+      if (err.status === 401 || (err.message && err.message.includes('401'))) {
+        this.clearSession();
+        await clearOfflineCollectorSession();
+        return null;
+      }
+
+      // Preserve existing localStorage user if offline/network timeout
+      return this.getCurrentUser();
     }
     return null;
   },
 
   /**
-   * Log out user and purge storage
+   * Log out user and purge both local and offline credentials
+   * Pending offline records are preserved in IndexedDB
    */
   async logout() {
     try {
-      await api.post('/auth/logout');
+      if (isOnline()) {
+        await api.post('/auth/logout');
+      }
     } catch (e) {
       // Ignore network errors on logout
     } finally {
       this.clearSession();
+      await clearOfflineCollectorSession();
     }
   },
 

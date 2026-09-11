@@ -9,6 +9,7 @@ import wasteService from './services/wasteService';
 import offerService from './services/offerService';
 import transactionService from './services/transactionService';
 import adminService from './services/adminService';
+import { subscribeSyncStatus } from './services/offline/syncManager';
 
 // Reference / Default Data Fallbacks
 import {
@@ -129,6 +130,16 @@ export default function App() {
     refreshAppData();
   }, [refreshAppData]);
 
+  // Subscribe to background sync manager events
+  useEffect(() => {
+    const unsub = subscribeSyncStatus((syncState) => {
+      if (syncState.status === 'completed') {
+        refreshAppData();
+      }
+    });
+    return unsub;
+  }, [refreshAppData]);
+
   // Auth Handlers
   const handleLoginSuccess = (userPayload) => {
     setCurrentUser(userPayload);
@@ -144,7 +155,7 @@ export default function App() {
     navigate('/');
   };
 
-  // Collector Workflow: Create E-Waste Request on Backend
+  // Collector Workflow: Create E-Waste Request on Backend or IndexedDB (Offline)
   const handleLotCreated = async (newLotData) => {
     try {
       const createdLot = await wasteService.createLot({
@@ -159,14 +170,18 @@ export default function App() {
         location: newLotData.location,
         locationText: newLotData.location,
         latitude: newLotData.latitude,
-        longitude: newLotData.longitude
+        longitude: newLotData.longitude,
+        quotedPrice: newLotData.quotedPrice,
+        benchmarkPrice: newLotData.benchmarkPrice,
+        estimatedLotValue: newLotData.estimatedLotValue,
+        allowedPriceRange: newLotData.allowedPriceRange
       });
 
-      // Update state with authoritative backend lot
+      // Update state with authoritative backend lot or local offline lot
       setMaterialLots(prev => [createdLot, ...prev]);
       return createdLot;
     } catch (err) {
-      console.error('Failed to create waste lot on server:', err);
+      console.error('Failed to create waste lot:', err);
       throw err;
     }
   };

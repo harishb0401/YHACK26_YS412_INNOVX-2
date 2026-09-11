@@ -161,7 +161,22 @@ export default function CollectorDashboard({
                       <h4 className="text-sm font-black text-[#203128] mt-1">{lot.material}</h4>
                       <span className="text-[11px] font-mono text-[#718078] font-bold">{lot.id}</span>
                     </div>
-                    <StatusBadge status={lot.status} size="sm" />
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <StatusBadge status={lot.status} size="sm" />
+                      {lot.syncStatus === 'pending' ? (
+                        <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                          🟠 Pending sync
+                        </span>
+                      ) : lot.syncStatus === 'failed' ? (
+                        <span className="text-[10px] font-black text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-300">
+                          ❌ Sync failed
+                        </span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                          ✓ Synced
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-[#718078]">

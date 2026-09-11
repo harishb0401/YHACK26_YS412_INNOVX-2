@@ -10,10 +10,13 @@ import { calculateFairPriceRange } from '../../utils/rulesEngine';
 import { mockBenchmarkPrices, mockCollector } from '../../data/mockData';
 import { validateQuotedPriceBackend } from '../../services/pricingService';
 import { useTranslation } from '../../i18n';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus';
+import { getCategoryPrice, getCachedSafetyGuidance } from '../../services/offline/offlineContentService';
 
 export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, onLotCreated, collectorProfile = mockCollector }) {
   const navigate = useNavigate();
   const { t, tCategory, tCondition } = useTranslation();
+  const { online } = useOnlineStatus();
 
   const [category, setCategory] = useState(structuredEWasteCategories[0].name);
   const [material, setMaterial] = useState(structuredEWasteCategories[0].description || structuredEWasteCategories[0].name);
@@ -28,6 +31,19 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
   const [collectionDate, setCollectionDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [offlinePriceInfo, setOfflinePriceInfo] = useState({ isOffline: false, lastUpdated: null });
+  const [safetyGuidance, setSafetyGuidance] = useState(null);
+  const [showSafetyGuide, setShowSafetyGuide] = useState(false);
+
+  // Load offline cached prices and safety guidelines
+  useEffect(() => {
+    getCategoryPrice(category).then(info => {
+      setOfflinePriceInfo(info);
+    });
+    getCachedSafetyGuidance(category).then(guide => {
+      setSafetyGuidance(guide);
+    });
+  }, [category, online]);
 
   // Selected Category Benchmark & Tolerance
   const selectedCatData = structuredEWasteCategories.find(c => c.name === category);
@@ -185,11 +201,15 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           },
           validationDetails: validation
         });
+
+        if (!online) {
+          alert("Saved offline. It will sync automatically when internet connection returns.");
+        }
       }
 
       navigate('/collector/requests');
     } catch (err) {
-      alert(err.message || "Failed to create waste lot on server. Please try again.");
+      alert(err.message || "Failed to create waste lot. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -387,6 +407,54 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 </span>
               </div>
             </div>
+
+            {/* Offline Price Badge */}
+            {!online && (
+              <div className="p-3 bg-amber-50 border border-amber-300 rounded-2xl text-xs font-bold text-amber-950 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 shadow-sm">
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-700 shrink-0" />
+                  <span>Offline price — last updated: {offlinePriceInfo.lastUpdated || 'Initial Baseline'}</span>
+                </div>
+                <span className="text-[10px] font-black uppercase bg-amber-200 text-amber-900 px-2 py-0.5 rounded-md self-start sm:self-auto">
+                  IndexedDB Cached Rate
+                </span>
+              </div>
+            )}
+
+            {/* Cached Safety Guidance Box */}
+            {safetyGuidance && (
+              <div className="p-4 bg-[#EAF4E8] border border-[#3F7655]/20 rounded-2xl space-y-2 text-xs">
+                <div 
+                  className="flex items-center justify-between cursor-pointer select-none"
+                  onClick={() => setShowSafetyGuide(!showSafetyGuide)}
+                >
+                  <span className="font-extrabold text-[#244936] flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-[#3F7655]" />
+                    <span>Safety Protocols for {category} (Offline Cached)</span>
+                  </span>
+                  <span className="text-[11px] font-bold text-[#3F7655] hover:underline">
+                    {showSafetyGuide ? '▲ Hide' : '▼ View Safety Guidance'}
+                  </span>
+                </div>
+
+                {showSafetyGuide && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-[11px] animate-in fade-in duration-150">
+                    <div className="bg-white p-3 rounded-xl border border-emerald-200 space-y-1">
+                      <strong className="text-emerald-800 uppercase block text-[10px] font-black">✓ Handling Do's</strong>
+                      <ul className="list-disc list-inside space-y-0.5 text-[#203128] font-medium">
+                        {safetyGuidance.dos?.map((d, i) => <li key={i}>{d}</li>)}
+                      </ul>
+                    </div>
+                    <div className="bg-white p-3 rounded-xl border border-rose-200 space-y-1">
+                      <strong className="text-rose-800 uppercase block text-[10px] font-black">✕ Handling Don'ts</strong>
+                      <ul className="list-disc list-inside space-y-0.5 text-[#203128] font-medium">
+                        {safetyGuidance.donts?.map((d, i) => <li key={i}>{d}</li>)}
+                      </ul>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {/* Input for Recycler Quoted Price */}
             <div>

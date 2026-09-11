@@ -7,10 +7,13 @@ import {
 import StatusBadge from '../../components/StatusBadge';
 import { mockWasteLots, mockOffers } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
+import { useOnlineStatus } from '../../hooks/useOnlineStatus';
+import { syncPendingRecords } from '../../services/offline/syncManager';
 
 export default function MyRequests({ materialLots = mockWasteLots, offers = mockOffers }) {
   const navigate = useNavigate();
   const { t, tCategory, tStatus } = useTranslation();
+  const { online } = useOnlineStatus();
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [viewMode, setViewMode] = useState('cards'); // 'cards' | 'table'
@@ -48,6 +51,10 @@ export default function MyRequests({ materialLots = mockWasteLots, offers = mock
   const acceptedCount = allLots.filter(l => ['OFFER_ACCEPTED', 'ACCEPTED', 'PICKUP_SCHEDULED', 'IN_TRANSIT', 'HANDED_OVER'].includes(l.status)).length;
   const completedCount = allLots.filter(l => ['COMPLETED', 'PAYMENT_COMPLETED'].includes(l.status)).length;
 
+  const pendingLotsCount = allLots.filter(l => l.syncStatus === 'pending').length;
+  const failedLotsCount = allLots.filter(l => l.syncStatus === 'failed').length;
+  const hasPending = pendingLotsCount > 0 || failedLotsCount > 0;
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -72,6 +79,39 @@ export default function MyRequests({ materialLots = mockWasteLots, offers = mock
           <span>{t('createEWasteRequest', 'Create E-Waste Request')}</span>
         </button>
       </div>
+
+      {/* Sync Status Banner (Requirement 11) */}
+      {hasPending ? (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-sm animate-in fade-in duration-150">
+          <div className="flex items-center gap-2.5">
+            <span className="w-3 h-3 rounded-full bg-amber-500 animate-pulse shrink-0" />
+            <div>
+              <span className="font-extrabold text-amber-950">
+                {pendingLotsCount} {pendingLotsCount === 1 ? 'record' : 'records'} waiting to sync
+              </span>
+              <p className="text-[11px] text-amber-800">
+                Data is saved safely offline on this device. It will upload automatically once connection is established.
+              </p>
+            </div>
+          </div>
+          {online && (
+            <button
+              onClick={() => syncPendingRecords()}
+              className="px-4 py-2 bg-[#3F7655] hover:bg-[#244936] text-white rounded-xl font-black text-xs shadow-sm transition flex items-center gap-1.5 cursor-pointer shrink-0 self-start sm:self-auto"
+            >
+              <span>Sync Now</span>
+            </button>
+          )}
+        </div>
+      ) : allLots.length > 0 && (
+        <div className="px-4 py-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between text-xs text-emerald-950 font-bold shadow-2xs">
+          <span className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>All records synced</span>
+          </span>
+          <span className="text-[11px] text-emerald-700 font-semibold">Local & cloud database synchronized</span>
+        </div>
+      )}
 
       {/* Overview Metric Pills */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -214,7 +254,25 @@ export default function MyRequests({ materialLots = mockWasteLots, offers = mock
                         <h3 className="text-base font-black text-[#203128] mt-1.5">{request.material}</h3>
                         <span className="text-xs font-mono font-bold text-[#718078]">{request.id}</span>
                       </div>
-                      <StatusBadge status={request.status} />
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
+                        <StatusBadge status={request.status} />
+                        {request.syncStatus === 'pending' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-950 border border-amber-300 inline-flex items-center gap-1 shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-600 animate-pulse" />
+                            <span>Pending sync</span>
+                          </span>
+                        ) : request.syncStatus === 'failed' ? (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-100 text-rose-950 border border-rose-300 inline-flex items-center gap-1 shadow-2xs">
+                            <span>✕</span>
+                            <span>Sync failed</span>
+                          </span>
+                        ) : (
+                          <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200 inline-flex items-center gap-1">
+                            <span>✓</span>
+                            <span>Synced</span>
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     {/* Details Grid */}
@@ -320,7 +378,22 @@ export default function MyRequests({ materialLots = mockWasteLots, offers = mock
                           {request.collectionDate || request.createdDate || 'Today'}
                         </td>
                         <td className="px-6 py-4">
-                          <StatusBadge status={request.status} size="sm" />
+                          <div className="flex flex-col gap-1 items-start">
+                            <StatusBadge status={request.status} size="sm" />
+                            {request.syncStatus === 'pending' ? (
+                              <span className="text-[10px] font-black text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-300">
+                                🟠 Pending sync
+                              </span>
+                            ) : request.syncStatus === 'failed' ? (
+                              <span className="text-[10px] font-black text-rose-800 bg-rose-100 px-2 py-0.5 rounded-full border border-rose-300">
+                                ❌ Sync failed
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                ✓ Synced
+                              </span>
+                            )}
+                          </div>
                         </td>
                         <td className="px-6 py-4">
                           {reqOffers.length > 0 ? (

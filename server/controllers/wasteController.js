@@ -14,6 +14,7 @@ export async function createWasteLot(req, res, next) {
 
     const collectorId = req.user.id;
     const {
+      clientOperationId,
       category,
       material,
       materialType,
@@ -31,6 +32,34 @@ export async function createWasteLot(req, res, next) {
     const parsedQuantity = parseFloat(quantity);
     if (!parsedQuantity || parsedQuantity <= 0) {
       return res.status(400).json({ success: false, message: 'Quantity must be greater than 0' });
+    }
+
+    // Idempotency check: if clientOperationId provided, check if this lot was already synced
+    if (clientOperationId) {
+      const { data: existingLot } = await supabase
+        .from('waste_lots')
+        .select('*')
+        .eq('collector_id', collectorId)
+        .ilike('description', `%[OpId: ${clientOperationId}]%`)
+        .maybeSingle();
+
+      if (existingLot) {
+        return res.status(200).json({
+          success: true,
+          message: 'Lot already synchronized (idempotent)',
+          data: {
+            ...existingLot,
+            id: existingLot.id,
+            lotId: existingLot.lot_id,
+            material: existingLot.material_type,
+            location: existingLot.location,
+            locationText: existingLot.location,
+            totalWeightKg: existingLot.quantity,
+            benchmarkPrice: existingLot.benchmark_rate,
+            estimatedLotValue: Math.round((existingLot.benchmark_rate || 0) * (existingLot.quantity || 0))
+          }
+        });
+      }
     }
 
     // 1. Authoritative server-side classification and pricing calculation
@@ -52,6 +81,10 @@ export async function createWasteLot(req, res, next) {
     });
 
     const finalLocationText = locationText || location || 'Chennai Hub';
+    const baseDescription = description || notes || `${parsedQuantity} ${unit} declared`;
+    const finalDescription = clientOperationId 
+      ? `${baseDescription} [OpId: ${clientOperationId}]`
+      : baseDescription;
 
     // 4. Insert waste lot into Supabase
     const { data: newLot, error: insertErr } = await supabase
@@ -62,7 +95,7 @@ export async function createWasteLot(req, res, next) {
           collector_id: collectorId,
           category: classification.category,
           material_type: material || classification.material,
-          description: description || notes || `${parsedQuantity} ${unit} declared`,
+          description: finalDescription,
           quantity: parsedQuantity,
           unit: unit || 'kg',
           condition: condition || 'Non-working / Scrap',

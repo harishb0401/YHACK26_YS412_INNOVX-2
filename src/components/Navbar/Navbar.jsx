@@ -6,6 +6,7 @@ import {
   ChevronDown, Sparkles
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import OfflineIndicator from '../OfflineIndicator';
 
 export default function Navbar({ 
   onOpenSearchModal,
@@ -261,6 +262,9 @@ export default function Navbar({
               </button>
             </div>
 
+            {/* Online / Offline Status Indicator */}
+            <OfflineIndicator currentRole={currentRole} />
+
             {/* ===================================================== */}
             {/* STATE 1: PUBLIC RIGHT SIDE -> SINGLE [ Login / Signup ] */}
             {/* ===================================================== */}
@@ -429,9 +433,8 @@ export default function Navbar({
       {mobileMenuOpen && (
         <div className="lg:hidden border-b border-[#3F7655]/15 bg-[#F8F5EA] px-4 pt-3 pb-6 space-y-3 animate-in slide-in-from-top duration-200">
           
-          {/* Language Toggle in Mobile Drawer */}
+          {/* Language & Connectivity in Mobile Drawer */}
           <div className="flex items-center justify-between pb-2 border-b border-[#3F7655]/10">
-            <span className="text-xs font-bold text-[#718078]">Language / மொழி:</span>
             <div className="flex items-center bg-white border border-[#3F7655]/20 rounded-full p-1">
               <button
                 onClick={() => setLang('en')}
@@ -446,6 +449,8 @@ export default function Navbar({
                 தமிழ்
               </button>
             </div>
+
+            <OfflineIndicator currentRole={currentRole} />
           </div>
 
           {/* 1. PUBLIC MOBILE NAV */}
