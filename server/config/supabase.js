@@ -29,9 +29,21 @@ if (!supabaseUrl || !supabaseServiceRoleKey) {
   );
 }
 
+const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || process.env.SUPABASE_ANON_KEY || supabaseServiceRoleKey;
+
 // Trusted backend client using the service role key (NEVER expose to frontend)
 export const supabase = (supabaseUrl && supabaseServiceRoleKey)
   ? createClient(supabaseUrl, supabaseServiceRoleKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
+  : null;
+
+// Auth client specifically for validating user credentials via GoTrue signInWithPassword
+export const authClient = (supabaseUrl && supabaseAnonKey)
+  ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false

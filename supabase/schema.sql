@@ -23,7 +23,7 @@ CREATE TABLE profiles (
     full_name TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
     phone TEXT UNIQUE,
-    password_hash TEXT NOT NULL,
+    password_hash TEXT,
     role TEXT NOT NULL CHECK (role IN ('collector', 'recycler', 'admin')),
     address TEXT,
     location_text TEXT,

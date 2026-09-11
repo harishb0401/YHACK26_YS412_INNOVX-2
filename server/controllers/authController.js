@@ -1,6 +1,5 @@
-import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { supabase } from '../config/supabase.js';
+import { supabase, authClient } from '../config/supabase.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'ecolink-production-jwt-super-secret-key-2026';
 const JWT_EXPIRES_IN = '7d';
@@ -20,7 +19,7 @@ function generateToken(user) {
 }
 
 /**
- * Format safe user object (removes password_hash)
+ * Format safe user object (never includes password_hash)
  */
 function formatSafeUser(profile, recyclerProfile = null) {
   const userLocation = profile.location || null;
@@ -66,6 +65,7 @@ function formatSafeUser(profile, recyclerProfile = null) {
 /**
  * User Registration Controller
  * POST /api/auth/register
+ * Creates user in Supabase Authentication (auth.users) and saves profile in public.profiles
  */
 export async function register(req, res, next) {
   try {
@@ -103,11 +103,13 @@ export async function register(req, res, next) {
       });
     }
 
-    // Check duplicate email
-    const { data: existingEmail, error: emailCheckErr } = await supabase
+    const normalizedEmail = (email || '').trim().toLowerCase();
+
+    // Check duplicate email in public.profiles
+    const { data: existingEmail } = await supabase
       .from('profiles')
       .select('id')
-      .eq('email', email.toLowerCase())
+      .eq('email', normalizedEmail)
       .maybeSingle();
 
     if (existingEmail) {
@@ -133,41 +135,63 @@ export async function register(req, res, next) {
       }
     }
 
-    // Hash password
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+    // 1. Create User in Supabase Authentication (auth.users)
+    const { data: authUser, error: authCreateErr } = await supabase.auth.admin.createUser({
+      email: normalizedEmail,
+      password: password,
+      email_confirm: true,
+      user_metadata: {
+        full_name: fullName,
+        role: role || 'collector'
+      }
+    });
 
-    // Map submitted address/location value to the 'location' database column
+    if (authCreateErr || !authUser?.user) {
+      return res.status(400).json({
+        success: false,
+        message: authCreateErr?.message || 'Failed to create user in authentication system.'
+      });
+    }
+
+    const userId = authUser.user.id;
     const resolvedProfileLocation = location || address || locationText || 'Chennai Hub';
 
-    // Insert profile strictly using valid schema columns:
-    // id, full_name, email, phone, password_hash, role, location, latitude, longitude, is_active
-    const { data: newProfile, error: profileInsertErr } = await supabase
+    // 2. Insert corresponding record in public.profiles using matching Supabase Auth UUID
+    const profilePayload = {
+      id: userId,
+      full_name: fullName,
+      email: normalizedEmail,
+      phone: phone || null,
+      role: role || 'collector',
+      location: resolvedProfileLocation,
+      latitude: latitude || null,
+      longitude: longitude || null,
+      is_active: true
+    };
+
+    let { data: newProfile, error: profileInsertErr } = await supabase
       .from('profiles')
-      .insert([
-        {
-          full_name: fullName,
-          email: email.toLowerCase(),
-          phone: phone || null,
-          password_hash: passwordHash,
-          role: role || 'collector',
-          location: resolvedProfileLocation,
-          latitude: latitude || null,
-          longitude: longitude || null,
-          is_active: true
-        }
-      ])
+      .upsert([profilePayload])
       .select()
       .single();
 
+    // If live table still enforces NOT NULL on password_hash prior to migration execution
+    if (profileInsertErr && profileInsertErr.message && profileInsertErr.message.includes('password_hash')) {
+      profilePayload.password_hash = '';
+      const retry = await supabase.from('profiles').upsert([profilePayload]).select().single();
+      newProfile = retry.data;
+      profileInsertErr = retry.error;
+    }
+
     if (profileInsertErr) {
+      // Clean up Supabase Auth user if profile insertion failed
+      await supabase.auth.admin.deleteUser(userId).catch(() => {});
       throw new Error(profileInsertErr.message);
     }
 
     let recyclerProfile = null;
 
-    // If recycler, create recycler_profiles entry using valid columns:
-    // user_id, facility_name, cpcb_reg_number, status, categories, monthly_capacity_kg, service_radius_km, facility_address, latitude, longitude
+    // 3. If recycler, create recycler_profiles entry
     if (role === 'recycler') {
       const resolvedFacilityName = facilityName || organizationName || fullName || 'Registered Recycler Facility';
       const resolvedFacilityAddress = facilityAddress || address || location || locationText || 'Tamil Nadu';
@@ -177,7 +201,7 @@ export async function register(req, res, next) {
 
       const { data: newRecycler, error: recInsertErr } = await supabase
         .from('recycler_profiles')
-        .insert([
+        .upsert([
           {
             user_id: newProfile.id,
             facility_name: resolvedFacilityName,
@@ -201,12 +225,13 @@ export async function register(req, res, next) {
       }
     }
 
-    // Generate JWT
+    // 4. Generate Session Token & Return format safe user
     const token = generateToken(newProfile);
     const safeUser = formatSafeUser(newProfile, recyclerProfile);
 
     return res.status(201).json({
       success: true,
+      message: 'Registration successful',
       data: {
         token,
         user: safeUser
@@ -220,15 +245,16 @@ export async function register(req, res, next) {
 /**
  * User Login Controller
  * POST /api/auth/login
+ * Authenticates credentials via Supabase Authentication (signInWithPassword)
  */
 export async function login(req, res, next) {
   try {
-    if (!supabase) {
-      return res.status(500).json({ success: false, message: 'Database client is unavailable' });
+    if (!supabase || !authClient) {
+      return res.status(500).json({ success: false, message: 'Authentication service is unavailable' });
     }
 
     const { email, identifier, password, role: requestedRole } = req.body;
-    const loginIdentifier = (identifier || email || '').trim().toLowerCase();
+    const loginIdentifier = (identifier || email || '').trim();
 
     if (!loginIdentifier || !password) {
       return res.status(400).json({
@@ -237,24 +263,68 @@ export async function login(req, res, next) {
       });
     }
 
-    // Search profile by email or phone
-    let query = supabase.from('profiles').select('*');
-    if (loginIdentifier.includes('@')) {
-      query = query.eq('email', loginIdentifier);
-    } else {
-      query = query.or(`email.eq.${loginIdentifier},phone.eq.${loginIdentifier}`);
+    let authEmail = loginIdentifier;
+
+    // If identifier is not an email (e.g. phone number), resolve corresponding profile email from public.profiles
+    if (!loginIdentifier.includes('@')) {
+      const { data: phoneProfile, error: phoneLookupErr } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('phone', loginIdentifier)
+        .maybeSingle();
+
+      if (phoneLookupErr || !phoneProfile || !phoneProfile.email) {
+        return res.status(401).json({
+          success: false,
+          message: 'Invalid credentials. Please check your email/phone and password.'
+        });
+      }
+      authEmail = phoneProfile.email;
     }
 
-    const { data: profile, error: fetchErr } = await query.maybeSingle();
+    // 1. Authenticate with Supabase Auth (source of truth for passwords)
+    const { data: authData, error: authError } = await authClient.auth.signInWithPassword({
+      email: authEmail.toLowerCase(),
+      password
+    });
 
-    if (fetchErr || !profile) {
+    if (authError || !authData?.user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials. Please check your email/phone and password.'
       });
     }
 
-    // Check if account is active
+    const authUserId = authData.user.id;
+
+    // 2. Retrieve corresponding public.profiles record using authenticated Supabase user UUID
+    let { data: profile, error: profileErr } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', authUserId)
+      .maybeSingle();
+
+    // Fallback search by email if id needs sync
+    if (!profile) {
+      const { data: emailProfile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('email', authEmail.toLowerCase())
+        .maybeSingle();
+
+      if (emailProfile) {
+        profile = emailProfile;
+      }
+    }
+
+    if (!profile) {
+      return res.status(404).json({
+        success: false,
+        message: 'User profile not found. Please contact support.'
+      });
+    }
+
+    // 3. Validate is_active
     if (!profile.is_active) {
       return res.status(403).json({
         success: false,
@@ -262,21 +332,15 @@ export async function login(req, res, next) {
       });
     }
 
-    // Verify bcrypt password
-    const isPasswordValid = await bcrypt.compare(password, profile.password_hash);
-    if (!isPasswordValid) {
-      return res.status(401).json({
+    // 4. Validate role if requested
+    if (requestedRole && requestedRole !== 'public' && requestedRole !== profile.role) {
+      return res.status(403).json({
         success: false,
-        message: 'Invalid credentials. Please check your email/phone and password.'
+        message: `Unauthorized. You are registered as ${profile.role}, not ${requestedRole}.`
       });
     }
 
-    // Optional check for role mismatch if specified
-    if (requestedRole && requestedRole !== profile.role) {
-      // Role note: allow login but inform
-    }
-
-    // Fetch recycler profile if recycler
+    // 5. Fetch recycler profile if user is recycler
     let recyclerProfile = null;
     if (profile.role === 'recycler') {
       const { data: recData } = await supabase
@@ -287,11 +351,13 @@ export async function login(req, res, next) {
       recyclerProfile = recData;
     }
 
+    // 6. Generate application JWT token
     const token = generateToken(profile);
     const safeUser = formatSafeUser(profile, recyclerProfile);
 
     return res.status(200).json({
       success: true,
+      message: 'Login successful',
       data: {
         token,
         user: safeUser
