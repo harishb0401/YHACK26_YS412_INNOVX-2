@@ -10,7 +10,7 @@
  * - cachedSafetyGuidance: Pictorial/textual e-waste sorting protocols
  * - syncQueue: Offline creation queue with idempotency keys
  */
-import Dexie from 'dexie';
+import { Dexie } from 'dexie';
 
 export const db = new Dexie('EcoLinkDB');
 

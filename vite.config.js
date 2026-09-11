@@ -109,6 +109,9 @@ function pricingApiPlugin() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), pricingApiPlugin()],
+  optimizeDeps: {
+    include: ['dexie']
+  },
   server: {
     port: 3000,
     open: true
