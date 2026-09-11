@@ -1,19 +1,104 @@
-import React, { useState } from 'react';
-import { Building, ShieldCheck, Phone, Mail, MapPin, CheckCircle2, Edit3, Save } from 'lucide-react';
-import { mockRecycler } from '../../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { Building, ShieldCheck, Phone, Mail, MapPin, CheckCircle2, Edit3, Save, Loader2 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import authService from '../../services/authService';
+import recyclerService from '../../services/recyclerService';
 
-export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
+export default function RecyclerProfile({ currentUser, onProfileUpdated }) {
   const { t } = useTranslation();
-  const [profile, setProfile] = useState(recyclerProfile || mockRecycler);
+  const [profile, setProfile] = useState({
+    companyName: currentUser?.recyclerProfile?.facilityName || currentUser?.recyclerProfile?.companyName || currentUser?.organizationName || currentUser?.fullName || '',
+    cpcbRegistrationNo: currentUser?.recyclerProfile?.cpcbRegistrationNo || currentUser?.recyclerProfile?.cpcbRegistrationNumber || currentUser?.recyclerProfile?.registrationNumber || '',
+    contactPerson: currentUser?.fullName || currentUser?.name || '',
+    phone: currentUser?.phone || '',
+    location: currentUser?.location || currentUser?.address || currentUser?.recyclerProfile?.facilityAddress || '',
+    email: currentUser?.email || '',
+    isVerified: currentUser?.recyclerProfile?.status === 'VERIFIED' || currentUser?.recyclerProfile?.isVerified || false
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    let isMounted = true;
+    const loadProfileData = async () => {
+      setIsLoading(true);
+      try {
+        const [freshUser, recRes] = await Promise.all([
+          authService.fetchCurrentUser().catch(() => null),
+          recyclerService.getProfile().catch(() => null)
+        ]);
+
+        if (isMounted) {
+          const recData = recRes?.data || freshUser?.recyclerProfile || {};
+          const userObj = freshUser || currentUser || {};
+          setProfile({
+            companyName: recData.facilityName || recData.companyName || recData.organizationName || userObj.fullName || '',
+            cpcbRegistrationNo: recData.cpcbRegistrationNo || recData.cpcbRegistrationNumber || recData.registrationNumber || '',
+            contactPerson: userObj.fullName || userObj.name || recData.contactPerson || '',
+            phone: userObj.phone || recData.phone || '',
+            location: userObj.location || userObj.address || recData.facilityAddress || recData.location || '',
+            email: userObj.email || '',
+            isVerified: recData.cpcbStatus === 'VERIFIED' || recData.isVerified || recData.status === 'VERIFIED' || false
+          });
+        }
+      } catch (err) {
+        console.warn('Could not load live recycler profile:', err.message);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    loadProfileData();
+    return () => { isMounted = false; };
+  }, [currentUser]);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setIsEditing(false);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+    setIsSaving(true);
+    try {
+      // 1. Update recycler facility details
+      await recyclerService.updateProfile({
+        facilityName: profile.companyName,
+        organizationName: profile.companyName,
+        cpcbRegistrationNo: profile.cpcbRegistrationNo,
+        cpcbRegistrationNumber: profile.cpcbRegistrationNo,
+        facilityAddress: profile.location,
+        location: profile.location,
+        phone: profile.phone,
+        fullName: profile.contactPerson,
+        contactPerson: profile.contactPerson
+      });
+
+      // 2. Update user profile
+      const updatedUser = await authService.updateProfile({
+        fullName: profile.contactPerson,
+        phone: profile.phone,
+        location: profile.location
+      });
+
+      if (onProfileUpdated && updatedUser) {
+        onProfileUpdated(updatedUser);
+      }
+
+      setIsEditing(false);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (err) {
+      alert(err.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const getInitials = () => {
+    const src = profile.companyName || profile.contactPerson || profile.email || 'RC';
+    const parts = src.trim().split(/\s+/);
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return src.slice(0, 2).toUpperCase();
   };
 
   return (
@@ -38,17 +123,23 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#3F7655]/10 pb-6">
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-2xl bg-[#F2C94C] text-[#244936] flex items-center justify-center font-black text-2xl shadow-sm">
-              GC
+              {getInitials()}
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h2 className="text-xl font-black text-[#203128]">{profile.companyName || 'GreenCycle Material Recovery Ltd'}</h2>
-                <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full flex items-center gap-1">
-                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                  {t('recStatusVERIFIED')}
+                <h2 className="text-xl font-black text-[#203128]">{profile.companyName || profile.contactPerson || 'Recycler Facility'}</h2>
+                <span className={`text-[10px] font-black px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                  profile.isVerified 
+                    ? 'text-emerald-800 bg-emerald-100' 
+                    : 'text-amber-800 bg-amber-100'
+                }`}>
+                  <ShieldCheck className="w-3 h-3" />
+                  {profile.isVerified ? t('recStatusVERIFIED') : 'Pending Verification'}
                 </span>
               </div>
-              <p className="text-xs text-[#718078] mt-0.5">Reg No: {profile.cpcbRegistrationNo || 'TN-EPR-2026-8821'}</p>
+              <p className="text-xs text-[#718078] mt-0.5">
+                Reg No: {profile.cpcbRegistrationNo ? profile.cpcbRegistrationNo : '—'}
+              </p>
             </div>
           </div>
 
@@ -68,8 +159,9 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.companyName || ''}
+                value={profile.companyName}
                 onChange={(e) => setProfile({ ...profile, companyName: e.target.value })}
+                placeholder="Facility / Company Name"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -79,8 +171,9 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.cpcbRegistrationNo || ''}
+                value={profile.cpcbRegistrationNo}
                 onChange={(e) => setProfile({ ...profile, cpcbRegistrationNo: e.target.value })}
+                placeholder="CPCB / TNPCB Reg Number"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -92,8 +185,9 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.contactPerson || 'Dr. K. Senthil Nathan'}
+                value={profile.contactPerson}
                 onChange={(e) => setProfile({ ...profile, contactPerson: e.target.value })}
+                placeholder="Contact Person Full Name"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -103,8 +197,9 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.phone || '+91 94441 23456'}
+                value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                placeholder="Phone Number"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -115,8 +210,9 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
             <input
               type="text"
               disabled={!isEditing}
-              value={profile.location || 'Ambattur Industrial Estate, Chennai'}
+              value={profile.location}
               onChange={(e) => setProfile({ ...profile, location: e.target.value })}
+              placeholder="Facility Address / Location"
               className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
             />
           </div>
@@ -124,10 +220,11 @@ export default function RecyclerProfile({ recyclerProfile = mockRecycler }) {
           {isEditing && (
             <button
               type="submit"
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-2xl font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-2"
+              disabled={isSaving}
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-2xl font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
-              <span>{t('save')}</span>
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>{isSaving ? 'Saving...' : t('save')}</span>
             </button>
           )}
         </form>

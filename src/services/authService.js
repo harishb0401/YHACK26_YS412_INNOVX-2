@@ -180,6 +180,19 @@ export const authService = {
   },
 
   /**
+   * Update profile on backend and refresh local storage
+   */
+  async updateProfile(profileData) {
+    const response = await api.put('/auth/profile', profileData);
+    if (response?.success && response?.data?.user) {
+      const user = response.data.user;
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      return user;
+    }
+    throw new Error(response?.message || 'Failed to update profile');
+  },
+
+  /**
    * Clear local storage session
    */
   clearSession() {

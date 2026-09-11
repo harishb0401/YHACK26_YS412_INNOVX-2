@@ -33,11 +33,18 @@ export default function SubmitOfferModal({
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    const recyclerFacilityName = currentRecycler?.facilityName || 
+      currentRecycler?.companyName || 
+      currentRecycler?.organizationName || 
+      currentRecycler?.fullName || 
+      currentRecycler?.name || 
+      "Authorized Recycler";
+
     const newOffer = {
       id: `OFF-2026-${Math.floor(1000 + Math.random() * 9000)}`,
       lotId: lot.id,
-      recyclerId: currentRecycler?.id || "REC-TN-01",
-      recyclerName: currentRecycler?.companyName || "GreenCycle Material Recovery Ltd",
+      recyclerId: currentRecycler?.id || currentRecycler?._id || "",
+      recyclerName: recyclerFacilityName,
       recyclerVerified: true,
       pricePerUnit: numericPrice,
       totalPrice: totalOfferedPrice,
@@ -47,7 +54,7 @@ export default function SubmitOfferModal({
       timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
                  new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
       proposedPickupDate,
-      location: currentRecycler?.location || "Chennai - Ambattur Industrial Estate",
+      location: currentRecycler?.location || currentRecycler?.address || "",
       distanceKm: 8.5,
       notes
     };

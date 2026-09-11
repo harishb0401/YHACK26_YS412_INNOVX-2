@@ -1,15 +1,20 @@
 import React from 'react';
 import { ShieldCheck, FileText, Download, Award, CheckCircle2, AlertCircle, BarChart3 } from 'lucide-react';
-import { mockRecycler } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
 
-export default function Compliance({ recyclerProfile = mockRecycler }) {
+export default function Compliance({ recyclerProfile }) {
   const { t } = useTranslation();
+  const regNo = recyclerProfile?.cpcbRegistrationNo || 
+    recyclerProfile?.cpcbRegistrationNumber || 
+    recyclerProfile?.registrationNumber || 
+    recyclerProfile?.cpcb_reg_number || 
+    'Pending Registration';
+
   const complianceData = {
-    cpcbRegistrationNo: recyclerProfile?.cpcbRegistrationNo || 'TN-EPR-2026-8821',
+    cpcbRegistrationNo: regNo,
     validTill: '31 Dec 2027',
-    status: 'ACTIVE_AUTHORIZED',
-    annualTargetKg: 50000,
+    status: recyclerProfile?.cpcbStatus || recyclerProfile?.status || 'ACTIVE_AUTHORIZED',
+    annualTargetKg: recyclerProfile?.monthlyCapacityKg ? recyclerProfile.monthlyCapacityKg * 12 : 50000,
     achievedKg: 44100,
     recoveryRatioPercent: 94.6,
     toxicDiversionKg: 3820

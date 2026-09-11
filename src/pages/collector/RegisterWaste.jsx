@@ -7,13 +7,13 @@ import {
 } from 'lucide-react';
 import { structuredEWasteCategories } from '../../data/scrapPrices';
 import { calculateFairPriceRange } from '../../utils/rulesEngine';
-import { mockBenchmarkPrices, mockCollector } from '../../data/mockData';
+import { mockBenchmarkPrices } from '../../data/mockData';
 import { validateQuotedPriceBackend } from '../../services/pricingService';
 import { useTranslation } from '../../i18n';
 import { useOnlineStatus } from '../../hooks/useOnlineStatus';
 import { getCategoryPrice, getCachedSafetyGuidance } from '../../services/offline/offlineContentService';
 
-export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, onLotCreated, collectorProfile = mockCollector }) {
+export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, onLotCreated, collectorProfile = null }) {
   const navigate = useNavigate();
   const { t, tCategory, tCondition } = useTranslation();
   const { online } = useOnlineStatus();
@@ -23,7 +23,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
   const [quantity, setQuantity] = useState('25');
   const [unit, setUnit] = useState('kg');
   const [condition, setCondition] = useState('Non-working / Scrap');
-  const [location, setLocation] = useState(collectorProfile?.location || 'Chennai - Guindy Industrial Estate');
+  const [location, setLocation] = useState(collectorProfile?.location || collectorProfile?.address || '');
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [isLocating, setIsLocating] = useState(false);

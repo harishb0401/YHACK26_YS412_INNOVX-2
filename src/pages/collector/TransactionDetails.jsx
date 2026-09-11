@@ -66,14 +66,14 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
           <div className="p-4 bg-[#F8F5EA] rounded-2xl border border-[#3F7655]/10 space-y-2">
             <span className="text-[10px] font-extrabold text-[#718078] uppercase block">{t('collectorLabel')}</span>
-            <h4 className="text-sm font-black text-[#203128]">{tx.collectorName || 'Ramesh Kumar'}</h4>
-            <p className="text-[#718078]">{t('storageLocationHub')}: Chennai Hub</p>
+            <h4 className="text-sm font-black text-[#203128]">{tx.collectorName || tx.collector?.fullName || 'Collector'}</h4>
+            <p className="text-[#718078]">{t('storageLocationHub')}: {tx.collectorLocation || tx.location || 'Local Collection Hub'}</p>
           </div>
 
           <div className="p-4 bg-[#F8F5EA] rounded-2xl border border-[#3F7655]/10 space-y-2">
             <span className="text-[10px] font-extrabold text-[#718078] uppercase block">{t('recyclerLabel')}</span>
-            <h4 className="text-sm font-black text-[#203128]">{tx.recyclerName || 'GreenCycle Material Recovery Ltd'}</h4>
-            <p className="text-[#718078]">CPCB License: TN-EPR-2026-8821</p>
+            <h4 className="text-sm font-black text-[#203128]">{tx.recyclerName || tx.recycler?.facilityName || 'Authorized Recycler'}</h4>
+            <p className="text-[#718078]">{tx.recyclerRegNo ? `CPCB License: ${tx.recyclerRegNo}` : 'CPCB Registered Facility'}</p>
           </div>
         </div>
 

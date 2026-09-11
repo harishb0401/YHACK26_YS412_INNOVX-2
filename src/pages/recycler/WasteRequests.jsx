@@ -9,9 +9,9 @@ import { calculateFairPriceRange } from '../../utils/rulesEngine';
 import { useTranslation } from '../../i18n';
 
 export default function WasteRequests({ 
-  materialLots = mockWasteLots, 
+  materialLots = [], 
   onSubmitOffer,
-  recyclerProfile = mockRecycler
+  recyclerProfile
 }) {
   const { t, tCategory } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
@@ -22,7 +22,7 @@ export default function WasteRequests({
   const [bidSubmitted, setBidSubmitted] = useState(false);
 
   // Available collector requests
-  const availableLots = (materialLots || mockWasteLots).filter(l => 
+  const availableLots = (materialLots || []).filter(l => 
     ['AWAITING_OFFERS', 'SUBMITTED', 'AVAILABLE', 'REGISTERED', 'OFFERS_RECEIVED', 'OFFER_RECEIVED', 'MATCHED'].includes(l.status)
   );
 
@@ -58,10 +58,17 @@ export default function WasteRequests({
     if (onSubmitOffer) {
       setIsSubmittingBid(true);
       try {
+        const recyclerFacilityName = recyclerProfile?.facilityName || 
+          recyclerProfile?.organizationName || 
+          recyclerProfile?.companyName || 
+          recyclerProfile?.fullName || 
+          recyclerProfile?.name || 
+          "Authorized Recycler";
+
         await onSubmitOffer({
           lotId: selectedLotForBid.lotId || selectedLotForBid.id,
-          recyclerId: recyclerProfile?._id || recyclerProfile?.id || "REC-TN-01",
-          recyclerName: recyclerProfile?.organizationName || recyclerProfile?.companyName || recyclerProfile?.name || "GreenCycle Material Recovery Ltd",
+          recyclerId: recyclerProfile?.id || recyclerProfile?._id || "",
+          recyclerName: recyclerFacilityName,
           recyclerVerified: true,
           pricePerUnit: rate,
           ratePerKg: rate,

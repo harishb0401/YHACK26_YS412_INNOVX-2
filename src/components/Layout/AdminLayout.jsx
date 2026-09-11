@@ -24,7 +24,7 @@ export default function AdminLayout({ currentUser, onLogout, onOpenSearchModal }
       <Navbar 
         isLoggedIn={true} 
         currentRole="admin" 
-        userProfile={currentUser || { name: "Platform Administrator" }}
+        userProfile={currentUser}
         onLogout={onLogout}
         onOpenSearchModal={onOpenSearchModal}
       />

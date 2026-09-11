@@ -6,14 +6,14 @@ import {
 } from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
 import StatusBadge from '../../components/StatusBadge';
-import { mockWasteLots, mockOffers, mockTransactions, mockCollector } from '../../data/mockData';
+import { mockWasteLots, mockOffers, mockTransactions } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
 
 export default function CollectorDashboard({ 
   materialLots = mockWasteLots, 
   offers = mockOffers,
   transactions = mockTransactions, 
-  collectorProfile = mockCollector 
+  collectorProfile = null 
 }) {
   const navigate = useNavigate();
   const { t, tCategory } = useTranslation();
@@ -44,7 +44,7 @@ export default function CollectorDashboard({
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black mt-2">
-            {t('goodMorningUser', { name: collectorProfile?.name || "Ramesh Kumar" })}
+            {t('goodMorningUser', { name: collectorProfile?.fullName || collectorProfile?.name || collectorProfile?.email || 'Collector' })}
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
             {t('eWasteManifestSubtitle')}

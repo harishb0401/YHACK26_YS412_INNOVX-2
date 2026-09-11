@@ -146,6 +146,10 @@ export default function App() {
     refreshAppData();
   };
 
+  const handleUserUpdated = (updatedUser) => {
+    setCurrentUser(updatedUser);
+  };
+
   const handleLogout = async () => {
     await authService.logout();
     setCurrentUser(null);
@@ -239,6 +243,7 @@ export default function App() {
         <AppRoutes
           currentUser={currentUser}
           onLoginSuccess={handleLoginSuccess}
+          onUserUpdated={handleUserUpdated}
           onLogout={handleLogout}
           materialLots={materialLots}
           offers={offers}

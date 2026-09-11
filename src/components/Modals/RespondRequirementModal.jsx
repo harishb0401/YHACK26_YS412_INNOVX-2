@@ -8,7 +8,8 @@ export default function RespondRequirementModal({
   isOpen, 
   onClose, 
   requirement, 
-  onSubmitResponse 
+  onSubmitResponse,
+  collectorProfile
 }) {
   const { t } = useTranslation();
 
@@ -18,7 +19,9 @@ export default function RespondRequirementModal({
     { id: "item-3", material: "Printers & Scanners", weightKg: 3, referencePrice: 200 }
   ]);
 
-  const [collectorName, setCollectorName] = useState('Apex Scrap Collection (Ramesh)');
+  const [collectorName, setCollectorName] = useState(
+    collectorProfile?.fullName || collectorProfile?.name || 'Registered Collector'
+  );
   const [askingPricePerKg, setAskingPricePerKg] = useState(310);
   const [notes, setNotes] = useState('Items tested, batteries safely packed in non-conductive crate.');
 

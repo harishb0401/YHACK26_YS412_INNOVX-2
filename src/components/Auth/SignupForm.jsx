@@ -162,7 +162,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
               required
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
-              placeholder="e.g. Ramesh Kumar"
+              placeholder="Enter your full name"
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
             />
           </div>
@@ -180,7 +180,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
                 required
                 value={organizationName}
                 onChange={(e) => setOrganizationName(e.target.value)}
-                placeholder="e.g. GreenCycle Recovery Ltd"
+                placeholder="Enter facility or company name"
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
               />
             </div>

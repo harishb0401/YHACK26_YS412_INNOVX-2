@@ -348,6 +348,60 @@ export async function getMe(req, res, next) {
 }
 
 /**
+ * Update Current User Profile Controller
+ * PUT /api/auth/profile
+ */
+export async function updateProfile(req, res, next) {
+  try {
+    if (!supabase) {
+      return res.status(500).json({ success: false, message: 'Database client is unavailable' });
+    }
+
+    const userId = req.user.id;
+    const { fullName, name, phone, location, address, locationText } = req.body;
+    const resolvedName = fullName || name;
+    const resolvedLocation = location || address || locationText;
+
+    const updates = {};
+    if (resolvedName !== undefined) updates.full_name = resolvedName;
+    if (phone !== undefined) updates.phone = phone || null;
+    if (resolvedLocation !== undefined) updates.location = resolvedLocation;
+    updates.updated_at = new Date().toISOString();
+
+    const { data: updatedProfile, error: profileErr } = await supabase
+      .from('profiles')
+      .update(updates)
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (profileErr) {
+      throw new Error(profileErr.message);
+    }
+
+    let recyclerProfile = null;
+    if (updatedProfile.role === 'recycler') {
+      const { data: recData } = await supabase
+        .from('recycler_profiles')
+        .select('*')
+        .eq('user_id', userId)
+        .maybeSingle();
+      recyclerProfile = recData;
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      data: {
+        user: formatSafeUser(updatedProfile, recyclerProfile)
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
  * Logout Controller
  * POST /api/auth/logout
  */
@@ -357,3 +411,4 @@ export async function logout(req, res) {
     message: 'Logged out successfully.'
   });
 }
+

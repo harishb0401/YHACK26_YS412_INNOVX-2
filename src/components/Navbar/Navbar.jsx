@@ -60,12 +60,10 @@ export default function Navbar({
   const isRecycler = isLoggedIn && currentRole === 'recycler';
   const isAdmin = isLoggedIn && currentRole === 'admin';
 
-  const rawName = userProfile?.name;
-  const displayName = (rawName === "Platform Administrator" || !rawName)
-    ? (isCollector ? "Ramesh Kumar" : 
-       isRecycler ? "GreenCycle Material Recovery" : 
-       isAdmin ? t("platformAdministrator") : t("guestRole"))
-    : rawName;
+  const rawName = userProfile?.fullName || userProfile?.name || userProfile?.facilityName || userProfile?.facility_name || userProfile?.organizationName || userProfile?.email;
+  const displayName = rawName || (isCollector ? t("collectorRole") : 
+       isRecycler ? t("recyclerRole") : 
+       isAdmin ? t("platformAdministrator") : t("guestRole"));
 
   const displayRoleTitle = isCollector ? t("collectorRole") : 
     isRecycler ? t("recyclerRole") : 

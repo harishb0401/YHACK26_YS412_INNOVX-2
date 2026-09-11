@@ -50,6 +50,7 @@ import NotFound from '../pages/NotFound';
 export default function AppRoutes({
   currentUser,
   onLoginSuccess,
+  onUserUpdated,
   onLogout,
   materialLots,
   offers,
@@ -78,9 +79,9 @@ export default function AppRoutes({
 
       {/* 2. COLLECTOR ROUTES (Request-Driven Flow) */}
       <Route path="/collector" element={<CollectorLayout currentUser={currentUser} onLogout={onLogout} />}>
-        <Route path="dashboard" element={<CollectorDashboard materialLots={materialLots} offers={offers} transactions={transactions} />} />
-        <Route path="register-waste" element={<RegisterWaste onLotCreated={onLotCreated} />} />
-        <Route path="create-request" element={<RegisterWaste onLotCreated={onLotCreated} />} />
+        <Route path="dashboard" element={<CollectorDashboard materialLots={materialLots} offers={offers} transactions={transactions} collectorProfile={currentUser} />} />
+        <Route path="register-waste" element={<RegisterWaste onLotCreated={onLotCreated} collectorProfile={currentUser} />} />
+        <Route path="create-request" element={<RegisterWaste onLotCreated={onLotCreated} collectorProfile={currentUser} />} />
         <Route path="requests" element={<MyRequests materialLots={materialLots} offers={offers} />} />
         <Route path="my-requests" element={<MyRequests materialLots={materialLots} offers={offers} />} />
         <Route path="waste-lots" element={<MyRequests materialLots={materialLots} offers={offers} />} />
@@ -90,32 +91,30 @@ export default function AppRoutes({
         <Route path="recycler-matches/:matchId" element={<Navigate to="/collector/requests" replace />} />
         <Route path="transactions" element={<Transactions transactions={transactions} />} />
         <Route path="transactions/:transactionId" element={<TransactionDetails transactions={transactions} />} />
-        <Route path="profile" element={<CollectorProfile />} />
+        <Route path="profile" element={<CollectorProfile currentUser={currentUser} onProfileUpdated={onUserUpdated} />} />
         <Route path="notifications" element={<CollectorNotifications />} />
       </Route>
 
       {/* 3. RECYCLER ROUTES */}
       <Route path="/recycler" element={<RecyclerLayout currentUser={currentUser} onLogout={onLogout} />}>
-        <Route path="dashboard" element={<RecyclerDashboard materialLots={materialLots} />} />
-
-        <Route path="waste-requests" element={<WasteRequests materialLots={materialLots} onSubmitOffer={onSubmitOffer} />} />
+        <Route path="dashboard" element={<RecyclerDashboard materialLots={materialLots} recyclerProfile={currentUser} />} />
+        <Route path="waste-requests" element={<WasteRequests materialLots={materialLots} onSubmitOffer={onSubmitOffer} recyclerProfile={currentUser} />} />
         <Route path="matches" element={<Navigate to="/recycler/waste-requests" replace />} />
         <Route path="transactions" element={<RecyclerTransactions transactions={transactions} />} />
-        <Route path="compliance" element={<Compliance />} />
-        <Route path="profile" element={<RecyclerProfile />} />
+        <Route path="compliance" element={<Compliance recyclerProfile={currentUser} />} />
+        <Route path="profile" element={<RecyclerProfile currentUser={currentUser} onProfileUpdated={onUserUpdated} />} />
         <Route path="notifications" element={<RecyclerNotifications />} />
       </Route>
 
-
       {/* 4. ADMIN ROUTES */}
       <Route path="/admin" element={<AdminLayout currentUser={currentUser} onLogout={onLogout} />}>
-        <Route path="dashboard" element={<AdminDashboard collectors={collectors} recyclers={recyclers} materialLots={materialLots} transactions={transactions} />} />
+        <Route path="dashboard" element={<AdminDashboard collectors={collectors} recyclers={recyclers} materialLots={materialLots} transactions={transactions} adminProfile={currentUser} />} />
         <Route path="collectors" element={<Collectors collectors={collectors} />} />
         <Route path="recyclers" element={<Recyclers recyclers={recyclers} />} />
         <Route path="waste-lots" element={<AdminWasteLots materialLots={materialLots} />} />
         <Route path="transactions" element={<AdminTransactions transactions={transactions} />} />
         <Route path="verification" element={<Verification recyclers={recyclers} />} />
-        <Route path="profile" element={<AdminProfile />} />
+        <Route path="profile" element={<AdminProfile currentUser={currentUser} onProfileUpdated={onUserUpdated} />} />
         <Route path="notifications" element={<AdminNotifications />} />
       </Route>
     </Routes>

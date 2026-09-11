@@ -6,7 +6,8 @@ import { ewasteCategoriesList, tamilNaduLocations } from '../../data/scrapPrices
 export default function PostRequirementModal({ 
   isOpen, 
   onClose, 
-  onAddRequirement 
+  onAddRequirement,
+  recyclerProfile
 }) {
   const { t } = useTranslation();
   const { tCategory } = useLanguage();
@@ -21,13 +22,26 @@ export default function PostRequirementModal({
 
   if (!isOpen) return null;
 
+  const recyclerName = recyclerProfile?.facilityName || 
+    recyclerProfile?.organizationName || 
+    recyclerProfile?.companyName || 
+    recyclerProfile?.fullName || 
+    recyclerProfile?.name || 
+    'Authorized Recycler';
+
+  const cpcbRegNo = recyclerProfile?.cpcbRegistrationNo || 
+    recyclerProfile?.cpcbRegistrationNumber || 
+    recyclerProfile?.registrationNumber || 
+    recyclerProfile?.cpcb_reg_number || 
+    'CPCB Verified';
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const newReq = {
       id: `REQ-${Date.now().toString().slice(-6)}`,
-      recyclerId: "REC-TN-01",
-      recyclerName: "GreenCycle Material Recovery Ltd",
-      cpcbRegistrationNo: "TN-EPR-2026-8821 (Demo)",
+      recyclerId: recyclerProfile?.id || recyclerProfile?._id || "",
+      recyclerName: recyclerName,
+      cpcbRegistrationNo: cpcbRegNo,
       isCpcbVerified: true,
       isPlatformVerified: true,
       category,
@@ -79,7 +93,7 @@ export default function PostRequirementModal({
         {/* CPCB Verified Notice */}
         <div className="bg-[#DDEBD8]/50 rounded-2xl p-3.5 border border-[#3F7655]/20 flex items-center gap-2.5 text-xs text-[#244936]">
           <ShieldCheck className="w-5 h-5 text-[#3F7655] shrink-0" />
-          <span>{t("postingAs", { name: "GreenCycle Material Recovery Ltd", reg: "TN-EPR-2026-8821" })}</span>
+          <span>{t("postingAs", { name: recyclerName, reg: cpcbRegNo })}</span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">

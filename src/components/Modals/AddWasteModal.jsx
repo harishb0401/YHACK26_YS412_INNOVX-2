@@ -107,9 +107,9 @@ export default function AddWasteModal({
 
     const newLot = {
       id: newLotId,
-      collectorId: collectorProfile?.id || "COL-TN-101",
-      collectorName: collectorProfile?.name || "Ramesh Kumar (Apex Scrap)",
-      collectorPhone: collectorProfile?.phone || "+91 98401 23456",
+      collectorId: collectorProfile?.id || collectorProfile?._id || "",
+      collectorName: collectorProfile?.fullName || collectorProfile?.name || "Registered Collector",
+      collectorPhone: collectorProfile?.phone || "",
       category: selectedCatObj.name,
       material: material.trim() || selectedCatObj.name,
       quantity: parseFloat(quantity) || 1,
@@ -129,7 +129,7 @@ export default function AddWasteModal({
       maxEstimatedValue: fairPricing.maxEstimatedValue,
       status: "AVAILABLE",
       timeline: [
-        createTraceabilityEvent("Phone Verified", "Collector", "Completed", { phone: collectorProfile?.phone || "+91 98401 23456" }),
+        createTraceabilityEvent("Phone Verified", "Collector", "Completed", { phone: collectorProfile?.phone || "" }),
         createTraceabilityEvent("Waste Added", "Collector", "Completed", { quantity: `${quantity} ${unit}`, material }),
         createTraceabilityEvent("Waste Classified", "Collector", "Completed", { category: selectedCatObj.name }),
         createTraceabilityEvent("Digital Lot Created", "System", "Completed", { lotId: newLotId }),

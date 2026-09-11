@@ -3,20 +3,27 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Package, ShoppingBag, DollarSign, Scale, RefreshCw, ArrowRight, CheckCircle2, Clock, Award } from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
 import WasteLotCard from '../../components/Cards/WasteLotCard';
-import { mockWasteLots, mockRecycler, mockTransactions } from '../../data/mockData';
+import { mockWasteLots, mockTransactions } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
 
-export default function RecyclerDashboard({ recyclerProfile = mockRecycler, materialLots = mockWasteLots }) {
+export default function RecyclerDashboard({ recyclerProfile, materialLots = [] }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const availableLots = (materialLots || mockWasteLots).filter(l => ['REGISTERED', 'MATCHED', 'AWAITING_OFFERS', 'AVAILABLE'].includes(l.status));
-  const activeProcessing = (materialLots || mockWasteLots).filter(l => ['ACCEPTED', 'DISPATCHED', 'OFFER_ACCEPTED'].includes(l.status));
-  const recycledLots = (materialLots || mockWasteLots).filter(l => l.status === 'COMPLETED');
+  const availableLots = (materialLots || []).filter(l => ['REGISTERED', 'MATCHED', 'AWAITING_OFFERS', 'AVAILABLE'].includes(l.status));
+  const activeProcessing = (materialLots || []).filter(l => ['ACCEPTED', 'DISPATCHED', 'OFFER_ACCEPTED'].includes(l.status));
+  const recycledLots = (materialLots || []).filter(l => l.status === 'COMPLETED');
 
-  const totalProcuredKg = (materialLots || mockWasteLots)
+  const totalProcuredKg = (materialLots || [])
     .filter(l => ['ACCEPTED', 'DISPATCHED', 'COMPLETED', 'OFFER_ACCEPTED'].includes(l.status))
     .reduce((sum, l) => sum + (parseFloat(l.quantity || l.totalWeightKg) || 0), 0);
+
+  const displayName = recyclerProfile?.facilityName || 
+    recyclerProfile?.companyName || 
+    recyclerProfile?.organizationName || 
+    recyclerProfile?.fullName || 
+    recyclerProfile?.name || 
+    'Recycler Facility';
 
   return (
     <div className="space-y-8">
@@ -33,7 +40,7 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black mt-2">
-            {recyclerProfile?.companyName || "GreenCycle Material Recovery Ltd"}
+            {displayName}
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
             {t('availableRequestsDesc')}

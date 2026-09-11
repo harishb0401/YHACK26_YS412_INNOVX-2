@@ -124,8 +124,11 @@ export async function updateRecyclerProfile(req, res, next) {
 
     const userId = req.user.id;
     const {
+      fullName,
+      contactPerson,
       organizationName,
       facilityName,
+      companyName,
       locationText,
       location,
       address,
@@ -134,18 +137,21 @@ export async function updateRecyclerProfile(req, res, next) {
       categories,
       monthlyCapacity,
       monthlyCapacityKg,
+      cpcbRegistrationNo,
       cpcbRegistrationNumber,
       cpcbRegNumber,
       phone
     } = req.body;
 
     const userLoc = location || address || locationText;
+    const resolvedPersonName = fullName || contactPerson;
 
     // Update user profile info
-    if (phone || userLoc) {
+    if (phone || userLoc || resolvedPersonName) {
       await supabase
         .from('profiles')
         .update({
+          ...(resolvedPersonName ? { full_name: resolvedPersonName } : {}),
           ...(phone ? { phone } : {}),
           ...(userLoc ? { location: userLoc } : {}),
           updated_at: new Date().toISOString()
@@ -153,11 +159,11 @@ export async function updateRecyclerProfile(req, res, next) {
         .eq('id', userId);
     }
 
-    const resolvedFacilityName = facilityName || organizationName;
+    const resolvedFacilityName = facilityName || companyName || organizationName;
     const resolvedFacilityAddress = facilityAddress || address || location || locationText;
     const resolvedCategories = categories || acceptedCategories;
     const resolvedCapacity = monthlyCapacityKg !== undefined ? parseFloat(monthlyCapacityKg) : (monthlyCapacity !== undefined ? parseFloat(monthlyCapacity) : undefined);
-    const resolvedCpcbReg = cpcbRegNumber || cpcbRegistrationNumber;
+    const resolvedCpcbReg = cpcbRegistrationNo || cpcbRegNumber || cpcbRegistrationNumber;
 
     // Update recycler profile
     const { data: updatedRecycler, error: recErr } = await supabase

@@ -50,11 +50,13 @@ export async function saveCollectorSession(user, token) {
     token: token || null,
     user: {
       id: user.id,
-      name: user.name || user.company || 'Collector',
+      name: user.fullName || user.name || '',
+      fullName: user.fullName || user.name || '',
       phone: user.phone || '',
       email: user.email || '',
       role: 'collector',
-      location: user.location || 'Tamil Nadu',
+      location: user.location || user.address || '',
+      address: user.location || user.address || '',
       phone_verified: user.phone_verified ?? true
     }
   };

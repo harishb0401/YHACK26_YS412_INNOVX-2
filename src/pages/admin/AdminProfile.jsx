@@ -1,19 +1,68 @@
-import React, { useState } from 'react';
-import { Shield, Mail, Phone, MapPin, CheckCircle2, Save, Edit3 } from 'lucide-react';
-import { mockAdmin } from '../../data/mockData';
+import React, { useState, useEffect } from 'react';
+import { Shield, Mail, Phone, MapPin, CheckCircle2, Save, Edit3, Loader2 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
+import authService from '../../services/authService';
 
-export default function AdminProfile({ adminProfile = mockAdmin }) {
+export default function AdminProfile({ currentUser, onProfileUpdated }) {
   const { t } = useTranslation();
-  const [profile, setProfile] = useState(adminProfile || mockAdmin);
+  const [profile, setProfile] = useState({
+    name: currentUser?.fullName || currentUser?.name || '',
+    email: currentUser?.email || '',
+    phone: currentUser?.phone || '',
+    department: currentUser?.department || currentUser?.location || ''
+  });
   const [isEditing, setIsEditing] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    let isMounted = true;
+    const loadProfile = async () => {
+      setIsLoading(true);
+      try {
+        const freshUser = await authService.fetchCurrentUser();
+        if (isMounted && freshUser) {
+          setProfile({
+            name: freshUser.fullName || freshUser.name || '',
+            email: freshUser.email || '',
+            phone: freshUser.phone || '',
+            department: freshUser.location || freshUser.department || ''
+          });
+        }
+      } catch (err) {
+        console.warn('Could not fetch live admin profile:', err.message);
+      } finally {
+        if (isMounted) setIsLoading(false);
+      }
+    };
+
+    loadProfile();
+    return () => { isMounted = false; };
+  }, [currentUser]);
+
+  const handleSave = async (e) => {
     e.preventDefault();
-    setIsEditing(false);
-    setSavedSuccess(true);
-    setTimeout(() => setSavedSuccess(false), 2500);
+    setIsSaving(true);
+    try {
+      const updatedUser = await authService.updateProfile({
+        fullName: profile.name,
+        phone: profile.phone,
+        location: profile.department
+      });
+
+      if (onProfileUpdated && updatedUser) {
+        onProfileUpdated(updatedUser);
+      }
+
+      setIsEditing(false);
+      setSavedSuccess(true);
+      setTimeout(() => setSavedSuccess(false), 2500);
+    } catch (err) {
+      alert(err.message || 'Failed to update admin profile');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -45,7 +94,7 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
                   {t('cpcbMasterAuthority')}
                 </span>
               </div>
-              <p className="text-xs text-[#718078] mt-0.5">{t('tnpcbBoard')}</p>
+              <p className="text-xs text-[#718078] mt-0.5">{profile.department ? profile.department : t('tnpcbBoard')}</p>
             </div>
           </div>
 
@@ -65,8 +114,9 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.name || ''}
+                value={profile.name}
                 onChange={(e) => setProfile({ ...profile, name: e.target.value })}
+                placeholder="Admin Full Name"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -75,9 +125,9 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
               <label className="text-xs font-extrabold text-[#203128] block mb-1">{t('emailAddress')}</label>
               <input
                 type="email"
-                disabled={!isEditing}
-                value={profile.email || ''}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                disabled={true}
+                value={profile.email}
+                placeholder="Email Address"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -89,8 +139,9 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.phone || '+91 44 2235 1234'}
+                value={profile.phone}
                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
+                placeholder="Phone Number"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -100,8 +151,9 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
               <input
                 type="text"
                 disabled={!isEditing}
-                value={profile.department || 'CPCB EPR Regulatory Wing - Chennai'}
+                value={profile.department}
                 onChange={(e) => setProfile({ ...profile, department: e.target.value })}
+                placeholder="Department / Wing"
                 className="w-full bg-[#F8F5EA] disabled:opacity-80 border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
@@ -110,10 +162,11 @@ export default function AdminProfile({ adminProfile = mockAdmin }) {
           {isEditing && (
             <button
               type="submit"
-              className="w-full sm:w-auto px-8 py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-2xl font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-2"
+              disabled={isSaving}
+              className="w-full sm:w-auto px-8 py-3.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-2xl font-black text-xs shadow transition cursor-pointer flex items-center justify-center gap-2 disabled:opacity-50"
             >
-              <Save className="w-4 h-4" />
-              <span>{t('save')}</span>
+              {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+              <span>{isSaving ? 'Saving...' : t('save')}</span>
             </button>
           )}
         </form>
