@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { 
-  Search, Menu, X, ArrowRight, User, Bell, 
+  Menu, X, ArrowRight, User, Bell, 
   CheckCircle2, LogOut, Settings, ShieldCheck, 
   ChevronDown, Sparkles
 } from 'lucide-react';
@@ -225,19 +225,6 @@ export default function Navbar({
           {/* RIGHT SIDE TOOLS: PUBLIC VS LOGGED-IN                     */}
           {/* ========================================================= */}
           <div className="hidden sm:flex items-center gap-3">
-            
-            {/* PUBLIC ONLY: Search Icon */}
-            {!isLoggedIn && (
-              <button
-                onClick={onOpenSearchModal}
-                title="Search e-waste materials & reference rates"
-                className="p-2.5 rounded-full text-[#203128] hover:text-[#3F7655] hover:bg-[#DDEBD8]/60 transition border border-[#3F7655]/10 flex items-center gap-1.5 text-xs font-semibold cursor-pointer"
-              >
-                <Search className="w-4 h-4 text-[#3F7655]" />
-                <span className="hidden xl:inline text-[#718078]">{t("navSearchPlaceholder") || "Search"}</span>
-              </button>
-            )}
-
             {/* Language Switcher: EN | தமிழ் (Always available) */}
             <div className="flex items-center bg-white border border-[#3F7655]/20 rounded-full p-1 shadow-sm">
               <button

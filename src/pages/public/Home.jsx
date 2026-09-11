@@ -304,38 +304,6 @@ export default function Home({ onOpenSearchModal }) {
       {/* 4. BOTTOM SECTIONS */}
       <section className="py-20 bg-white border-b border-[#3F7655]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          
-          {/* Environmental Impact Metrics */}
-          <div className="space-y-6">
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-3 py-1 rounded-full">
-                {t('envImpactBadge', 'ENVIRONMENTAL IMPACT')}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#203128]">
-                {t('drivingResourceRecoveryTitle', 'Driving Measurable Resource Recovery')}
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#3F7655] block">{communityImpactStats.recycledKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('totalEWasteProcessed', 'Total E-Waste Processed')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#244936] block">{communityImpactStats.co2SavedKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('co2EmissionsPrevented', 'CO₂ Emissions Prevented')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-amber-600 block">{communityImpactStats.goldRecoveredGrams}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('preciousMetalsRecovered', 'Precious Metals Recovered')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#3F7655] block">{communityImpactStats.copperRecoveredKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('secondaryCopperRecycled', 'Secondary Copper Recycled')}</span>
-              </div>
-            </div>
-          </div>
-
           {/* Number of Waste Lots Processed */}
           <div className="p-8 rounded-[32px] bg-[#DDEBD8]/50 border border-[#3F7655]/20 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">

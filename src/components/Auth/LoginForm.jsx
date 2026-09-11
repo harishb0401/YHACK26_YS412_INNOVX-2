@@ -74,37 +74,6 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
     }
   };
 
-  const handleQuickRoleLogin = async (role) => {
-    setSelectedRole(role);
-    setErrorMessage('');
-    setIsLoading(true);
-
-    const demoCredentials = {
-      collector: { id: 'demo.collector@example.com', pass: 'EcoLink@2026' },
-      recycler: { id: 'demo.recycler@example.com', pass: 'EcoLink@2026' },
-      admin: { id: 'demo.admin@example.com', pass: 'EcoLink@2026' }
-    };
-
-    const creds = demoCredentials[role];
-    setIdentifier(creds.id);
-    setPassword(creds.pass);
-
-    try {
-      const user = await authService.login(creds.id, creds.pass, role);
-      if (onLoginSuccess) {
-        onLoginSuccess(user);
-      }
-      if (role === 'collector') navigate('/collector/dashboard');
-      else if (role === 'recycler') navigate('/recycler/dashboard');
-      else if (role === 'admin') navigate('/admin/dashboard');
-    } catch (err) {
-      // If server is not yet populated with seed data or offline fallback
-      setErrorMessage(err.message || `Could not log in as ${role}. Please check server.`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   return (
     <div className="space-y-5 animate-in fade-in duration-150">
       {/* Title & Subtitle */}
@@ -236,7 +205,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
               required
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
-              placeholder={selectedRole === 'collector' ? "demo.collector@example.com" : selectedRole === 'recycler' ? "demo.recycler@example.com" : "demo.admin@example.com"}
+              placeholder="Enter your email or phone number"
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
             />
           </div>
@@ -272,7 +241,7 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
 
           <button
             type="button"
-            onClick={() => alert("Demo Password: EcoLink@2026. For existing accounts, please contact administrator.")}
+            onClick={() => alert("Please contact the administrator to reset your password.")}
             className="font-bold text-[#3F7655] hover:underline cursor-pointer"
           >
             {t('forgotPassword')}
@@ -297,39 +266,6 @@ export default function LoginForm({ onLoginSuccess, onSwitchToSignup }) {
           )}
         </button>
       </form>
-
-      {/* Demo Quick Login */}
-      <div className="pt-3 border-t border-[#3F7655]/10 space-y-1.5">
-        <span className="text-[10px] font-extrabold text-[#718078] uppercase tracking-wider block text-center">
-          {t('quickInstantLogin')}
-        </span>
-        <div className="grid grid-cols-3 gap-2">
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={() => handleQuickRoleLogin('collector')}
-            className="py-1.5 px-2 bg-[#DDEBD8] hover:bg-[#c6dfc0] text-[#244936] rounded-xl text-[10px] font-black cursor-pointer transition text-center"
-          >
-            {t('collectorRole')} →
-          </button>
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={() => handleQuickRoleLogin('recycler')}
-            className="py-1.5 px-2 bg-[#244936] hover:bg-[#183225] text-white rounded-xl text-[10px] font-black cursor-pointer transition text-center"
-          >
-            {t('recyclerRole')} →
-          </button>
-          <button
-            type="button"
-            disabled={isLoading}
-            onClick={() => handleQuickRoleLogin('admin')}
-            className="py-1.5 px-2 bg-[#14291E] hover:bg-black text-[#F2C94C] rounded-xl text-[10px] font-black cursor-pointer transition text-center"
-          >
-            {t('adminRole')} →
-          </button>
-        </div>
-      </div>
 
       {/* Switch to Signup */}
       <div className="text-center pt-2">
