@@ -121,9 +121,11 @@ export default function Navbar({
             to={isLoggedIn ? (isCollector ? '/collector/dashboard' : isRecycler ? '/recycler/dashboard' : '/admin/dashboard') : '/'} 
             className="flex items-center gap-2.5 cursor-pointer group shrink-0"
           >
-            <div className="w-10 h-10 rounded-2xl bg-[#3F7655] flex items-center justify-center text-white shadow-md shadow-[#3F7655]/20 group-hover:scale-105 transition-transform">
-              <span className="text-xl font-black">♻</span>
-            </div>
+            <img 
+              src="/ecolink-logo.png" 
+              alt="EcoLink" 
+              className="w-10 h-10 object-contain rounded-2xl shadow-sm group-hover:scale-105 transition-transform bg-white p-1 border border-[#3F7655]/20" 
+            />
             <span className="text-2xl font-extrabold tracking-tight text-[#244936]">
               Eco-<span className="text-[#3F7655]">Link</span>
             </span>

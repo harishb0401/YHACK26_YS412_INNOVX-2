@@ -90,61 +90,17 @@ export default function Home({ onOpenSearchModal }) {
 
             </div>
 
-            {/* Right Interactive Card */}
-            <div className="lg:col-span-5 relative">
-              <div className="bg-white p-6 sm:p-8 rounded-[32px] border border-[#3F7655]/20 shadow-xl space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-[#3F7655]/15">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-2xl bg-[#3F7655] text-white flex items-center justify-center font-black">
-                      EL
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-extrabold uppercase text-[#3F7655] tracking-widest block">
-                        {t('marketplaceFlowHeader', 'E-WASTE MARKETPLACE FLOW')}
-                      </span>
-                      <h3 className="text-sm font-black text-[#244936]">Collector ↔ Recycler</h3>
-                    </div>
-                  </div>
-                  <span className="text-xs font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full">
-                    {t('liveEngineTag', 'Live Engine')}
-                  </span>
-                </div>
-
-                <div className="space-y-2.5 text-xs">
-                  <div className="p-3 rounded-2xl bg-[#FAF8F2] border border-[#3F7655]/15 flex items-center justify-between">
-                    <div>
-                      <span className="text-slate-500 font-bold block text-[10px]">1. {t('wasteRegistrationStep', 'Waste Registration')}</span>
-                      <strong className="text-slate-800">5 x Laptops (12 kg)</strong>
-                    </div>
-                    <span className="font-black text-[#3F7655]">₹40/kg {t('benchmark', 'Benchmark')}</span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-[#FAF8F2] border border-[#3F7655]/15 flex items-center justify-between">
-                    <div>
-                      <span className="text-slate-500 font-bold block text-[10px]">2. {t('fairPriceValidationStep', 'Fair Price Validation')}</span>
-                      <strong className="text-slate-800">{t('offeredRate', 'Offered')}: ₹42/kg</strong>
-                    </div>
-                    <span className="font-black text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">{t('priceAcceptedBadge', 'Price Accepted ✓')}</span>
-                  </div>
-
-                  <div className="p-3 rounded-2xl bg-[#DDEBD8]/60 border border-[#3F7655]/20 flex items-center justify-between">
-                    <div>
-                      <span className="text-slate-600 font-bold block text-[10px]">3. {t('digitalLotHandoverStep', 'Digital Lot & Handover')}</span>
-                      <strong className="text-[#244936]">EL-2026-00125</strong>
-                    </div>
-                    <span className="text-xs font-black text-[#3F7655] flex items-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" /> {t('matched', 'Matched')}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => navigate('/collector/dashboard')}
-                  className="w-full py-3 rounded-2xl bg-[#244936] hover:bg-[#14291E] text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>{t('openCollectorPortalBtn', 'Open Collector Portal')}</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
+            {/* Right Hero Branding Image */}
+            <div className="lg:col-span-5 relative flex items-center justify-center">
+              <div className="relative w-full max-w-lg bg-white p-6 sm:p-8 rounded-[36px] border border-[#3F7655]/20 shadow-2xl flex flex-col items-center justify-center group hover:border-[#3F7655]/40 transition duration-300">
+                <div className="absolute -top-16 -right-16 w-40 h-40 bg-[#DDEBD8]/60 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-16 -left-16 w-40 h-40 bg-[#F2C94C]/20 rounded-full blur-3xl pointer-events-none" />
+                
+                <img
+                  src="/ecolink-logo.png"
+                  alt="EcoLink - Recycle Today • A Greener Tomorrow"
+                  className="w-full max-h-[380px] object-contain drop-shadow-md rounded-2xl transform group-hover:scale-[1.02] transition duration-500"
+                />
               </div>
             </div>
 
