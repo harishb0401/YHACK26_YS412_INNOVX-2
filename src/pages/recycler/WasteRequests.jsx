@@ -42,7 +42,9 @@ export default function WasteRequests({
     setBidSubmitted(false);
   };
 
-  const handleSendBid = (e) => {
+  const [isSubmittingBid, setIsSubmittingBid] = useState(false);
+
+  const handleSendBid = async (e) => {
     e.preventDefault();
     const rate = parseFloat(bidRate);
     if (!rate || rate <= 0) {
@@ -54,26 +56,33 @@ export default function WasteRequests({
     const total = Math.round(rate * qty);
 
     if (onSubmitOffer) {
-      onSubmitOffer({
-        lotId: selectedLotForBid.id,
-        recyclerId: recyclerProfile?.id || "REC-TN-01",
-        recyclerName: recyclerProfile?.companyName || "GreenCycle Material Recovery Ltd",
-        recyclerVerified: true,
-        pricePerUnit: rate,
-        totalPrice: total,
-        proposedPickupDate: pickupDate,
-        notes: logisticsNotes,
-        fairPriceStatus: "FAIR",
-        timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
-      });
+      setIsSubmittingBid(true);
+      try {
+        await onSubmitOffer({
+          lotId: selectedLotForBid.lotId || selectedLotForBid.id,
+          recyclerId: recyclerProfile?._id || recyclerProfile?.id || "REC-TN-01",
+          recyclerName: recyclerProfile?.organizationName || recyclerProfile?.companyName || recyclerProfile?.name || "GreenCycle Material Recovery Ltd",
+          recyclerVerified: true,
+          pricePerUnit: rate,
+          ratePerKg: rate,
+          totalPrice: total,
+          proposedPickupDate: pickupDate,
+          notes: logisticsNotes,
+          timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        });
+        setBidSubmitted(true);
+        setTimeout(() => {
+          setSelectedLotForBid(null);
+          setBidSubmitted(false);
+        }, 1200);
+      } catch (err) {
+        alert(err.message || "Failed to submit offer to server.");
+      } finally {
+        setIsSubmittingBid(false);
+      }
     }
-
-    setBidSubmitted(true);
-    setTimeout(() => {
-      setSelectedLotForBid(null);
-      setBidSubmitted(false);
-    }, 1500);
   };
+
 
   return (
     <div className="space-y-6">

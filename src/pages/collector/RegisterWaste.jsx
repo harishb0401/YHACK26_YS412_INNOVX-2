@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   ArrowLeft, Scale, DollarSign, CheckCircle2, XCircle, 
   AlertTriangle, Calculator, ShieldCheck, TrendingDown, 
-  TrendingUp, RefreshCw, HelpCircle, Info
+  TrendingUp, RefreshCw, HelpCircle, Info, MapPin, Loader2, Navigation
 } from 'lucide-react';
 import { structuredEWasteCategories } from '../../data/scrapPrices';
 import { calculateFairPriceRange } from '../../utils/rulesEngine';
@@ -21,8 +21,13 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
   const [unit, setUnit] = useState('kg');
   const [condition, setCondition] = useState('Non-working / Scrap');
   const [location, setLocation] = useState(collectorProfile?.location || 'Chennai - Guindy Industrial Estate');
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [isLocating, setIsLocating] = useState(false);
+  const [locationSuccess, setLocationSuccess] = useState('');
   const [collectionDate, setCollectionDate] = useState(new Date().toISOString().split('T')[0]);
   const [notes, setNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Selected Category Benchmark & Tolerance
   const selectedCatData = structuredEWasteCategories.find(c => c.name === category);
@@ -50,6 +55,35 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
         setQuotedPrice(String(newBenchmark));
       }
     }
+  };
+
+  // Geolocation detector
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      alert("Geolocation is not supported by your browser. Please enter location manually.");
+      return;
+    }
+
+    setIsLocating(true);
+    setLocationSuccess('');
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lon = pos.coords.longitude;
+        setLatitude(lat);
+        setLongitude(lon);
+        setLocationSuccess(`GPS coordinates detected: ${lat.toFixed(4)}, ${lon.toFixed(4)}`);
+        setLocation(`Chennai Hub (${lat.toFixed(3)}°N, ${lon.toFixed(3)}°E)`);
+        setIsLocating(false);
+      },
+      (err) => {
+        console.warn('Geolocation error:', err.message);
+        alert('Could not access GPS location. You can continue by entering your location manually.');
+        setIsLocating(false);
+      },
+      { timeout: 10000, enableHighAccuracy: true }
+    );
   };
 
   // Trigger backend validation asynchronously on input changes
@@ -110,7 +144,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
         : `Quoted price (₹${parsedQuote}/${unit}) is within the allowed fair benchmark range (₹${minPrice} – ₹${maxPrice}/${unit}).`
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!parsedQty || parsedQty <= 0) {
       alert("Please enter a valid positive quantity / lot weight.");
@@ -122,35 +156,44 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
       return;
     }
 
-    if (onLotCreated) {
-      onLotCreated({
-        category,
-        material: (material || '').trim() || category,
-        quantity: parsedQty,
-        totalWeightKg: parsedQty,
-        unit,
-        condition,
-        location,
-        collectionDate,
-        notes,
-        benchmarkPrice: displayBenchmark,
-        quotedPrice: parsedQuote,
-        estimatedLotValue: estimatedTotalAmount,
-        isPreCleared: validation.isCleared,
-        clearanceBadge: validation.badgeText,
-        clearanceStatus: validation.status,
-        allowedPriceRange: {
-          minPrice,
-          maxPrice,
-          rangeLabel: `₹${minPrice} – ₹${maxPrice} / ${unit}`
-        },
-        validationDetails: validation
-      });
+    setIsSubmitting(true);
+
+    try {
+      if (onLotCreated) {
+        await onLotCreated({
+          category,
+          material: (material || '').trim() || category,
+          quantity: parsedQty,
+          totalWeightKg: parsedQty,
+          unit,
+          condition,
+          location,
+          latitude,
+          longitude,
+          collectionDate,
+          notes,
+          benchmarkPrice: displayBenchmark,
+          quotedPrice: parsedQuote,
+          estimatedLotValue: estimatedTotalAmount,
+          isPreCleared: validation.isCleared,
+          clearanceBadge: validation.badgeText,
+          clearanceStatus: validation.status,
+          allowedPriceRange: {
+            minPrice,
+            maxPrice,
+            rangeLabel: `₹${minPrice} – ₹${maxPrice} / ${unit}`
+          },
+          validationDetails: validation
+        });
+      }
+
+      navigate('/collector/requests');
+    } catch (err) {
+      alert(err.message || "Failed to create waste lot on server. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    navigate('/collector/requests');
   };
-
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
@@ -258,12 +301,32 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
             </div>
           </div>
 
-          {/* Row 3: Location and Collection Date */}
+          {/* Row 3: Location (with GPS Detect) and Collection Date */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                {t('storageLocationHub', 'Storage Location / Hub')} *
-              </label>
+              <div className="flex items-center justify-between mb-1">
+                <label className="text-xs font-extrabold text-[#203128]">
+                  {t('storageLocationHub', 'Storage Location / Hub')} *
+                </label>
+                <button
+                  type="button"
+                  onClick={handleDetectLocation}
+                  disabled={isLocating}
+                  className="text-[11px] font-bold text-[#3F7655] hover:text-[#244936] flex items-center gap-1 cursor-pointer"
+                >
+                  {isLocating ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>{t('detectingGps', 'Detecting GPS...')}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Navigation className="w-3 h-3" />
+                      <span>{t('detectMyLocation', 'Detect My Location')}</span>
+                    </>
+                  )}
+                </button>
+              </div>
               <input
                 type="text"
                 required
@@ -272,6 +335,12 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 placeholder={t('placeholderLocation')}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
+              {locationSuccess && (
+                <p className="text-[10px] font-bold text-emerald-700 mt-1 flex items-center gap-1">
+                  <CheckCircle2 className="w-3 h-3" />
+                  <span>{locationSuccess}</span>
+                </p>
+              )}
             </div>
 
             <div>
@@ -288,7 +357,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
             </div>
           </div>
 
-          {/* NEW SECTION: QUOTED AMOUNT & LIVE BACKEND PRICING VALIDATION */}
+          {/* QUOTED AMOUNT & LIVE BACKEND PRICING VALIDATION */}
           <div className="p-6 sm:p-7 bg-[#FAF8F2] rounded-[28px] border-2 border-[#3F7655]/30 shadow-sm space-y-5">
             {/* Section Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#3F7655]/15 pb-3">
@@ -360,134 +429,115 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 </span>
               </div>
               <p className="text-[11px] text-[#718078] mt-1.5">
-                {t('quotedPriceHelpText', 'Enter the unit price offered by the recycler or your target rate to check instant regulatory clearance.')}
+                {t('quotedPriceHelpText', 'Enter your asking or quoted price per {unit}. The system checks if it falls within the fair ±{tolerance}% reference range.', { unit, tolerance: displayTolerance })}
               </p>
             </div>
 
-            {/* 4 Automatically Calculated Metrics Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-              {/* 1. Benchmark Rate */}
-              <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  {t('benchmarkPriceLabel', 'Benchmark Rate')}
+            {/* Live Benchmark & Allowed Range Summary Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="p-3.5 rounded-2xl bg-white border border-[#3F7655]/20 space-y-1">
+                <span className="text-[10px] font-black uppercase text-[#718078] tracking-wider block">
+                  {t('categoryBenchmarkLabel', 'Category Benchmark')}
                 </span>
                 <span className="text-base font-black text-[#203128] block">
-                  ₹{displayBenchmark} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
+                  ₹{displayBenchmark} / {unit}
                 </span>
-                <span className="text-[10px] font-medium text-[#718078] block">
-                  {t('cpcbReferenceRateLabel', 'CPCB reference rate')}
-                </span>
-              </div>
-
-              {/* 2. Allowed Price Range */}
-              <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  {t('allowedPriceRange', 'Allowed Price Range')}
-                </span>
-                <span className="text-sm font-black text-[#3F7655] block truncate">
-                  ₹{minPrice} – ₹{maxPrice} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
-                </span>
-                <span className="text-[10px] font-medium text-[#718078] block">
-                  {t('toleranceBandText', 'Band of ±{tolerance}% from benchmark', { tolerance: displayTolerance })}
+                <span className="text-[10px] text-[#718078] block">
+                  {t('cpcbReferenceRateLabel', 'CPCB Reference Price')}
                 </span>
               </div>
 
-              {/* 3. Recycler Quoted Price */}
-              <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  {t('recyclerQuotedPrice', 'Recycler Quoted Price')}
+              <div className="p-3.5 rounded-2xl bg-white border border-[#3F7655]/20 space-y-1">
+                <span className="text-[10px] font-black uppercase text-[#718078] tracking-wider block">
+                  {t('allowedPriceRange', 'Allowed Price Range')} (±{displayTolerance}%)
+                </span>
+                <span className="text-base font-black text-[#3F7655] block">
+                  ₹{minPrice} – ₹{maxPrice} / {unit}
+                </span>
+                <span className="text-[10px] text-[#718078] block">
+                  {t('fairTransactionBoundsLabel', 'Fair Transaction Bounds')}
+                </span>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-white border border-[#3F7655]/20 space-y-1">
+                <span className="text-[10px] font-black uppercase text-[#718078] tracking-wider block">
+                  {t('estimatedTotalValue', 'Estimated Total Value')}
                 </span>
                 <span className="text-base font-black text-[#203128] block">
-                  ₹{parsedQuote || 0} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
-                </span>
-                <span className="text-[10px] font-semibold block text-[#718078]">
-                  {t('declaredUnitOfferLabel', 'Declared unit offer')}
-                </span>
-              </div>
-
-              {/* 4. Estimated Total Amount = Lot Weight × Recycler Quoted Price */}
-              <div className="p-3.5 bg-[#DDEBD8]/60 rounded-2xl border border-[#3F7655]/30 shadow-sm space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-[#244936] block tracking-wide">
-                  {t('estimatedTotalAmount', 'Estimated Total Amount')}
-                </span>
-                <span className="text-base font-black text-[#244936] block">
                   ₹{estimatedTotalAmount.toLocaleString()}
                 </span>
-                <span className="text-[10px] font-medium text-[#244936]/80 block truncate">
+                <span className="text-[10px] text-[#718078] block">
                   {parsedQty} {unit} × ₹{parsedQuote || 0}
                 </span>
               </div>
             </div>
 
-            {/* Validation Clearance Status Banner */}
-            <div className={`p-4 rounded-2xl border-2 transition-all ${
-              validation.isCleared 
-                ? 'bg-[#DDEBD8]/90 border-[#3F7655]/40 text-[#203128]' 
+            {/* Clearance & Validation Status Banner */}
+            <div className={`p-4 rounded-2xl border transition-all ${
+              validation.isCleared
+                ? 'bg-emerald-50/90 border-emerald-300 text-emerald-950'
                 : validation.position === 'BELOW_RANGE'
-                  ? 'bg-rose-50 border-rose-300 text-rose-950'
-                  : 'bg-amber-50 border-amber-300 text-amber-950'
+                  ? 'bg-rose-50/90 border-rose-300 text-rose-950'
+                  : 'bg-amber-50/90 border-amber-300 text-amber-950'
             }`}>
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-                <div className="flex items-start sm:items-center gap-2.5">
-                  {validation.isCleared ? (
-                    <div className="w-8 h-8 rounded-full bg-[#3F7655] text-white flex items-center justify-center shrink-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 text-white font-bold ${
+                    validation.isCleared ? 'bg-emerald-600' : validation.position === 'BELOW_RANGE' ? 'bg-rose-600' : 'bg-amber-600'
+                  }`}>
+                    {validation.isCleared ? (
                       <CheckCircle2 className="w-5 h-5" />
-                    </div>
-                  ) : validation.position === 'BELOW_RANGE' ? (
-                    <div className="w-8 h-8 rounded-full bg-rose-600 text-white flex items-center justify-center shrink-0">
-                      <TrendingDown className="w-5 h-5" />
-                    </div>
-                  ) : (
-                    <div className="w-8 h-8 rounded-full bg-amber-600 text-white flex items-center justify-center shrink-0">
-                      <TrendingUp className="w-5 h-5" />
-                    </div>
-                  )}
-
-                  <div>
+                    ) : (
+                      <AlertTriangle className="w-5 h-5" />
+                    )}
+                  </div>
+                  <div className="space-y-0.5">
                     <div className="flex items-center gap-2">
-                      <span className={`text-xs font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                      <span className="text-xs font-black uppercase tracking-wider">
+                        Validation Status:
+                      </span>
+                      <span className={`px-2 py-0.5 rounded-full text-[11px] font-black ${
                         validation.isCleared 
-                          ? 'bg-[#3F7655] text-white' 
-                          : validation.position === 'BELOW_RANGE'
-                            ? 'bg-rose-600 text-white'
-                            : 'bg-amber-600 text-white'
+                          ? 'bg-emerald-200 text-emerald-900' 
+                          : 'bg-rose-200 text-rose-900'
                       }`}>
                         {validation.isCleared ? t('preClearedBadge', 'PRE-CLEARED ✅') : t('notClearedBadge', 'NOT CLEARED ❌')}
                       </span>
-
                       {!validation.isCleared && (
                         <span className="text-[11px] font-black uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">
                           {validation.position === 'BELOW_RANGE' ? t('belowAllowedRange', 'Below Allowed Range') : t('aboveAllowedRange', 'Above Allowed Range')}
                         </span>
                       )}
                     </div>
-
-                    <p className="text-xs font-bold mt-1">
-                      {validation.isCleared ? (
-                        <span>{t('preClearedMessageText', 'The quoted price of ₹{quote}/{unit} is within the allowed fair price range (₹{min} – ₹{max}/{unit}). Instant pre-clearance granted.', { quote: parsedQuote, unit, min: minPrice, max: maxPrice })}</span>
-                      ) : validation.position === 'BELOW_RANGE' ? (
-                        <span>{t('belowRangeMessageText', 'The quoted price of ₹{quote}/{unit} is BELOW the allowed fair range (Minimum allowed: ₹{min}/{unit}) by {percent}%.', { quote: parsedQuote, unit, min: minPrice, percent: validation.diffPercent })}</span>
-                      ) : (
-                        <span>{t('aboveRangeMessageText', 'The quoted price of ₹{quote}/{unit} is ABOVE the allowed fair range (Maximum allowed: ₹{max}/{unit}) by {percent}%.', { quote: parsedQuote, unit, max: maxPrice, percent: validation.diffPercent })}</span>
-                      )}
+                    <p className="text-xs font-bold leading-snug">
+                      {validation.message}
+                    </p>
+                    <p className="text-[11px] opacity-80">
+                      {validation.explanation}
                     </p>
                   </div>
                 </div>
 
-                <div className="text-[11px] font-extrabold sm:text-right shrink-0">
-                  {validation.isCleared ? (
-                    <span className="text-[#3F7655] bg-white/80 px-2.5 py-1 rounded-xl border border-[#3F7655]/20 block">
-                      {t('readyForImmediateBroadcast', '✓ Ready for Immediate Broadcast')}
-                    </span>
-                  ) : (
-                    <span className={`px-2.5 py-1 rounded-xl border block ${
-                      validation.position === 'BELOW_RANGE' 
-                        ? 'bg-white text-rose-700 border-rose-200' 
-                        : 'bg-white text-amber-800 border-amber-200'
-                    }`}>
-                      {t('priceOutOfBounds', '⚠️ Price Out of Bounds')}
-                    </span>
-                  )}
+                <div className="shrink-0 self-end sm:self-center">
+                  <span className={`px-3 py-1.5 rounded-xl text-xs font-black border flex items-center gap-1.5 shadow-sm ${
+                    validation.isCleared
+                      ? 'bg-emerald-600 text-white border-emerald-700'
+                      : validation.position === 'BELOW_RANGE'
+                        ? 'bg-rose-600 text-white border-rose-700'
+                        : 'bg-amber-600 text-white border-amber-700'
+                  }`}>
+                    {validation.isCleared ? (
+                      <>
+                        <ShieldCheck className="w-4 h-4" />
+                        <span>{t('preClearedBadge', 'Pre-Cleared')}</span>
+                      </>
+                    ) : (
+                      <>
+                        <AlertTriangle className="w-4 h-4" />
+                        <span>{t('flaggedBadge', 'Flagged')} ({validation.diffPercent}% off)</span>
+                      </>
+                    )}
+                  </span>
                 </div>
               </div>
             </div>
@@ -496,28 +546,47 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           {/* Notes */}
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              {t('additionalInspectionNotes', 'Additional Inspection Notes')}
+              {t('additionalInspectionNotes', 'Collector Notes / Special Instructions')}
             </label>
             <textarea
-              rows="2"
+              rows="3"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder={t('placeholderStorageNotes')}
+              placeholder={t('placeholderStorageNotes', 'e.g. Stored in ESD safe boxes, ready for loading dock inspection.')}
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl p-4 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
             />
           </div>
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            className="w-full py-4 bg-[#3F7655] hover:bg-[#244936] text-white font-black text-xs rounded-2xl shadow-md transition cursor-pointer flex items-center justify-center gap-2"
-          >
-            <ShieldCheck className="w-4 h-4" />
-            <span>{t('submitAndBroadcastBtn', 'Submit E-Waste Request & Broadcast to Recyclers')}</span>
-          </button>
+          <div className="pt-4 border-t border-[#3F7655]/10 flex items-center justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => navigate('/collector/dashboard')}
+              className="px-6 py-3.5 text-xs font-bold text-[#718078] hover:text-[#203128] cursor-pointer"
+            >
+              {t('cancel', 'Cancel')}
+            </button>
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-8 py-3.5 bg-[#3F7655] hover:bg-[#244936] disabled:opacity-60 text-white rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  <span>{t('submittingToDatabase', 'Submitting to Database...')}</span>
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>{t('submitAndBroadcastBtn', 'Declare Request & Broadcast to Recyclers')}</span>
+                </>
+              )}
+            </button>
+          </div>
         </form>
       </div>
     </div>
   );
 }
-

@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShieldCheck, Users, Package, DollarSign, Scale, AlertTriangle, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { ShieldCheck, Users, Package, DollarSign, Scale, AlertTriangle, ArrowRight, ShieldAlert, CheckCircle2, Loader2, RefreshCw } from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
-import { mockCollectors, mockRecyclers, mockWasteLots, mockTransactions, mockAdmin } from '../../data/mockData';
+import { mockCollectors, mockRecyclers, mockWasteLots, mockTransactions } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
+import adminService from '../../services/adminService';
 
 export default function AdminDashboard({
   collectors = mockCollectors,
@@ -13,13 +14,32 @@ export default function AdminDashboard({
 }) {
   const navigate = useNavigate();
   const { t } = useTranslation();
+  const [stats, setStats] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const totalCollectors = (collectors || mockCollectors).length;
-  const verifiedCollectors = (collectors || mockCollectors).filter(c => c.phone_verified || c.phoneVerified).length;
-  const totalRecyclers = (recyclers || mockRecyclers).length;
-  const verifiedRecyclers = (recyclers || mockRecyclers).filter(r => r.verificationStatus === 'VERIFIED').length;
-  const totalWasteKg = (materialLots || mockWasteLots).reduce((sum, l) => sum + (parseFloat(l.quantity || l.totalWeightKg) || 0), 0);
-  const totalTxValue = (transactions || mockTransactions).reduce((sum, t) => sum + (t.totalValue || 0), 0);
+  const fetchStats = async () => {
+    setIsLoading(true);
+    try {
+      const data = await adminService.getDashboardStats();
+      if (data) setStats(data);
+    } catch (err) {
+      console.warn('Could not load live admin statistics:', err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const totalCollectors = stats?.totalCollectors ?? (collectors || []).length;
+  const totalRecyclers = stats?.totalRecyclers ?? (recyclers || []).length;
+  const verifiedRecyclers = stats?.verifiedRecyclers ?? (recyclers || []).filter(r => r.cpcbStatus === 'VERIFIED' || r.verificationStatus === 'VERIFIED').length;
+  const pendingVerifications = stats?.pendingVerifications ?? (recyclers || []).filter(r => r.cpcbStatus === 'PENDING' || r.verificationStatus === 'PENDING').length;
+  const totalWasteKg = stats?.totalWasteKg ?? stats?.totalWasteWeightKg ?? (materialLots || []).reduce((sum, l) => sum + (parseFloat(l.quantity || l.totalWeightKg) || 0), 0);
+  const totalTxValue = stats?.totalTxValue ?? stats?.transactionVolume ?? (transactions || []).reduce((sum, t) => sum + (parseFloat(t.amount || t.totalValue) || 0), 0);
+  const abnormalOffers = stats?.abnormalOffers ?? 0;
 
   return (
     <div className="space-y-8">
@@ -48,9 +68,41 @@ export default function AdminDashboard({
             className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#14291E] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>{t('reviewPendingVerifications', 'Review Pending Verifications')}</span>
+            <span>{t('reviewPendingVerifications', 'Review Pending Verifications')} ({pendingVerifications})</span>
           </button>
         </div>
+      </div>
+
+      {/* Live Platform KPI Metrics */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          title="Total Registered Collectors"
+          value={totalCollectors}
+          icon={Users}
+          color="emerald"
+          subtitle="Informal & MSME Aggregators"
+        />
+        <StatCard
+          title="Authorized Recyclers"
+          value={totalRecyclers}
+          icon={ShieldCheck}
+          color="blue"
+          subtitle={`${verifiedRecyclers} CPCB Certified`}
+        />
+        <StatCard
+          title="Total Waste Volume"
+          value={`${totalWasteKg.toLocaleString()} kg`}
+          icon={Scale}
+          color="amber"
+          subtitle="Declared manifests"
+        />
+        <StatCard
+          title="Simulated Escrow Volume"
+          value={`₹${totalTxValue.toLocaleString()}`}
+          icon={DollarSign}
+          color="purple"
+          subtitle={`${abnormalOffers} flagged pricing audits`}
+        />
       </div>
 
       {/* Management Navigation Cards */}
@@ -126,7 +178,7 @@ export default function AdminDashboard({
             to="/admin/verification"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>{t('openQueue', 'Open Queue')}</span>
+            <span>{t('openQueue', 'Open Queue')} ({pendingVerifications})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

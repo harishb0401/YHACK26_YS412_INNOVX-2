@@ -1,51 +1,123 @@
-import React, { useState } from 'react';
-import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, Building, FileText, Check, X } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, Building, FileText, Check, X, Loader2, RefreshCw } from 'lucide-react';
 import { mockRecyclers } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
+import adminService from '../../services/adminService';
 
 export default function Verification({ recyclers = mockRecyclers }) {
   const { t } = useTranslation();
-  const [pendingRecyclers, setPendingRecyclers] = useState(
-    (recyclers || mockRecyclers).filter(r => r.verificationStatus === 'PENDING_VERIFICATION' || r.verificationStatus === 'SUSPENDED')
-  );
+  const [pendingRecyclers, setPendingRecyclers] = useState([]);
+  const [flaggedOffers, setFlaggedOffers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [actionAlert, setActionAlert] = useState(null);
 
-  const [flaggedOffers, setFlaggedOffers] = useState([
-    {
-      id: 'FLAG-901',
-      lotId: 'EW-2026-001247',
-      recyclerName: 'Apex E-Waste Solutions',
-      material: 'Display Panels & Monitors',
-      offeredPricePerKg: 110,
-      benchmarkRate: 140,
-      minFairPrice: 105,
-      issue: 'Offer is near low threshold boundary (-21.4%). Requires approval.'
+  const fetchVerifications = async () => {
+    setIsLoading(true);
+    try {
+      const data = await adminService.getVerifications();
+      if (data) {
+        setPendingRecyclers(data.pendingRecyclers || []);
+        setFlaggedOffers(data.flaggedOffers || []);
+      }
+    } catch (err) {
+      console.warn('Could not fetch live verifications:', err.message);
+      setPendingRecyclers((recyclers || []).filter(r => r.cpcbStatus === 'PENDING' || r.verificationStatus === 'PENDING'));
+    } finally {
+      setIsLoading(false);
     }
-  ]);
-
-  const handleApproveRecycler = (id) => {
-    setPendingRecyclers(pendingRecyclers.filter(r => r.id !== id));
-    alert(`Facility ${id} approved & CPCB credentials verified!`);
   };
 
-  const handleRejectRecycler = (id) => {
-    setPendingRecyclers(pendingRecyclers.filter(r => r.id !== id));
-    alert(`Facility ${id} rejected.`);
+  useEffect(() => {
+    fetchVerifications();
+  }, []);
+
+  const handleApproveRecycler = async (id) => {
+    try {
+      await adminService.verifyRecycler(id);
+      setPendingRecyclers(prev => prev.filter(r => r.id !== id && r.userId !== id));
+      setActionAlert({
+        type: 'success',
+        text: `Facility approved! CPCB credentials verified and status updated to VERIFIED in Supabase.`
+      });
+    } catch (err) {
+      alert(err.message || 'Failed to approve recycler on server.');
+    }
   };
 
-  const handleResolveFlag = (id, action) => {
-    setFlaggedOffers(flaggedOffers.filter(f => f.id !== id));
-    alert(`Flagged offer ${id} ${action}!`);
+  const handleRejectRecycler = async (id) => {
+    const reason = prompt('Please enter the regulatory rejection reason:', 'Facility documentation does not meet regulatory CPCB threshold');
+    if (reason === null) return;
+
+    try {
+      await adminService.rejectRecycler(id, reason);
+      setPendingRecyclers(prev => prev.filter(r => r.id !== id && r.userId !== id));
+      setActionAlert({
+        type: 'error',
+        text: `Facility application rejected and logged in verification records.`
+      });
+    } catch (err) {
+      alert(err.message || 'Failed to reject recycler on server.');
+    }
+  };
+
+  const handleResolveFlag = async (id, action) => {
+    try {
+      if (action === 'dismissed') {
+        await adminService.cancelOffer(id);
+        setActionAlert({
+          type: 'error',
+          text: `Flagged offer ${id} was cancelled by administrator.`
+        });
+      } else {
+        setActionAlert({
+          type: 'success',
+          text: `Flagged offer ${id} was reviewed and approved for transaction.`
+        });
+      }
+      setFlaggedOffers(prev => prev.filter(f => f.id !== id && f.offerId !== id));
+    } catch (err) {
+      alert(err.message || 'Failed to update flagged offer.');
+    }
   };
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('verificationQueue')}</h1>
-        <p className="text-xs sm:text-sm text-[#718078]">
-          {t('reviewAndApprovePending')}
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('verificationQueue', 'Verification & Compliance Queue')}</h1>
+          <p className="text-xs sm:text-sm text-[#718078]">
+            {t('reviewAndApprovePending', 'Review pending recycler CPCB licenses and investigate rule-engine flagged pricing offers.')}
+          </p>
+        </div>
+
+        <button
+          onClick={fetchVerifications}
+          className="px-4 py-2 bg-white border border-[#3F7655]/20 text-xs font-bold text-[#203128] rounded-xl hover:bg-[#DDEBD8]/50 flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+        >
+          <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+          <span>{t('refreshQueue', 'Refresh Queue')}</span>
+        </button>
       </div>
+
+      {/* Action Banner */}
+      {actionAlert && (
+        <div className={`p-4 rounded-2xl text-xs font-bold flex items-center justify-between shadow-sm animate-in fade-in duration-150 ${
+          actionAlert.type === 'success' ? 'bg-emerald-50 border border-emerald-300 text-emerald-950' : 'bg-rose-50 border border-rose-300 text-rose-950'
+        }`}>
+          <div className="flex items-center gap-2">
+            {actionAlert.type === 'success' ? (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            ) : (
+              <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
+            )}
+            <span>{actionAlert.text}</span>
+          </div>
+          <button onClick={() => setActionAlert(null)} className="text-xs font-bold opacity-70 hover:opacity-100">
+            Dismiss
+          </button>
+        </div>
+      )}
 
       {/* Pending Facilities Section */}
       <div className="bg-white p-6 sm:p-8 rounded-[32px] border border-[#3F7655]/20 shadow-md space-y-6">
@@ -59,28 +131,33 @@ export default function Verification({ recyclers = mockRecyclers }) {
           </span>
         </div>
 
-        {pendingRecyclers.length > 0 ? (
+        {isLoading ? (
+          <div className="py-8 text-center text-[#718078]">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#3F7655] mb-2" />
+            <p className="text-xs font-bold">Loading pending facility applications...</p>
+          </div>
+        ) : pendingRecyclers.length > 0 ? (
           <div className="space-y-4">
             {pendingRecyclers.map((rec) => (
               <div
-                key={rec.id}
+                key={rec.id || rec.userId}
                 className="p-5 rounded-2xl bg-[#FAF8F2] border border-[#3F7655]/15 flex flex-col md:flex-row md:items-center justify-between gap-4"
               >
                 <div className="space-y-1 text-xs">
-                  <h3 className="text-base font-black text-[#203128]">{rec.companyName}</h3>
-                  <p className="text-[#718078]">{t('locationLabel')}: {rec.location} • Contact: {rec.contactPerson} ({rec.phone})</p>
-                  <p className="text-[#718078]">{t('cpcbRegLabel')}: <span className="font-mono font-bold text-[#203128]">{rec.cpcbRegistrationNo}</span></p>
+                  <h3 className="text-base font-black text-[#203128]">{rec.companyName || rec.organizationName}</h3>
+                  <p className="text-[#718078]">{t('locationLabel', 'Location')}: {rec.location} • {t('contactLabel', 'Contact')}: {rec.contactPerson} ({rec.phone || 'N/A'})</p>
+                  <p className="text-[#718078]">{t('cpcbRegLabel', 'CPCB Reg')}: <span className="font-mono font-bold text-[#203128]">{rec.cpcbRegistrationNo || rec.cpcbRegistrationNumber || 'PENDING'}</span></p>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <button
-                    onClick={() => handleRejectRecycler(rec.id)}
+                    onClick={() => handleRejectRecycler(rec.id || rec.userId)}
                     className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer"
                   >
                     {t('reject')}
                   </button>
                   <button
-                    onClick={() => handleApproveRecycler(rec.id)}
+                    onClick={() => handleApproveRecycler(rec.id || rec.userId)}
                     className="px-5 py-2 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer flex items-center gap-1.5"
                   >
                     <Check className="w-4 h-4" />
@@ -107,7 +184,12 @@ export default function Verification({ recyclers = mockRecyclers }) {
           </span>
         </div>
 
-        {flaggedOffers.length > 0 ? (
+        {isLoading ? (
+          <div className="py-8 text-center text-[#718078]">
+            <Loader2 className="w-6 h-6 animate-spin mx-auto text-[#3F7655] mb-2" />
+            <p className="text-xs font-bold">Scanning flagged pricing bids...</p>
+          </div>
+        ) : flaggedOffers.length > 0 ? (
           <div className="space-y-4">
             {flaggedOffers.map((item) => (
               <div

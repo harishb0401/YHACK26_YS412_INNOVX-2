@@ -1,14 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, QrCode, MapPin, Scale, Clock, ShieldCheck, 
   CheckCircle2, AlertTriangle, FileText, Send, DollarSign, 
-  Calendar, Check, X, Building, Truck, Sparkles, Image as ImageIcon
+  Calendar, Check, X, Building, Truck, Sparkles, Image as ImageIcon, Loader2
 } from 'lucide-react';
 import StatusBadge from '../../components/StatusBadge';
 import { calculateFairPriceRange, evaluateOfferFairPrice } from '../../utils/rulesEngine';
 import { mockWasteLots, mockOffers } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
+import wasteService from '../../services/wasteService';
 
 export default function RequestDetails({ 
   materialLots = mockWasteLots, 
@@ -20,17 +21,69 @@ export default function RequestDetails({
   const navigate = useNavigate();
   const { t, tCategory, tStatus } = useTranslation();
 
-  const allLots = materialLots || mockWasteLots;
-  const request = allLots.find(l => l.id === currentId) || allLots[0];
+  const [localLot, setLocalLot] = useState(null);
+  const [localOffers, setLocalOffers] = useState([]);
+  const [isLoadingLot, setIsLoadingLot] = useState(false);
+  const [isAccepting, setIsAccepting] = useState(false);
 
-  const allOffers = offers || mockOffers;
-  const requestOffers = allOffers.filter(o => o.lotId === request?.id);
+  // Match from props if available
+  const allLots = materialLots || [];
+  const propLot = allLots.find(l => l.id === currentId || l.lotId === currentId || l.lot_id === currentId);
+
+  useEffect(() => {
+    let isMounted = true;
+    if (propLot) {
+      setLocalLot(propLot);
+      const propOffers = (offers || []).filter(o => o.lotId === propLot.id || o.lotId === propLot.lotId || o.lotId === currentId);
+      if (propOffers.length > 0) {
+        setLocalOffers(propOffers);
+      } else {
+        // Fetch fresh offers from backend
+        wasteService.getLotOffers(currentId).then(fetched => {
+          if (isMounted && fetched) setLocalOffers(fetched);
+        }).catch(() => {});
+      }
+    } else if (currentId) {
+      setIsLoadingLot(true);
+      Promise.all([
+        wasteService.getLotById(currentId).catch(() => null),
+        wasteService.getLotOffers(currentId).catch(() => [])
+      ]).then(([fetchedLot, fetchedOffers]) => {
+        if (isMounted) {
+          if (fetchedLot) setLocalLot(fetchedLot);
+          if (fetchedOffers) setLocalOffers(fetchedOffers);
+          setIsLoadingLot(false);
+        }
+      });
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [currentId, propLot, offers]);
+
+  const request = localLot || propLot;
+  const requestOffers = localOffers.length > 0 ? localOffers : (offers || []).filter(o => o.lotId === request?.id || o.lotId === request?.lotId);
 
   const [selectedOfferForReview, setSelectedOfferForReview] = useState(null);
-  const [acceptedOfferId, setAcceptedOfferId] = useState(
-    request?.status === 'OFFER_ACCEPTED' || request?.status === 'COMPLETED' ? (request?.selectedRecyclerId || requestOffers.find(o => o.status === 'ACCEPTED')?.id) : null
-  );
+  const [acceptedOfferId, setAcceptedOfferId] = useState(null);
   const [actionMessage, setActionMessage] = useState(null);
+
+  useEffect(() => {
+    if (request?.status === 'OFFER_ACCEPTED' || request?.status === 'COMPLETED') {
+      const accepted = requestOffers.find(o => o.status === 'ACCEPTED');
+      if (accepted) setAcceptedOfferId(accepted.id || accepted.offerId);
+    }
+  }, [request, requestOffers]);
+
+  if (isLoadingLot) {
+    return (
+      <div className="bg-white p-12 rounded-[32px] border border-[#3F7655]/20 text-center space-y-3 max-w-xl mx-auto">
+        <Loader2 className="w-8 h-8 animate-spin text-[#3F7655] mx-auto" />
+        <p className="text-xs font-bold text-[#718078]">Loading request manifest from database...</p>
+      </div>
+    );
+  }
 
   if (!request) {
     return (
@@ -44,18 +97,18 @@ export default function RequestDetails({
     );
   }
 
-  const benchmark = request.benchmarkPrice || 350;
+  const benchmark = request.benchmarkPrice || request.benchmark_price || 350;
   const tolerance = request.tolerancePercent !== undefined ? request.tolerancePercent : (request.tolerance ? request.tolerance * 100 : 25);
   const fairPricing = calculateFairPriceRange(benchmark, tolerance);
   const qty = request.quantity || request.totalWeightKg || 1;
   const unit = request.unit || 'kg';
-  const estimatedTotal = request.estimatedLotValue || Math.round(qty * benchmark);
+  const estimatedTotal = request.estimatedLotValue || request.estimated_value || Math.round(qty * benchmark);
 
   const isAcceptedState = ['OFFER_ACCEPTED', 'ACCEPTED', 'PICKUP_SCHEDULED', 'IN_TRANSIT', 'HANDED_OVER', 'COMPLETED', 'PAYMENT_COMPLETED'].includes(request.status) || !!acceptedOfferId;
 
   // Lifecycle Timeline
   const timelineEvents = request.timeline && request.timeline.length > 0 ? request.timeline : [
-    { id: "e-1", event: "Request Created", timestamp: request.createdDate || "09 Sep 2026, 10:30 AM", userRole: "Collector", status: "Completed", details: `${qty} ${unit} ${request.material} declared` },
+    { id: "e-1", event: "Request Created", timestamp: request.createdDate || "09 Sep 2026, 10:30 AM", userRole: "Collector", status: "Completed", details: `${qty} ${unit} ${request.material || request.material_type} declared` },
     { id: "e-2", event: "Price Band Calculated", timestamp: request.createdDate || "09 Sep 2026, 10:30 AM", userRole: "Rules Engine", status: "Completed", details: `Benchmark: ₹${benchmark}/${unit} | Fair Band: ₹${fairPricing.minPrice}–₹${fairPricing.maxPrice}` },
     { id: "e-3", event: "Recyclers Notified", timestamp: request.createdDate || "09 Sep 2026, 10:35 AM", userRole: "System", status: "Completed", details: "Broadcasted to verified recyclers in zone" },
     ...(requestOffers.length > 0 ? [
@@ -66,26 +119,34 @@ export default function RequestDetails({
     ] : [])
   ];
 
-  const handleAcceptClick = (offer) => {
-    setAcceptedOfferId(offer.id);
-    setSelectedOfferForReview(null);
-    setActionMessage({
-      type: 'success',
-      text: `Offer from ${offer.recyclerName} accepted! Status updated to "Offer Accepted" and Escrow Vault is locked.`
-    });
+  const handleAcceptClick = async (offer) => {
+    setIsAccepting(true);
+    try {
+      if (onAcceptOffer) {
+        await onAcceptOffer({
+          requestId: request.id || request.lotId,
+          offerId: offer.id || offer.offerId,
+          recyclerId: offer.recyclerId,
+          recyclerName: offer.recyclerName,
+          agreedPricePerUnit: offer.pricePerUnit || offer.ratePerKg,
+          agreedTotalValue: offer.totalPrice || offer.totalAmount || ((offer.pricePerUnit || offer.ratePerKg) * qty),
+          proposedPickupDate: offer.proposedPickupDate || offer.pickupDate
+        });
+      }
 
-    if (onAcceptOffer) {
-      onAcceptOffer({
-        requestId: request.id,
-        offerId: offer.id,
-        recyclerId: offer.recyclerId,
-        recyclerName: offer.recyclerName,
-        agreedPricePerUnit: offer.pricePerUnit,
-        agreedTotalValue: offer.totalPrice || (offer.pricePerUnit * qty),
-        proposedPickupDate: offer.proposedPickupDate
+      setAcceptedOfferId(offer.id || offer.offerId);
+      setSelectedOfferForReview(null);
+      setActionMessage({
+        type: 'success',
+        text: `Offer from ${offer.recyclerName} accepted! Status updated to "Offer Accepted" and Simulated Escrow Vault is locked.`
       });
+    } catch (err) {
+      alert(err.message || 'Failed to accept offer on server.');
+    } finally {
+      setIsAccepting(false);
     }
   };
+
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto">

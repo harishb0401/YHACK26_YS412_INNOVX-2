@@ -1,213 +1,222 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppRoutes from './routes/AppRoutes';
 import { LanguageProvider } from './i18n';
+
+// Backend Services
+import authService from './services/authService';
+import wasteService from './services/wasteService';
+import offerService from './services/offerService';
+import transactionService from './services/transactionService';
+import adminService from './services/adminService';
+
+// Reference / Default Data Fallbacks
 import {
   mockCollectors,
   mockRecyclers,
   mockWasteLots,
   mockTransactions,
-  mockOffers,
-  mockCollector,
-  mockRecycler,
-  mockAdmin
+  mockOffers
 } from './data/mockData';
 
 export default function App() {
   const navigate = useNavigate();
 
   // Active User / Auth State
-  const [currentUser, setCurrentUser] = useState(null);
+  const [currentUser, setCurrentUser] = useState(() => authService.getCurrentUser());
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
 
-  // Platform Data
-  const [materialLots, setMaterialLots] = useState(mockWasteLots);
-  const [offers, setOffers] = useState(mockOffers);
-  const [transactions, setTransactions] = useState(mockTransactions);
-  const [collectors, setCollectors] = useState(mockCollectors);
-  const [recyclers, setRecyclers] = useState(mockRecyclers);
+  // Live Platform Data State
+  const [materialLots, setMaterialLots] = useState([]);
+  const [offers, setOffers] = useState([]);
+  const [transactions, setTransactions] = useState([]);
+  const [collectors, setCollectors] = useState([]);
+  const [recyclers, setRecyclers] = useState([]);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
+  // 1. Validate / Refresh Auth Session on Mount
+  useEffect(() => {
+    let isMounted = true;
+    async function verifyAuth() {
+      try {
+        const user = await authService.fetchCurrentUser();
+        if (isMounted) {
+          setCurrentUser(user);
+        }
+      } catch (err) {
+        console.debug('Session check:', err.message);
+      } finally {
+        if (isMounted) {
+          setIsAuthChecking(false);
+        }
+      }
+    }
+    verifyAuth();
+
+    // Listen for 401 unauthorized events
+    const handleUnauthorized = () => {
+      setCurrentUser(null);
+      navigate('/login');
+    };
+    window.addEventListener('ecolink_unauthorized', handleUnauthorized);
+
+    return () => {
+      isMounted = false;
+      window.removeEventListener('ecolink_unauthorized', handleUnauthorized);
+    };
+  }, [navigate]);
+
+  // 2. Fetch live domain data from Express/Supabase based on current role
+  const refreshAppData = useCallback(async () => {
+    if (!currentUser) {
+      setMaterialLots([]);
+      setOffers([]);
+      setTransactions([]);
+      return;
+    }
+
+    setIsLoadingData(true);
+    try {
+      if (currentUser.role === 'collector') {
+        const [lots, txs] = await Promise.all([
+          wasteService.getMyLots().catch(err => {
+            console.warn('Could not fetch collector lots:', err.message);
+            return mockWasteLots;
+          }),
+          transactionService.getMyTransactions().catch(err => {
+            console.warn('Could not fetch collector transactions:', err.message);
+            return mockTransactions;
+          })
+        ]);
+        setMaterialLots(lots || []);
+        setTransactions(txs || []);
+      } else if (currentUser.role === 'recycler') {
+        const [availableLots, myOffers, txs] = await Promise.all([
+          wasteService.getAvailableLots().catch(err => {
+            console.warn('Could not fetch available lots:', err.message);
+            return mockWasteLots;
+          }),
+          offerService.getMyOffers().catch(err => {
+            console.warn('Could not fetch recycler offers:', err.message);
+            return mockOffers;
+          }),
+          transactionService.getMyTransactions().catch(err => {
+            console.warn('Could not fetch recycler transactions:', err.message);
+            return mockTransactions;
+          })
+        ]);
+        setMaterialLots(availableLots || []);
+        setOffers(myOffers || []);
+        setTransactions(txs || []);
+      } else if (currentUser.role === 'admin') {
+        const [cols, recs, allTxs] = await Promise.all([
+          adminService.getCollectors().catch(() => mockCollectors),
+          adminService.getRecyclers().catch(() => mockRecyclers),
+          transactionService.getAllTransactions().catch(() => mockTransactions)
+        ]);
+        setCollectors(cols || []);
+        setRecyclers(recs || []);
+        setTransactions(allTxs || []);
+      }
+    } catch (err) {
+      console.error('Failed to load application data from backend:', err);
+    } finally {
+      setIsLoadingData(false);
+    }
+  }, [currentUser]);
+
+  useEffect(() => {
+    refreshAppData();
+  }, [refreshAppData]);
 
   // Auth Handlers
   const handleLoginSuccess = (userPayload) => {
     setCurrentUser(userPayload);
+    refreshAppData();
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await authService.logout();
     setCurrentUser(null);
+    setMaterialLots([]);
+    setOffers([]);
+    setTransactions([]);
     navigate('/');
   };
 
-  // Collector Workflow: Create E-Waste Request
-  const handleLotCreated = (newLotData) => {
-    const newLotId = `REQ-2026-${String(Math.floor(100000 + Math.random() * 900000)).slice(0, 6)}`;
-    const declaredQuotedPrice = newLotData.quotedPrice !== undefined ? newLotData.quotedPrice : (newLotData.benchmarkPrice || 350);
-    const newLot = {
-      id: newLotId,
-      category: newLotData.category,
-      material: newLotData.material,
-      quantity: newLotData.quantity,
-      totalWeightKg: newLotData.quantity,
-      unit: newLotData.unit || 'kg',
-      condition: newLotData.condition || 'Non-working / Scrap',
-      location: newLotData.location || (currentUser?.location || 'Chennai Hub'),
-      collectionDate: newLotData.collectionDate || new Date().toISOString().split('T')[0],
-      createdDate: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-      benchmarkPrice: newLotData.benchmarkPrice || 350,
-      quotedPrice: declaredQuotedPrice,
-      estimatedLotValue: newLotData.estimatedLotValue !== undefined ? newLotData.estimatedLotValue : Math.round(newLotData.quantity * declaredQuotedPrice),
-      isPreCleared: newLotData.isPreCleared !== undefined ? newLotData.isPreCleared : true,
-      clearanceBadge: newLotData.clearanceBadge || "PRE-CLEARED ✅",
-      clearanceStatus: newLotData.clearanceStatus || "PRE_CLEARED",
-      allowedPriceRange: newLotData.allowedPriceRange,
-      status: 'AWAITING_OFFERS',
-      qrPayload: `EPR-QR-${newLotId}`,
-      collectorId: currentUser?.id || "COL-TN-101",
-      collectorName: currentUser?.name || "Ramesh Kumar (Apex Scrap)",
-      notes: newLotData.notes || "Declared via collector portal",
-      timeline: [
-        {
-          id: `ev-1`,
-          event: "Request Created",
-          timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          userRole: "Collector",
-          status: "Completed",
-          details: `${newLotData.quantity} ${newLotData.unit || 'kg'} ${newLotData.material} declared`
-        },
-        {
-          id: `ev-2`,
-          event: "Price Bounds & Quote Validated",
-          timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          userRole: "Rules Engine",
-          status: "Completed",
-          details: `Benchmark: ₹${newLotData.benchmarkPrice || 350}/${newLotData.unit || 'kg'} | Quoted: ₹${declaredQuotedPrice}/${newLotData.unit || 'kg'} (${newLotData.clearanceBadge || 'PRE-CLEARED ✅'})`
-        },
-        {
-          id: `ev-3`,
-          event: "Recyclers Notified",
-          timestamp: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }),
-          userRole: "System",
-          status: "Completed",
-          details: "Broadcasted to authorized recyclers in your zone"
-        }
-      ]
-    };
+  // Collector Workflow: Create E-Waste Request on Backend
+  const handleLotCreated = async (newLotData) => {
+    try {
+      const createdLot = await wasteService.createLot({
+        category: newLotData.category,
+        material: newLotData.material,
+        materialType: newLotData.material,
+        description: newLotData.description || newLotData.notes,
+        quantity: newLotData.quantity,
+        unit: newLotData.unit || 'kg',
+        condition: newLotData.condition || 'Non-working / Scrap',
+        notes: newLotData.notes,
+        location: newLotData.location,
+        locationText: newLotData.location,
+        latitude: newLotData.latitude,
+        longitude: newLotData.longitude
+      });
 
-    setMaterialLots([newLot, ...materialLots]);
+      // Update state with authoritative backend lot
+      setMaterialLots(prev => [createdLot, ...prev]);
+      return createdLot;
+    } catch (err) {
+      console.error('Failed to create waste lot on server:', err);
+      throw err;
+    }
   };
 
   // Recycler Workflow: Submit Price Offer on Collector Request
-  const handleSubmitOffer = (newOfferData) => {
-    const offerId = `OFF-2026-${String(Math.floor(1000 + Math.random() * 9000))}`;
-    const newOffer = {
-      id: offerId,
-      lotId: newOfferData.lotId,
-      recyclerId: newOfferData.recyclerId || "REC-TN-01",
-      recyclerName: newOfferData.recyclerName || "GreenCycle Material Recovery Ltd",
-      recyclerVerified: true,
-      pricePerUnit: newOfferData.pricePerUnit,
-      totalPrice: newOfferData.totalPrice,
-      fairPriceStatus: newOfferData.fairPriceStatus || "FAIR",
-      fairPriceBadge: "FAIR ✓",
-      status: "PENDING",
-      timestamp: newOfferData.timestamp || "Just now",
-      proposedPickupDate: newOfferData.proposedPickupDate || "Within 48h",
-      notes: newOfferData.notes || "Direct factory pickup arranged with certified weighing scales."
-    };
+  const handleSubmitOffer = async (newOfferData) => {
+    try {
+      const createdOffer = await offerService.submitOffer({
+        lotId: newOfferData.lotId,
+        ratePerKg: newOfferData.pricePerUnit || newOfferData.ratePerKg,
+        pricePerUnit: newOfferData.pricePerUnit || newOfferData.ratePerKg,
+        pickupDate: newOfferData.proposedPickupDate || newOfferData.pickupDate,
+        notes: newOfferData.notes
+      });
 
-    // Add offer to state
-    setOffers([newOffer, ...offers]);
-
-    // Update the lot's status to OFFERS_RECEIVED if awaiting
-    setMaterialLots(materialLots.map(lot => {
-      if (lot.id === newOfferData.lotId && ['AWAITING_OFFERS', 'SUBMITTED', 'AVAILABLE', 'REGISTERED'].includes(lot.status)) {
-        return {
-          ...lot,
-          status: 'OFFERS_RECEIVED',
-          timeline: [
-            ...(lot.timeline || []),
-            {
-              id: `ev-${Date.now()}`,
-              event: "Offer Received",
-              timestamp: "Just now",
-              userRole: "Recycler",
-              status: "Completed",
-              details: `Offer submitted: ₹${newOfferData.pricePerUnit}/kg (Total: ₹${(newOfferData.totalPrice || 0).toLocaleString()}) by ${newOfferData.recyclerName}`
-            }
-          ]
-        };
-      }
-      return lot;
-    }));
+      setOffers(prev => [createdOffer, ...prev]);
+      // Refresh lots so status changes to OFFERS_RECEIVED
+      refreshAppData();
+      return createdOffer;
+    } catch (err) {
+      console.error('Failed to submit offer to server:', err);
+      throw err;
+    }
   };
 
-  // Collector Workflow: Accept One Recycler Offer
-  const handleAcceptOffer = (acceptPayload) => {
-    const { requestId, offerId, recyclerId, recyclerName, agreedPricePerUnit, agreedTotalValue, proposedPickupDate } = acceptPayload;
-
-    // 1. Update Offer status
-    setOffers(offers.map(o => {
-      if (o.id === offerId) {
-        return { ...o, status: 'ACCEPTED' };
-      }
-      if (o.lotId === requestId && o.id !== offerId) {
-        return { ...o, status: 'REJECTED' };
-      }
-      return o;
-    }));
-
-    // 2. Update Request / Lot status to OFFER_ACCEPTED
-    setMaterialLots(materialLots.map(lot => {
-      if (lot.id === requestId) {
-        return {
-          ...lot,
-          status: 'OFFER_ACCEPTED',
-          selectedRecyclerId: recyclerId,
-          selectedRecyclerName: recyclerName,
-          agreedPricePerUnit: agreedPricePerUnit,
-          agreedTotalValue: agreedTotalValue,
-          timeline: [
-            ...(lot.timeline || []),
-            {
-              id: `ev-${Date.now()}`,
-              event: "Offer Accepted",
-              timestamp: "Just now",
-              userRole: "Collector",
-              status: "Completed",
-              details: `Collector accepted offer from ${recyclerName} (₹${agreedPricePerUnit}/kg, Total: ₹${(agreedTotalValue || 0).toLocaleString()})`
-            },
-            {
-              id: `ev-${Date.now() + 1}`,
-              event: "Pickup Scheduled",
-              timestamp: "Just now",
-              userRole: "Logistics",
-              status: "Active",
-              details: `Scheduled for pickup on ${proposedPickupDate || "upcoming business day"}`
-            }
-          ]
-        };
-      }
-      return lot;
-    }));
-
-
-    // 3. Create or update a Transaction record with ESCROW_LOCKED status
-    const newTxn = {
-      id: `TXN-2026-${String(Math.floor(1000 + Math.random() * 9000))}`,
-      lotId: requestId,
-      collectorId: currentUser?.id || "COL-TN-101",
-      collectorName: currentUser?.name || "Ramesh Kumar",
-      recyclerId: recyclerId,
-      recyclerName: recyclerName,
-      totalWeightKg: materialLots.find(l => l.id === requestId)?.quantity || 25,
-      ratePerKg: agreedPricePerUnit,
-      totalValue: agreedTotalValue,
-      status: "ESCROW_LOCKED",
-      paymentMethod: "Eco-Link Smart Escrow (UPI/NEFT)",
-      date: new Date().toISOString().split('T')[0],
-      qrHash: `TXN-VERIFIED-${requestId}`
-    };
-
-    setTransactions([newTxn, ...transactions]);
+  // Collector Workflow: Accept One Recycler Offer (Atomic backend transaction)
+  const handleAcceptOffer = async (acceptPayload) => {
+    try {
+      const result = await offerService.acceptOffer(acceptPayload.offerId);
+      // Refresh live state from database
+      await refreshAppData();
+      return result;
+    } catch (err) {
+      console.error('Failed to accept offer on server:', err);
+      throw err;
+    }
   };
+
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-[#F8F5EA] flex items-center justify-center text-[#203128]">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-4 border-[#3F7655] border-t-transparent rounded-full animate-spin mx-auto" />
+          <p className="text-xs font-bold uppercase tracking-wider text-[#718078]">
+            Connecting to Eco-Link Secure Network...
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <LanguageProvider>
@@ -221,9 +230,11 @@ export default function App() {
           onLotCreated={handleLotCreated}
           onSubmitOffer={handleSubmitOffer}
           onAcceptOffer={handleAcceptOffer}
+          onRefreshData={refreshAppData}
           transactions={transactions}
           collectors={collectors}
           recyclers={recyclers}
+          isLoadingData={isLoadingData}
         />
       </div>
     </LanguageProvider>
