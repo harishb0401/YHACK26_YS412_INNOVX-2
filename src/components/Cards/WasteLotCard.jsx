@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { QrCode, MapPin, Scale, Clock, ArrowRight } from 'lucide-react';
+import { FileText, MapPin, Scale, Clock, ArrowRight } from 'lucide-react';
 import StatusBadge from '../StatusBadge';
 import { useTranslation } from '../../i18n';
 
@@ -53,7 +53,7 @@ export default function WasteLotCard({ lot, onViewDetails, onOpenOffers }) {
           to={`/collector/requests/${lot.id}`}
           className="flex-1 py-2 text-center text-xs font-bold text-[#244936] bg-[#DDEBD8]/50 hover:bg-[#DDEBD8] rounded-xl transition flex items-center justify-center gap-1 cursor-pointer"
         >
-          <QrCode className="w-3.5 h-3.5" />
+          <FileText className="w-3.5 h-3.5" />
           <span>{t('viewDetails')}</span>
         </Link>
 

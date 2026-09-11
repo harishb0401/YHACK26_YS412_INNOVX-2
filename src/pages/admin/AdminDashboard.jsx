@@ -152,7 +152,7 @@ export default function AdminDashboard({
             </div>
             <h3 className="text-base font-extrabold text-[#203128]">{t('wasteLotsTitle', 'Waste Lots')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              {t('inspectActiveDeclarations', 'Inspect active material declarations, tolerance compliance, and QR traceability.')}
+              {t('inspectActiveDeclarations', 'Inspect active material declarations, tolerance compliance, and verification compliance.')}
             </p>
           </div>
           <Link

@@ -1,3 +1,4 @@
+
 /**
  * Eco-Link Network Connectivity Status Service
  * Listens to browser online/offline events and provides reactive network state.

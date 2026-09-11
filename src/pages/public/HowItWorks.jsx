@@ -100,19 +100,19 @@ export default function HowItWorks() {
       summary: t('hwStep7Summary', 'Scheduled pickup and secure physical collection between collector and recycler.'),
       details: [
         t('hwStep7Detail1', 'Pickup date and time coordination'),
-        t('hwStep7Detail2', 'Physical QR verification scan at weighbridge'),
+        t('hwStep7Detail2', 'Weighbridge verification and material inspection'),
         t('hwStep7Detail3', 'Direct digital settlement into collector wallet')
       ],
       badge: "Step 07"
     },
     {
       step: 8,
-      title: t('hwStep8Title', 'Traceability & Certificate'),
+      title: t('hwStep8Title', 'Settlement & Certificate'),
       subtitle: t('hwStep8Subtitle', 'EPR Compliance Record'),
       icon: <FileCheck2 className="w-6 h-6 text-emerald-700" />,
-      summary: t('hwStep8Summary', 'End-to-end traceability timeline completed with verifiable recovery certificate.'),
+      summary: t('hwStep8Summary', 'Completed handover settlement with verifiable government recovery certificate.'),
       details: [
-        t('hwStep8Detail1', '12-stage tamper-proof digital traceability trail'),
+        t('hwStep8Detail1', 'Certified material recovery documentation'),
         t('hwStep8Detail2', 'Government CPCB compliant recovery certificate issued'),
         t('hwStep8Detail3', 'Full transparent transaction history recorded')
       ],
@@ -134,7 +134,7 @@ export default function HowItWorks() {
             {t('howEcoLinkWorksTitle', 'How Eco-Link Works')}
           </h1>
           <p className="text-base sm:text-lg text-[#718078] font-medium leading-relaxed">
-            {t('howItWorksSubtitle', 'From informal collection to certified industrial recycling — follow the complete 8-step journey built on transparent pricing and end-to-end traceability.')}
+            {t('howItWorksSubtitle', 'From informal collection to certified industrial recycling — follow the complete 8-step journey built on transparent pricing and certified compliance.')}
           </p>
         </div>
 

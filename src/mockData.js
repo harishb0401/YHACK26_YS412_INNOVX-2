@@ -227,7 +227,6 @@ export const initialMaterialLots = [
     agreedTotalValue: 13400,
     selectedRecyclerId: "REC-TN-01",
     selectedRecyclerName: "GreenCycle Material Recovery Ltd",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00125::QTY=20KG::CAT=PCB::VAL=13400::RECYCLER=GreenCycle",
     timeline: [
       { id: "e-1", event: "Phone Verified", timestamp: "08 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 98401 23456 verified via OTP" },
       { id: "e-2", event: "Waste Added", timestamp: "09 Sep 2026, 10:15 AM", userRole: "Collector", status: "Completed", details: "20 kg PCB Scrap declared" },
@@ -267,7 +266,6 @@ export const initialMaterialLots = [
     agreedTotalValue: 11500,
     selectedRecyclerId: "REC-TN-02",
     selectedRecyclerName: "Madurai CleanMetals Eco-Processing",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00124::QTY=25KG::CAT=BATTERIES::VAL=11500::RECYCLER=MaduraiCleanMetals",
     timeline: [
       { id: "e-1", event: "Phone Verified", timestamp: "05 Sep 2026, 11:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 94432 87654 verified via OTP" },
       { id: "e-2", event: "Waste Added", timestamp: "07 Sep 2026, 02:00 PM", userRole: "Collector", status: "Completed", details: "25 kg Battery Scrap declared" },
@@ -278,7 +276,7 @@ export const initialMaterialLots = [
       { id: "e-7", event: "Offer Received", timestamp: "07 Sep 2026, 04:00 PM", userRole: "Recycler", status: "Completed", details: "Offer submitted: ₹460/kg (Total: ₹11,500) - Status: FAIR ✓" },
       { id: "e-8", event: "Offer Accepted", timestamp: "07 Sep 2026, 04:30 PM", userRole: "Collector", status: "Completed", details: "Collector accepted Madurai CleanMetals offer" },
       { id: "e-9", event: "Pickup Scheduled", timestamp: "08 Sep 2026, 09:30 AM", userRole: "Logistics", status: "Completed", details: "Scheduled for 08 Sep 2026" },
-      { id: "e-10", event: "Waste Handed Over", timestamp: "08 Sep 2026, 02:00 PM", userRole: "Collector & Recycler", status: "Completed", details: "Physical QR scanned & verified at weighbridge" },
+      { id: "e-10", event: "Waste Handed Over", timestamp: "08 Sep 2026, 02:00 PM", userRole: "Collector & Recycler", status: "Completed", details: "Material verified and accepted at weighbridge" },
       { id: "e-11", event: "Payment Recorded", timestamp: "08 Sep 2026, 03:30 PM", userRole: "System", status: "Completed", details: "Transaction TXN-2026-9921 recorded: ₹11,500 settled" },
       { id: "e-12", event: "Transaction Completed", timestamp: "09 Sep 2026, 05:00 PM", userRole: "Recycler", status: "Completed", details: "Recovery Certificate CERT-TN-2026-0088 issued" }
     ],
@@ -313,7 +311,6 @@ export const initialMaterialLots = [
     minEstimatedValue: 17280,
     maxEstimatedValue: 25920,
     status: "OFFER_RECEIVED",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00126::QTY=30KG::CAT=COPPER::VAL=21600",
     timeline: [
       { id: "e-1", event: "Phone Verified", timestamp: "08 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 98401 23456 verified" },
       { id: "e-2", event: "Waste Added", timestamp: "10 Sep 2026, 09:00 AM", userRole: "Collector", status: "Completed", details: "30 kg Copper Scrap declared" },
@@ -347,7 +344,6 @@ export const initialMaterialLots = [
     minEstimatedValue: 3600,
     maxEstimatedValue: 6000,
     status: "AVAILABLE",
-    qrPayload: "ECOLINK::LOT-EL26-TN-00127::QTY=15KG::CAT=COMPUTERS::VAL=4800",
     timeline: [
       { id: "e-1", event: "Phone Verified", timestamp: "09 Sep 2026, 10:00 AM", userRole: "Collector", status: "Completed", details: "Phone +91 97890 54321 verified" },
       { id: "e-2", event: "Waste Added", timestamp: "10 Sep 2026, 11:20 AM", userRole: "Collector", status: "Completed", details: "15 kg Computer Equipment declared" },
@@ -454,7 +450,6 @@ export const initialHandovers = [
     pickupDate: "11 Sep 2026, 10:00 AM",
     location: "Guindy Scrap Yard Node #4, Chennai",
     status: "PICKUP_SCHEDULED",
-    qrCode: "ECOLINK-HANDOVER-LOT-00125",
     notes: "GreenCycle driver assigned: K. Vijay (+91 98840 99881)"
   },
   {
@@ -472,7 +467,6 @@ export const initialHandovers = [
     pickupDate: "08 Sep 2026, 02:00 PM",
     location: "Kappalur SIDCO Drop Node, Madurai",
     status: "HANDED_OVER",
-    qrCode: "ECOLINK-HANDOVER-LOT-00124",
     notes: "Handover successfully completed and verified at weighbridge."
   }
 ];
@@ -686,7 +680,7 @@ export const ecoJournalArticles = [
     category: "Regulatory Standards",
     readTime: "5 min read",
     icon: "📜",
-    summary: "Why traceability and digital material lot certificates are mandatory under national Extended Producer Responsibility guidelines."
+    summary: "Why certified material recovery documentation is mandatory under national Extended Producer Responsibility guidelines."
   },
   {
     id: "art-3",
@@ -708,7 +702,7 @@ export const communityTestimonials = [
     avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&auto=format&fit=crop"
   },
   {
-    quote: "Creating digital lots with QR verification gives our facility 100% auditable evidence for CPCB and EPR reporting. The rule-based price check saves hours of negotiation.",
+    quote: "Creating verified digital lots gives our facility 100% auditable evidence for CPCB and EPR reporting. The rule-based price check saves hours of negotiation.",
     name: "Dr. K. Senthil Nathan",
     location: "GreenCycle Material Recovery, Ambattur",
     role: "Verified Recycler Manager",
