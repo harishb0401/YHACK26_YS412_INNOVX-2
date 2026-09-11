@@ -27,7 +27,7 @@ export default function PriceWarningModal({
               {t("priceWarningTitle")}
             </span>
             <h3 className="text-xl font-black text-slate-900 mt-0.5">
-              Asking Price Exceeds Reference Range
+              {t("askingPriceExceedsRange")}
             </h3>
           </div>
         </div>
@@ -57,7 +57,7 @@ export default function PriceWarningModal({
 
         {/* Information note */}
         <p className="text-xs text-slate-500 leading-relaxed">
-          <strong>Rule-based Policy:</strong> You may proceed with this price. The verified recycler will see the asking price marked with a price alert badge for negotiation.
+          <strong>{t("ruleBasedPolicyLabel")}:</strong> {t("ruleBasedPolicyDesc")}
         </p>
 
         {/* Action Buttons */}

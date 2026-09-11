@@ -35,7 +35,7 @@ export default function Footer() {
 
           {/* Column 2: Portals */}
           <div className="space-y-3 text-sm">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Portals</h4>
+            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">{t("footerPortals")}</h4>
             <ul className="space-y-2 text-[#DDEBD8]">
               <li>
                 <Link to="/collector/dashboard" className="hover:text-[#F2C94C] transition cursor-pointer">
@@ -62,7 +62,7 @@ export default function Footer() {
 
           {/* Column 3: Resources */}
           <div className="space-y-3 text-sm">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Resources</h4>
+            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">{t("footerResources")}</h4>
             <ul className="space-y-2 text-[#DDEBD8]">
               <li>
                 <Link to="/recycle-guide" className="hover:text-[#F2C94C] transition cursor-pointer">
@@ -84,12 +84,12 @@ export default function Footer() {
 
           {/* Column 4: Standards & Compliance */}
           <div className="space-y-3 text-sm">
-            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">Compliance</h4>
+            <h4 className="text-white font-extrabold tracking-wider uppercase text-xs">{t("footerCompliance")}</h4>
             <ul className="space-y-2 text-[#DDEBD8] text-xs">
-              <li>CPCB / EPR Guideline Aligned</li>
-              <li>Deterministic Rule Engine</li>
-              <li>Digital Material Lots (QR)</li>
-              <li>Tamil Nadu SIDCO Nodes</li>
+              <li>{t("cpcbEprAligned")}</li>
+              <li>{t("deterministicRuleEngine")}</li>
+              <li>{t("digitalMaterialLotsQr")}</li>
+              <li>{t("tnSidcoNodes")}</li>
             </ul>
           </div>
 
@@ -97,7 +97,7 @@ export default function Footer() {
 
         {/* Bottom copyright & disclaimer */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-[#DDEBD8]/70">
-          <p>© {new Date().getFullYear()} ECO-Link Platform. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} ECO-Link Platform. {t("allRightsReserved")}</p>
           <div className="text-[11px] text-[#DDEBD8]/60 max-w-md text-center sm:text-right">
             {t("verificationDisclaimer")}
           </div>

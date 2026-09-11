@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { ShieldCheck, CheckCircle2, AlertTriangle, XCircle, Building, FileText, Check, X } from 'lucide-react';
 import { mockRecyclers } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function Verification({ recyclers = mockRecyclers }) {
+  const { t } = useTranslation();
   const [pendingRecyclers, setPendingRecyclers] = useState(
     (recyclers || mockRecyclers).filter(r => r.verificationStatus === 'PENDING_VERIFICATION' || r.verificationStatus === 'SUSPENDED')
   );
@@ -39,9 +41,9 @@ export default function Verification({ recyclers = mockRecyclers }) {
     <div className="space-y-8 max-w-5xl mx-auto">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Verification & Compliance Queue</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('verificationQueue')}</h1>
         <p className="text-xs sm:text-sm text-[#718078]">
-          Review pending recycler CPCB licenses and investigate rule-engine flagged pricing offers.
+          {t('reviewAndApprovePending')}
         </p>
       </div>
 
@@ -50,10 +52,10 @@ export default function Verification({ recyclers = mockRecyclers }) {
         <div className="flex items-center justify-between border-b border-[#3F7655]/10 pb-4">
           <div className="flex items-center gap-2">
             <Building className="w-5 h-5 text-[#3F7655]" />
-            <h2 className="text-lg font-black text-[#203128]">Pending Recycler Registrations</h2>
+            <h2 className="text-lg font-black text-[#203128]">{t('pendingRecyclerRegistrations')}</h2>
           </div>
           <span className="text-xs font-black text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
-            {pendingRecyclers.length} Awaiting Review
+            {pendingRecyclers.length} {t('awaitingReview')}
           </span>
         </div>
 
@@ -66,8 +68,8 @@ export default function Verification({ recyclers = mockRecyclers }) {
               >
                 <div className="space-y-1 text-xs">
                   <h3 className="text-base font-black text-[#203128]">{rec.companyName}</h3>
-                  <p className="text-[#718078]">Location: {rec.location} • Contact: {rec.contactPerson} ({rec.phone})</p>
-                  <p className="text-[#718078]">CPCB Reg: <span className="font-mono font-bold text-[#203128]">{rec.cpcbRegistrationNo}</span></p>
+                  <p className="text-[#718078]">{t('locationLabel')}: {rec.location} • Contact: {rec.contactPerson} ({rec.phone})</p>
+                  <p className="text-[#718078]">{t('cpcbRegLabel')}: <span className="font-mono font-bold text-[#203128]">{rec.cpcbRegistrationNo}</span></p>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -75,21 +77,21 @@ export default function Verification({ recyclers = mockRecyclers }) {
                     onClick={() => handleRejectRecycler(rec.id)}
                     className="px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer"
                   >
-                    Reject
+                    {t('reject')}
                   </button>
                   <button
                     onClick={() => handleApproveRecycler(rec.id)}
                     className="px-5 py-2 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer flex items-center gap-1.5"
                   >
                     <Check className="w-4 h-4" />
-                    <span>Approve CPCB Facility</span>
+                    <span>{t('approveCpcbFacility')}</span>
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-[#718078] text-center py-4">All facility applications have been cleared.</p>
+          <p className="text-xs text-[#718078] text-center py-4">{t('allApplicationsCleared')}</p>
         )}
       </div>
 
@@ -98,10 +100,10 @@ export default function Verification({ recyclers = mockRecyclers }) {
         <div className="flex items-center justify-between border-b border-[#3F7655]/10 pb-4">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-amber-600" />
-            <h2 className="text-lg font-black text-[#203128]">Rule Engine Flagged Price Offers</h2>
+            <h2 className="text-lg font-black text-[#203128]">{t('ruleEngineFlaggedBids')}</h2>
           </div>
           <span className="text-xs font-black text-rose-800 bg-rose-100 px-3 py-1 rounded-full">
-            {flaggedOffers.length} Flagged Cases
+            {flaggedOffers.length} {t('flaggedCases')}
           </span>
         </div>
 
@@ -126,20 +128,20 @@ export default function Verification({ recyclers = mockRecyclers }) {
                     onClick={() => handleResolveFlag(item.id, 'dismissed')}
                     className="px-4 py-2 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold text-xs rounded-xl cursor-pointer"
                   >
-                    Cancel Bid
+                    {t('cancelBid')}
                   </button>
                   <button
                     onClick={() => handleResolveFlag(item.id, 'cleared')}
                     className="px-5 py-2 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow cursor-pointer"
                   >
-                    Override & Allow Bid
+                    {t('overrideAllowBid')}
                   </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-[#718078] text-center py-4">No active price anomaly flags.</p>
+          <p className="text-xs text-[#718078] text-center py-4">{t('noPriceAnomalyFlags')}</p>
         )}
       </div>
     </div>

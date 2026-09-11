@@ -59,7 +59,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             </div>
             <div>
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                GENERATOR DISPOSAL
+                {t("generatorDisposal")}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-0.5">
                 {t("disposeEWaste")}
@@ -80,9 +80,9 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             <div className="w-16 h-16 rounded-full bg-[#DDEBD8] text-[#3F7655] flex items-center justify-center text-3xl mx-auto shadow-inner">
               ✓
             </div>
-            <h4 className="text-xl font-black text-[#244936]">Disposal Request Logged!</h4>
+            <h4 className="text-xl font-black text-[#244936]">{t("disposalRequestLogged")}</h4>
             <p className="text-xs text-[#718078] max-w-xs mx-auto">
-              Your e-waste is assigned to a verified ECO-Link collector and matched with a certified material recovery lot.
+              {t("disposalRequestLoggedDesc")}
             </p>
           </div>
         ) : (
@@ -90,12 +90,12 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             
             <div>
               <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                E-Waste Item Description
+                {t("eWasteItemDescription")}
               </label>
               <input
                 type="text"
                 required
-                placeholder="e.g., Old Lenovo ThinkPad & Broken Tablet"
+                placeholder={t("eWasteItemPlaceholder")}
                 value={deviceTitle}
                 onChange={(e) => setDeviceTitle(e.target.value)}
                 className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
@@ -105,7 +105,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                  Primary Category
+                  {t("primaryCategory")}
                 </label>
                 <select
                   value={selectedScrap}
@@ -120,7 +120,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
 
               <div>
                 <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                  Approx Weight (kg)
+                  {t("approxWeightKg")}
                 </label>
                 <input
                   type="number"
@@ -137,11 +137,11 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             {/* Estimated Value Preview */}
             <div className="bg-[#DDEBD8]/60 p-3 rounded-2xl border border-[#3F7655]/20 flex items-center justify-between text-xs">
               <div>
-                <span className="text-[#718078] font-bold block">Estimated Scrap Value</span>
+                <span className="text-[#718078] font-bold block">{t("estimatedScrapValue")}</span>
                 <span className="text-sm font-black text-[#244936]">₹{estimatedValue} (@ ₹{scrapObj.referencePrice}/kg)</span>
               </div>
               <div className="text-right">
-                <span className="text-[#718078] font-bold block">Reward Points</span>
+                <span className="text-[#718078] font-bold block">{t("rewardPoints")}</span>
                 <span className="text-sm font-black text-[#3F7655]">+{pointsAwarded} pts 🌟</span>
               </div>
             </div>
@@ -149,7 +149,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                  Location / City
+                  {t("locationCity")}
                 </label>
                 <select
                   value={locationCity}
@@ -164,7 +164,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
 
               <div>
                 <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                  Contact Mobile
+                  {t("contactMobile")}
                 </label>
                 <input
                   type="text"
@@ -178,7 +178,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
 
             <div>
               <label className="block text-xs font-extrabold text-[#203128] mb-1">
-                Pickup Address / Doorstep Details
+                {t("pickupAddress")}
               </label>
               <input
                 type="text"
@@ -201,7 +201,7 @@ export default function DisposeEWasteModal({ isOpen, onClose, onDisposalCreated 
                 type="submit"
                 className="py-2.5 px-6 text-xs font-extrabold bg-[#3F7655] hover:bg-[#244936] text-white rounded-xl shadow-md transition flex items-center gap-1.5"
               >
-                <span>Request Disposal</span>
+                <span>{t("requestDisposal")}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             </div>

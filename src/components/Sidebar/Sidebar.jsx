@@ -12,38 +12,37 @@ export default function Sidebar({ role = 'collector', userProfile }) {
   const location = useLocation();
 
   const collectorLinks = [
-    { to: '/collector/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/collector/register-waste', label: 'Register E-Waste', icon: PlusCircle },
-    { to: '/collector/requests', label: 'My Requests', icon: Package },
-    { to: '/collector/transactions', label: 'Transactions', icon: Award },
-    { to: '/collector/profile', label: 'Profile', icon: User },
-    { to: '/collector/notifications', label: 'Notifications', icon: Bell },
+    { to: '/collector/dashboard', key: 'navDashboard', icon: LayoutDashboard },
+    { to: '/collector/register-waste', key: 'navRegisterEWaste', icon: PlusCircle },
+    { to: '/collector/requests', key: 'navMyWasteLots', icon: Package },
+    { to: '/collector/transactions', key: 'navTransactions', icon: Award },
+    { to: '/collector/profile', key: 'navProfile', icon: User },
+    { to: '/collector/notifications', key: 'navNotifications', icon: Bell },
   ];
 
   const recyclerLinks = [
-    { to: '/recycler/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/recycler/waste-requests', label: 'Waste Requests', icon: Layers },
-    { to: '/recycler/transactions', label: 'Transactions', icon: Award },
-    { to: '/recycler/compliance', label: 'Compliance', icon: ShieldCheck },
-    { to: '/recycler/profile', label: 'Profile', icon: User },
-    { to: '/recycler/notifications', label: 'Notifications', icon: Bell },
+    { to: '/recycler/dashboard', key: 'navDashboard', icon: LayoutDashboard },
+    { to: '/recycler/waste-requests', key: 'navWasteRequests', icon: Layers },
+    { to: '/recycler/transactions', key: 'navTransactions', icon: Award },
+    { to: '/recycler/compliance', key: 'navCompliance', icon: ShieldCheck },
+    { to: '/recycler/profile', key: 'navProfile', icon: User },
+    { to: '/recycler/notifications', key: 'navNotifications', icon: Bell },
   ];
 
-
   const adminLinks = [
-    { to: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { to: '/admin/collectors', label: 'Collectors', icon: Users },
-    { to: '/admin/recyclers', label: 'Recyclers', icon: ShieldCheck },
-    { to: '/admin/waste-lots', label: 'Waste Lots', icon: Package },
-    { to: '/admin/transactions', label: 'Transactions', icon: Award },
-    { to: '/admin/verification', label: 'Verification', icon: CheckCircle2 },
-    { to: '/admin/profile', label: 'Profile', icon: User },
-    { to: '/admin/notifications', label: 'Notifications', icon: Bell },
+    { to: '/admin/dashboard', key: 'navDashboard', icon: LayoutDashboard },
+    { to: '/admin/collectors', key: 'navCollectors', icon: Users },
+    { to: '/admin/recyclers', key: 'navRecyclers', icon: ShieldCheck },
+    { to: '/admin/waste-lots', key: 'navWasteLots', icon: Package },
+    { to: '/admin/transactions', key: 'navTransactions', icon: Award },
+    { to: '/admin/verification', key: 'navVerification', icon: CheckCircle2 },
+    { to: '/admin/profile', key: 'navProfile', icon: User },
+    { to: '/admin/notifications', key: 'navNotifications', icon: Bell },
   ];
 
   const links = role === 'collector' ? collectorLinks : role === 'recycler' ? recyclerLinks : adminLinks;
 
-  const displayName = userProfile?.name || userProfile?.companyName || (role === 'collector' ? 'Collector' : role === 'recycler' ? 'Recycler' : 'Admin');
+  const displayName = userProfile?.name || userProfile?.companyName || (role === 'collector' ? t('collectorRole') : role === 'recycler' ? t('recyclerRole') : t('adminRole'));
 
   return (
     <aside className="w-64 bg-white border-r border-[#3F7655]/15 p-5 flex flex-col justify-between shrink-0 min-h-[calc(100vh-5rem)]">
@@ -57,7 +56,7 @@ export default function Sidebar({ role = 'collector', userProfile }) {
           <div className="overflow-hidden">
             <h4 className="text-xs font-black text-[#203128] truncate">{displayName}</h4>
             <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5 uppercase tracking-wider">
-              {role}
+              {role === 'collector' ? t('collectorRole') : role === 'recycler' ? t('recyclerRole') : t('adminRole')}
             </span>
           </div>
         </div>
@@ -79,7 +78,7 @@ export default function Sidebar({ role = 'collector', userProfile }) {
                 }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
-                <span>{link.label}</span>
+                <span>{t(link.key)}</span>
               </NavLink>
             );
           })}
@@ -89,7 +88,7 @@ export default function Sidebar({ role = 'collector', userProfile }) {
 
       {/* Footer info in sidebar */}
       <div className="pt-4 border-t border-[#3F7655]/10 text-[11px] text-[#718078] font-semibold text-center">
-        Eco-Link v2.6.0 · EPR Ready
+        Eco-Link v2.6.0 · {t('eprCompliant')}
       </div>
     </aside>
   );

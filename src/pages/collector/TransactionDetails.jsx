@@ -2,10 +2,12 @@ import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ArrowLeft, DollarSign, CheckCircle2, Download, ShieldCheck, QrCode, FileText, Calendar, Building, MapPin } from 'lucide-react';
 import { mockTransactions } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function TransactionDetails({ transactions = mockTransactions }) {
   const { transactionId } = useParams();
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const allTx = transactions || mockTransactions;
   const tx = allTx.find(t => t.id === transactionId) || allTx[0];
@@ -13,9 +15,9 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
   if (!tx) {
     return (
       <div className="bg-white p-12 rounded-[32px] border border-[#3F7655]/20 text-center space-y-4 shadow-sm">
-        <h2 className="text-xl font-black text-[#203128]">Invoice Not Found</h2>
+        <h2 className="text-xl font-black text-[#203128]">{t('transactionsTitle')}</h2>
         <Link to="/collector/transactions" className="text-xs font-bold text-[#3F7655] underline">
-          Return to All Invoices
+          {t('backToDashboard')}
         </Link>
       </div>
     );
@@ -30,12 +32,12 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
           className="px-4 py-2 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/20 rounded-xl hover:bg-[#DDEBD8]/50 transition flex items-center gap-2 cursor-pointer shadow-sm"
         >
           <ArrowLeft className="w-4 h-4 text-[#3F7655]" />
-          <span>Back to Invoices</span>
+          <span>{t('backToDashboard')}</span>
         </button>
 
         <span className="text-xs font-black text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full flex items-center gap-1">
           <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          {tx.status || 'SETTLED'}
+          {t('payStatusPAID')}
         </span>
       </div>
 
@@ -45,10 +47,10 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
         <div className="border-b border-[#3F7655]/10 pb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <span className="text-[10px] font-black uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-3 py-1 rounded-full">
-              Tax Invoice & Payout Voucher
+              {t('digitalReceipt')}
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-[#203128] mt-2">{tx.id}</h1>
-            <p className="text-xs text-[#718078]">Settled on: {tx.date || tx.paymentDate || '2026-03-01'}</p>
+            <p className="text-xs text-[#718078]">{t('collectionDate')}: {tx.date || tx.paymentDate || '2026-03-01'}</p>
           </div>
 
           <button
@@ -56,34 +58,32 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
             className="px-4 py-2.5 bg-[#F8F5EA] hover:bg-[#DDEBD8] text-[#244936] border border-[#3F7655]/20 rounded-xl font-bold text-xs transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
           >
             <Download className="w-4 h-4" />
-            <span>Download Invoice PDF</span>
+            <span>{t('digitalReceipt')} PDF</span>
           </button>
         </div>
 
         {/* Parties Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs">
           <div className="p-4 bg-[#F8F5EA] rounded-2xl border border-[#3F7655]/10 space-y-2">
-            <span className="text-[10px] font-extrabold text-[#718078] uppercase block">Collector (Beneficiary)</span>
+            <span className="text-[10px] font-extrabold text-[#718078] uppercase block">{t('collectorLabel')}</span>
             <h4 className="text-sm font-black text-[#203128]">{tx.collectorName || 'Ramesh Kumar'}</h4>
-            <p className="text-[#718078]">Payout Method: UPI (ramesh@okhdfcbank)</p>
-            <p className="text-[#718078]">Location: Chennai Hub</p>
+            <p className="text-[#718078]">{t('storageLocationHub')}: Chennai Hub</p>
           </div>
 
           <div className="p-4 bg-[#F8F5EA] rounded-2xl border border-[#3F7655]/10 space-y-2">
-            <span className="text-[10px] font-extrabold text-[#718078] uppercase block">Recycler (Payer)</span>
+            <span className="text-[10px] font-extrabold text-[#718078] uppercase block">{t('recyclerLabel')}</span>
             <h4 className="text-sm font-black text-[#203128]">{tx.recyclerName || 'GreenCycle Material Recovery Ltd'}</h4>
             <p className="text-[#718078]">CPCB License: TN-EPR-2026-8821</p>
-            <p className="text-[#718078]">Facility: Ambattur Industrial Estate, Chennai</p>
           </div>
         </div>
 
         {/* Invoice Items Table */}
         <div className="border border-[#3F7655]/15 rounded-2xl overflow-hidden text-xs">
           <div className="bg-[#FAF8F2] p-3 font-black text-[#203128] grid grid-cols-12 border-b border-[#3F7655]/10">
-            <span className="col-span-6">Material Description</span>
-            <span className="col-span-2 text-right">Quantity</span>
-            <span className="col-span-2 text-right">Agreed Rate</span>
-            <span className="col-span-2 text-right">Total Payout</span>
+            <span className="col-span-6">{t('materialDescription')}</span>
+            <span className="col-span-2 text-right">{t('quantityLabel')}</span>
+            <span className="col-span-2 text-right">{t('benchmarkPriceLabel')}</span>
+            <span className="col-span-2 text-right">{t('totalValue')}</span>
           </div>
 
           <div className="p-4 grid grid-cols-12 text-[#203128] font-semibold items-center">
@@ -97,7 +97,7 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
           </div>
 
           <div className="bg-[#FAF8F2] p-4 border-t border-[#3F7655]/10 flex justify-between items-center font-black text-sm">
-            <span className="text-[#203128]">Total Net Payout Released</span>
+            <span className="text-[#203128]">{t('totalValue')}</span>
             <span className="text-xl text-[#244936]">₹{(tx.totalValue || 45600).toLocaleString()}</span>
           </div>
         </div>
@@ -106,7 +106,7 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
         <div className="p-4 bg-[#DDEBD8]/50 rounded-2xl border border-[#3F7655]/20 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#3F7655]" />
-            <span className="font-bold text-[#244936]">CPCB EPR Certificate & Form-2 Manifest Auto-Generated</span>
+            <span className="font-bold text-[#244936]">{t('cpcbVerified')}</span>
           </div>
           <span className="font-mono text-[10px] text-[#718078]">CERT-EPR-2026-9921</span>
         </div>

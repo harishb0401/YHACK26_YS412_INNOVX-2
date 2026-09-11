@@ -1,7 +1,9 @@
 import React from 'react';
 import { ShieldCheck, MapPin, Phone, Mail, Award, CheckCircle2, Clock } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function RecyclerCard({ recycler, onSelect, showActions = true }) {
+  const { t } = useTranslation();
   if (!recycler) return null;
 
   const isVerified = recycler.verificationStatus === 'VERIFIED';
@@ -14,7 +16,7 @@ export default function RecyclerCard({ recycler, onSelect, showActions = true })
             <h3 className="text-base font-black text-[#203128]">{recycler.companyName}</h3>
             {isVerified && (
               <span className="text-[10px] font-extrabold bg-[#244936] text-white px-2 py-0.5 rounded-full flex items-center gap-1 shadow-sm">
-                <ShieldCheck className="w-3 h-3 text-[#F2C94C]" /> CPCB Verified
+                <ShieldCheck className="w-3 h-3 text-[#F2C94C]" /> {t("cpcbVerifiedBadge")}
               </span>
             )}
           </div>
@@ -45,7 +47,7 @@ export default function RecyclerCard({ recycler, onSelect, showActions = true })
       </div>
 
       <div className="pt-2">
-        <span className="text-[10px] font-extrabold uppercase text-[#718078] block mb-1.5">Authorized Materials</span>
+        <span className="text-[10px] font-extrabold uppercase text-[#718078] block mb-1.5">{t("authorizedMaterials")}</span>
         <div className="flex flex-wrap gap-1.5">
           {(recycler.acceptedCategories || []).map((cat, idx) => (
             <span key={idx} className="text-[10px] font-bold bg-[#FAF8F2] text-[#244936] px-2.5 py-1 rounded-lg border border-[#3F7655]/15">

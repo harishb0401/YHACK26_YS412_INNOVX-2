@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Bell, CheckCircle2, ShieldCheck, AlertCircle, DollarSign, Package, Clock } from 'lucide-react';
 import { mockNotifications } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function CollectorNotifications({ notifications = mockNotifications }) {
+  const { t } = useTranslation();
   const [list, setList] = useState(notifications || mockNotifications);
 
   const markAllRead = () => {
@@ -28,9 +30,9 @@ export default function CollectorNotifications({ notifications = mockNotificatio
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Notifications</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('navNotifications')}</h1>
           <p className="text-xs sm:text-sm text-[#718078]">
-            Real-time activity logs on e-waste lot verification, recycler offers, and payouts.
+            {t('collectorNotifSubtitle')}
           </p>
         </div>
 
@@ -38,7 +40,7 @@ export default function CollectorNotifications({ notifications = mockNotificatio
           onClick={markAllRead}
           className="px-4 py-2 bg-white hover:bg-[#DDEBD8] text-[#244936] border border-[#3F7655]/20 rounded-xl font-bold text-xs transition cursor-pointer self-start sm:self-auto shadow-sm"
         >
-          Mark all as read
+          {t('unreadNotifications')}
         </button>
       </div>
 
@@ -59,13 +61,13 @@ export default function CollectorNotifications({ notifications = mockNotificatio
 
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-black text-[#203128]">{item.title}</h3>
+                <h3 className="text-sm font-black text-[#203128]">{t(item.title)}</h3>
                 <span className="text-[11px] text-[#718078] flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {item.time || item.timestamp || 'Just now'}
                 </span>
               </div>
-              <p className="text-xs text-[#718078] leading-relaxed">{item.message}</p>
+              <p className="text-xs text-[#718078] leading-relaxed">{t(item.message || item.desc)}</p>
             </div>
           </div>
         ))}

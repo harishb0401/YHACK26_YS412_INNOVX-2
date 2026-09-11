@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Search, ShieldCheck, Building, CheckCircle2, AlertTriangle, XCircle, ShieldAlert } from 'lucide-react';
 import { mockRecyclers } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function Recyclers({ recyclers = mockRecyclers }) {
+  const { t, tCategory } = useTranslation();
   const [recyclerList, setRecyclerList] = useState(recyclers || mockRecyclers);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -22,9 +24,9 @@ export default function Recyclers({ recyclers = mockRecyclers }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Recyclers Registry</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('adminRecyclersTitle')}</h1>
         <p className="text-xs sm:text-sm text-[#718078]">
-          Central Pollution Control Board (CPCB) authorized e-waste processing and material recovery facilities.
+          {t('verifyCpcbLicenses')}
         </p>
       </div>
 
@@ -36,7 +38,7 @@ export default function Recyclers({ recyclers = mockRecyclers }) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search company, CPCB Reg No, location..."
+            placeholder={t('search')}
             className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
           />
         </div>
@@ -63,20 +65,20 @@ export default function Recyclers({ recyclers = mockRecyclers }) {
                     isVerified ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
                   }`}>
                     {isVerified ? <CheckCircle2 className="w-3 h-3 text-emerald-600" /> : <AlertTriangle className="w-3 h-3 text-amber-600" />}
-                    {r.verificationStatus}
+                    {isVerified ? t('recStatusVERIFIED') : t('recStatusPENDING')}
                   </span>
                 </div>
 
                 <div className="text-xs space-y-1">
-                  <p><strong>CPCB Reg No:</strong> <span className="font-mono text-[11px]">{r.cpcbRegistrationNo}</span></p>
-                  <p><strong>Contact Person:</strong> {r.contactPerson} ({r.phone})</p>
-                  <p><strong>Monthly Capacity:</strong> {(r.capacityMonthlyKg || 50000).toLocaleString()} kg / mo</p>
+                  <p><strong>{t('cpcbRegNoLabel')}:</strong> <span className="font-mono text-[11px]">{r.cpcbRegistrationNo}</span></p>
+                  <p><strong>{t('contactPersonLabel')}:</strong> {r.contactPerson} ({r.phone})</p>
+                  <p><strong>{t('monthlyCapacityLabel')}:</strong> {(r.capacityMonthlyKg || 50000).toLocaleString()} kg / mo</p>
                   <div>
-                    <strong className="block mb-1">Accepted Categories:</strong>
+                    <strong className="block mb-1">{t('acceptedCategoriesLabel')}:</strong>
                     <div className="flex flex-wrap gap-1">
                       {(r.acceptedCategories || []).map((cat, i) => (
                         <span key={i} className="px-2 py-0.5 bg-[#F8F5EA] border border-[#3F7655]/15 rounded text-[10px] font-bold">
-                          {cat}
+                          {tCategory(cat)}
                         </span>
                       ))}
                     </div>
@@ -91,14 +93,14 @@ export default function Recyclers({ recyclers = mockRecyclers }) {
                     onClick={() => updateStatus(r.id, 'SUSPENDED')}
                     className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs rounded-xl border border-rose-200 transition cursor-pointer"
                   >
-                    Suspend Facility
+                    {t('suspendAccountBtn')}
                   </button>
                 ) : (
                   <button
                     onClick={() => updateStatus(r.id, 'VERIFIED')}
                     className="px-4 py-1.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer"
                   >
-                    Approve & Verify CPCB
+                    {t('approveVerificationBtn')}
                   </button>
                 )}
               </div>

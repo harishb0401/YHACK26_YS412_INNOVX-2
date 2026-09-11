@@ -59,14 +59,16 @@ export default function Navbar({
   const isRecycler = isLoggedIn && currentRole === 'recycler';
   const isAdmin = isLoggedIn && currentRole === 'admin';
 
-  const displayName = userProfile?.name || 
-    (isCollector ? "Ramesh Kumar" : 
-     isRecycler ? "GreenCycle Material Recovery" : 
-     isAdmin ? "Platform Administrator" : "Guest");
+  const rawName = userProfile?.name;
+  const displayName = (rawName === "Platform Administrator" || !rawName)
+    ? (isCollector ? "Ramesh Kumar" : 
+       isRecycler ? "GreenCycle Material Recovery" : 
+       isAdmin ? t("platformAdministrator") : t("guestRole"))
+    : rawName;
 
-  const displayRoleTitle = isCollector ? "Collector" : 
-    isRecycler ? "Recycler" : 
-    isAdmin ? "Administrator" : "Public";
+  const displayRoleTitle = isCollector ? t("collectorRole") : 
+    isRecycler ? t("recyclerRole") : 
+    isAdmin ? t("adminRole") : t("publicRole");
 
   const profilePath = isCollector ? '/collector/profile' : isRecycler ? '/recycler/profile' : '/admin/profile';
   const notifPath = isCollector ? '/collector/notifications' : isRecycler ? '/recycler/notifications' : '/admin/notifications';
@@ -134,19 +136,19 @@ export default function Navbar({
           {!isLoggedIn && (
             <nav className="hidden lg:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
               <Link to="/" className={getNavLinkClass('/', true)}>
-                Home
+                {t("navHome")}
               </Link>
               <Link to="/how-it-works" className={getNavLinkClass('/how-it-works')}>
-                How It Works
+                {t("navHowItWorks")}
               </Link>
               <Link to="/recycle-guide" className={getNavLinkClass('/recycle-guide')}>
-                Recycle Guide
+                {t("navGuide")}
               </Link>
               <Link to="/locations" className={getNavLinkClass('/locations')}>
-                Locations
+                {t("navLocations")}
               </Link>
               <Link to="/about" className={getNavLinkClass('/about')}>
-                About
+                {t("navAbout")}
               </Link>
             </nav>
           )}
@@ -157,16 +159,16 @@ export default function Navbar({
           {isCollector && (
             <nav className="hidden lg:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
               <Link to="/collector/dashboard" className={getNavLinkClass('/collector/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/collector/register-waste" className={getNavLinkClass('/collector/register-waste')}>
-                Register E-Waste
+                {t("navRegisterEWaste")}
               </Link>
               <Link to="/collector/requests" className={getNavLinkClass('/collector/requests')}>
-                My Requests
+                {t("navMyWasteLots")}
               </Link>
               <Link to="/collector/transactions" className={getNavLinkClass('/collector/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
             </nav>
           )}
@@ -177,16 +179,16 @@ export default function Navbar({
           {isRecycler && (
             <nav className="hidden lg:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
               <Link to="/recycler/dashboard" className={getNavLinkClass('/recycler/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/recycler/waste-requests" className={getNavLinkClass('/recycler/waste-requests')}>
-                Waste Requests
+                {t("navWasteRequests")}
               </Link>
               <Link to="/recycler/transactions" className={getNavLinkClass('/recycler/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
               <Link to="/recycler/compliance" className={getNavLinkClass('/recycler/compliance')}>
-                Compliance
+                {t("navCompliance")}
               </Link>
             </nav>
           )}
@@ -198,22 +200,22 @@ export default function Navbar({
           {isAdmin && (
             <nav className="hidden lg:flex items-center gap-1 bg-[#DDEBD8]/40 p-1.5 rounded-full border border-[#3F7655]/10">
               <Link to="/admin/dashboard" className={getNavLinkClass('/admin/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/admin/collectors" className={getNavLinkClass('/admin/collectors')}>
-                Collectors
+                {t("navCollectors")}
               </Link>
               <Link to="/admin/recyclers" className={getNavLinkClass('/admin/recyclers')}>
-                Recyclers
+                {t("navRecyclers")}
               </Link>
               <Link to="/admin/waste-lots" className={getNavLinkClass('/admin/waste-lots')}>
-                Waste Lots
+                {t("navWasteLots")}
               </Link>
               <Link to="/admin/transactions" className={getNavLinkClass('/admin/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
               <Link to="/admin/verification" className={getNavLinkClass('/admin/verification')}>
-                Verification
+                {t("navVerification")}
               </Link>
             </nav>
           )}
@@ -272,7 +274,7 @@ export default function Navbar({
                       : 'bg-[#3F7655] text-white hover:bg-[#244936]'
                   }`}
                 >
-                  Login / Signup
+                  {t("loginSignupBtn")}
                 </Link>
               </div>
             )}
@@ -291,7 +293,7 @@ export default function Navbar({
                       setNotifDropdownOpen(!notifDropdownOpen);
                       setProfileDropdownOpen(false);
                     }}
-                    title="Notifications"
+                    title={t("notifications")}
                     className="p-2.5 rounded-full text-[#203128] bg-white hover:bg-[#DDEBD8]/60 border border-[#3F7655]/20 relative transition cursor-pointer shadow-sm"
                   >
                     <Bell className="w-4 h-4 text-[#3F7655]" />
@@ -303,9 +305,9 @@ export default function Navbar({
                   {notifDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border border-[#3F7655]/20 shadow-xl py-3 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                       <div className="px-4 pb-2 border-b border-[#3F7655]/10 flex items-center justify-between">
-                        <span className="text-xs font-black text-[#203128]">Notifications</span>
+                        <span className="text-xs font-black text-[#203128]">{t("notifications")}</span>
                         <Link to={notifPath} className="text-[10px] font-bold text-[#3F7655] hover:underline">
-                          View All
+                          {t("viewAll")}
                         </Link>
                       </div>
 
@@ -317,17 +319,17 @@ export default function Navbar({
                             className={`p-3 text-xs hover:bg-[#FAF8F2] transition cursor-pointer ${n.unread ? 'bg-[#DDEBD8]/20' : ''}`}
                           >
                             <div className="flex items-center justify-between">
-                              <span className="font-extrabold text-[#203128]">{n.title}</span>
+                              <span className="font-extrabold text-[#203128]">{t(n.title)}</span>
                               <span className="text-[10px] text-slate-400">{n.time}</span>
                             </div>
-                            <p className="text-[11px] text-[#718078] mt-0.5">{n.desc}</p>
+                            <p className="text-[11px] text-[#718078] mt-0.5">{t(n.desc)}</p>
                           </div>
                         ))}
                       </div>
 
                       <div className="pt-2 px-3 border-t border-[#3F7655]/10 text-center">
                         <Link to={notifPath} className="text-[11px] font-bold text-[#3F7655] hover:underline">
-                          Open Notifications Center →
+                          {t("openNotificationsCenter")} →
                         </Link>
                       </div>
                     </div>
@@ -374,7 +376,7 @@ export default function Navbar({
                           className="w-full text-left px-4 py-2 hover:bg-[#DDEBD8]/40 transition flex items-center gap-2.5 cursor-pointer"
                         >
                           <User className="w-4 h-4 text-[#3F7655]" />
-                          <span>Profile</span>
+                          <span>{t("profile")}</span>
                         </Link>
                         
                         <button
@@ -385,7 +387,7 @@ export default function Navbar({
                           className="w-full text-left px-4 py-2 hover:bg-[#DDEBD8]/40 transition flex items-center gap-2.5 cursor-pointer"
                         >
                           <Settings className="w-4 h-4 text-[#718078]" />
-                          <span>Settings</span>
+                          <span>{t("settings")}</span>
                         </button>
                       </div>
 
@@ -396,7 +398,7 @@ export default function Navbar({
                           className="w-full text-left px-3 py-2 text-xs font-bold text-rose-700 hover:bg-rose-50 rounded-xl transition flex items-center gap-2.5 cursor-pointer"
                         >
                           <LogOut className="w-4 h-4 text-rose-600" />
-                          <span>Logout</span>
+                          <span>{t("logout")}</span>
                         </button>
                       </div>
                     </div>
@@ -447,22 +449,23 @@ export default function Navbar({
           </div>
 
           {/* 1. PUBLIC MOBILE NAV */}
+          {/* 1. PUBLIC MOBILE NAV */}
           {!isLoggedIn && (
             <div className="flex flex-col space-y-1">
               <Link to="/" className={getMobileNavLinkClass('/', true)}>
-                Home
+                {t("navHome")}
               </Link>
               <Link to="/how-it-works" className={getMobileNavLinkClass('/how-it-works')}>
-                How It Works
+                {t("navHowItWorks")}
               </Link>
               <Link to="/recycle-guide" className={getMobileNavLinkClass('/recycle-guide')}>
-                Recycle Guide
+                {t("navGuide")}
               </Link>
               <Link to="/locations" className={getMobileNavLinkClass('/locations')}>
-                Locations
+                {t("navLocations")}
               </Link>
               <Link to="/about" className={getMobileNavLinkClass('/about')}>
-                About
+                {t("navAbout")}
               </Link>
 
               <div className="pt-3 border-t border-[#3F7655]/10">
@@ -470,7 +473,7 @@ export default function Navbar({
                   to="/login"
                   className="block w-full py-2.5 text-xs font-extrabold text-white bg-[#3F7655] hover:bg-[#244936] rounded-xl text-center shadow-sm"
                 >
-                  Login / Signup
+                  {t("navLogin")} / {t("navSignUp")}
                 </Link>
               </div>
             </div>
@@ -482,34 +485,34 @@ export default function Navbar({
               <div className="p-3 bg-white rounded-xl border border-[#3F7655]/15 mb-2 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-black text-[#203128] block">{displayName}</span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">Collector</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">{t("collectorRole")}</span>
                 </div>
-                <Link to="/collector/profile" className="text-xs font-bold text-[#3F7655] underline">Profile</Link>
+                <Link to="/collector/profile" className="text-xs font-bold text-[#3F7655] underline">{t("navProfile")}</Link>
               </div>
 
               <Link to="/collector/dashboard" className={getMobileNavLinkClass('/collector/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/collector/register-waste" className={getMobileNavLinkClass('/collector/register-waste')}>
-                Register E-Waste
+                {t("navRegisterEWaste")}
               </Link>
               <Link to="/collector/requests" className={getMobileNavLinkClass('/collector/requests')}>
-                My Requests
+                {t("navMyWasteLots")}
               </Link>
               <Link to="/collector/transactions" className={getMobileNavLinkClass('/collector/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
               <Link to="/collector/notifications" className={getMobileNavLinkClass('/collector/notifications')}>
-                Notifications ({unreadCount})
+                {t("navNotifications")} ({unreadCount})
               </Link>
 
               <div className="pt-2 border-t border-[#3F7655]/10">
                 <button
                   onClick={handleLogoutClick}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 text-rose-600" />
-                  <span>Logout</span>
+                  <span>{t("navLogout")}</span>
                 </button>
               </div>
             </div>
@@ -521,35 +524,35 @@ export default function Navbar({
               <div className="p-3 bg-white rounded-xl border border-[#3F7655]/15 mb-2 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-black text-[#203128] block">{displayName}</span>
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">Recycler</span>
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full inline-block mt-0.5">{t("recyclerRole")}</span>
                 </div>
-                <Link to="/recycler/profile" className="text-xs font-bold text-[#3F7655] underline">Profile</Link>
+                <Link to="/recycler/profile" className="text-xs font-bold text-[#3F7655] underline">{t("navProfile")}</Link>
               </div>
 
               <Link to="/recycler/dashboard" className={getMobileNavLinkClass('/recycler/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/recycler/waste-requests" className={getMobileNavLinkClass('/recycler/waste-requests')}>
-                Waste Requests
+                {t("navWasteRequests")}
               </Link>
               <Link to="/recycler/transactions" className={getMobileNavLinkClass('/recycler/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
               <Link to="/recycler/compliance" className={getMobileNavLinkClass('/recycler/compliance')}>
-                Compliance
+                {t("navCompliance")}
               </Link>
               <Link to="/recycler/notifications" className={getMobileNavLinkClass('/recycler/notifications')}>
-                Notifications ({unreadCount})
+                {t("navNotifications")} ({unreadCount})
               </Link>
 
 
               <div className="pt-2 border-t border-[#3F7655]/10">
                 <button
                   onClick={handleLogoutClick}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 text-rose-600" />
-                  <span>Logout</span>
+                  <span>{t("navLogout")}</span>
                 </button>
               </div>
             </div>
@@ -561,40 +564,40 @@ export default function Navbar({
               <div className="p-3 bg-white rounded-xl border border-[#3F7655]/15 mb-2 flex items-center justify-between">
                 <div>
                   <span className="text-xs font-black text-[#203128] block">{displayName}</span>
-                  <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full inline-block mt-0.5">Admin</span>
+                  <span className="text-[10px] font-bold text-amber-900 bg-amber-100 px-2 py-0.5 rounded-full inline-block mt-0.5">{t("adminRole")}</span>
                 </div>
-                <Link to="/admin/profile" className="text-xs font-bold text-[#3F7655] underline">Profile</Link>
+                <Link to="/admin/profile" className="text-xs font-bold text-[#3F7655] underline">{t("navProfile")}</Link>
               </div>
 
               <Link to="/admin/dashboard" className={getMobileNavLinkClass('/admin/dashboard', true)}>
-                Dashboard
+                {t("navDashboard")}
               </Link>
               <Link to="/admin/collectors" className={getMobileNavLinkClass('/admin/collectors')}>
-                Collectors
+                {t("navCollectors")}
               </Link>
               <Link to="/admin/recyclers" className={getMobileNavLinkClass('/admin/recyclers')}>
-                Recyclers
+                {t("navRecyclers")}
               </Link>
               <Link to="/admin/waste-lots" className={getMobileNavLinkClass('/admin/waste-lots')}>
-                Waste Lots
+                {t("navWasteLots")}
               </Link>
               <Link to="/admin/transactions" className={getMobileNavLinkClass('/admin/transactions')}>
-                Transactions
+                {t("navTransactions")}
               </Link>
               <Link to="/admin/verification" className={getMobileNavLinkClass('/admin/verification')}>
-                Verification
+                {t("navVerification")}
               </Link>
               <Link to="/admin/notifications" className={getMobileNavLinkClass('/admin/notifications')}>
-                Notifications ({unreadCount})
+                {t("navNotifications")} ({unreadCount})
               </Link>
 
               <div className="pt-2 border-t border-[#3F7655]/10">
                 <button
                   onClick={handleLogoutClick}
-                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2"
+                  className="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-extrabold text-rose-700 bg-rose-50 flex items-center gap-2 cursor-pointer"
                 >
                   <LogOut className="w-4 h-4 text-rose-600" />
-                  <span>Logout</span>
+                  <span>{t("navLogout")}</span>
                 </button>
               </div>
             </div>

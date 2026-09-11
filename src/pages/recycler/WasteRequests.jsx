@@ -6,12 +6,14 @@ import {
 } from 'lucide-react';
 import { mockWasteLots, mockBenchmarkPrices, mockRecycler } from '../../data/mockData';
 import { calculateFairPriceRange } from '../../utils/rulesEngine';
+import { useTranslation } from '../../i18n';
 
 export default function WasteRequests({ 
   materialLots = mockWasteLots, 
   onSubmitOffer,
   recyclerProfile = mockRecycler
 }) {
+  const { t, tCategory } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedLotForBid, setSelectedLotForBid] = useState(null);
   const [bidRate, setBidRate] = useState('');
@@ -79,12 +81,12 @@ export default function WasteRequests({
       <div>
         <div className="flex items-center gap-2">
           <span className="text-[10px] font-black uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-3 py-0.5 rounded-full">
-            Recycler Intake Pipeline
+            {t('recyclerIntakePipeline', 'Recycler Intake Pipeline')}
           </span>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#203128] mt-1.5">Available Collector Requests</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#203128] mt-1.5">{t('availableCollectorRequests', 'Available Collector Requests')}</h1>
         <p className="text-xs sm:text-sm text-[#718078]">
-          Review authenticated e-waste requests declared by registered collectors and submit competitive price offers.
+          {t('availableRequestsDesc', 'Review authenticated e-waste requests declared by registered collectors and submit competitive price offers.')}
         </p>
       </div>
 
@@ -96,13 +98,13 @@ export default function WasteRequests({
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search material category, request ID, or location..."
+            placeholder={t('searchRecyclerRequestsPlaceholder', 'Search material category, request ID, or location...')}
             className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
           />
         </div>
 
         <span className="text-xs font-black text-[#3F7655] bg-[#DDEBD8] px-3.5 py-1.5 rounded-xl self-start md:self-auto">
-          {filteredLots.length} Requests Available for Bidding
+          {t('requestsAvailableBiddingCount', '{count} Requests Available for Bidding', { count: filteredLots.length })}
         </span>
       </div>
 
@@ -123,7 +125,7 @@ export default function WasteRequests({
                 <div className="flex items-start justify-between gap-2 border-b border-[#3F7655]/10 pb-3">
                   <div>
                     <span className="text-[10px] font-extrabold text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                      {lot.category}
+                      {tCategory(lot.category)}
                     </span>
                     <h3 className="text-base font-black text-[#203128] mt-1.5">{lot.material}</h3>
                     <span className="text-xs font-mono font-bold text-[#718078]">{lot.id}</span>
@@ -140,18 +142,18 @@ export default function WasteRequests({
                   </p>
                   <p className="flex items-center gap-1.5">
                     <Calendar className="w-3.5 h-3.5 text-[#3F7655] shrink-0" />
-                    <span>Posted: {lot.collectionDate || lot.createdDate || 'Today'}</span>
+                    <span>{t('postedDate', 'Posted')}: {lot.collectionDate || lot.createdDate || 'Today'}</span>
                   </p>
                 </div>
 
                 {/* Benchmark Band info */}
                 <div className="p-3.5 bg-[#FAF8F2] rounded-2xl border border-[#3F7655]/10 text-xs space-y-1.5">
                   <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-extrabold text-[#718078] uppercase">State Benchmark Rate</span>
+                    <span className="text-[10px] font-extrabold text-[#718078] uppercase">{t('stateBenchmarkRate', 'State Benchmark Rate')}</span>
                     <span className="font-black text-[#203128]">₹{benchmark} / {unit}</span>
                   </div>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-[#718078]">Fair Range (±25%)</span>
+                    <span className="text-[#718078]">{t('fairRange25', 'Fair Range (±25%)')}</span>
                     <span className="font-bold text-[#3F7655]">₹{fairBand.minPrice} – ₹{fairBand.maxPrice} / {unit}</span>
                   </div>
                 </div>
@@ -164,7 +166,7 @@ export default function WasteRequests({
                   className="w-full py-3 bg-[#3F7655] hover:bg-[#244936] text-white rounded-xl font-black text-xs shadow transition flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <DollarSign className="w-4 h-4" />
-                  <span>Submit Price Offer</span>
+                  <span>{t('submitPriceOffer', 'Submit Price Offer')}</span>
                 </button>
               </div>
             </div>
@@ -179,7 +181,7 @@ export default function WasteRequests({
             <div className="flex items-center justify-between pb-4 border-b border-[#3F7655]/15">
               <div>
                 <span className="text-[10px] font-black uppercase text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                  Submit Recycler Offer
+                  {t('submitRecyclerOfferModalTitle', 'Submit Recycler Offer')}
                 </span>
                 <h3 className="text-xl font-black text-[#203128] mt-1">{selectedLotForBid.id}</h3>
               </div>
@@ -193,14 +195,14 @@ export default function WasteRequests({
 
             <form onSubmit={handleSendBid} className="space-y-4 text-xs">
               <div className="p-3.5 bg-[#F8F5EA] rounded-2xl space-y-1">
-                <p><strong>Material:</strong> {selectedLotForBid.material}</p>
-                <p><strong>Weight:</strong> {selectedLotForBid.quantity || selectedLotForBid.totalWeightKg} {selectedLotForBid.unit || 'kg'}</p>
-                <p><strong>Benchmark Rate:</strong> ₹{selectedLotForBid.benchmarkPrice || 350} / {selectedLotForBid.unit || 'kg'}</p>
+                <p><strong>{t('materialCategory', 'Material')}:</strong> {selectedLotForBid.material}</p>
+                <p><strong>{t('weight', 'Weight')}:</strong> {selectedLotForBid.quantity || selectedLotForBid.totalWeightKg} {selectedLotForBid.unit || 'kg'}</p>
+                <p><strong>{t('benchmarkPriceLabel', 'Benchmark Rate')}:</strong> ₹{selectedLotForBid.benchmarkPrice || 350} / {selectedLotForBid.unit || 'kg'}</p>
               </div>
 
               <div>
                 <label className="font-extrabold text-[#203128] block mb-1">
-                  Your Offered Price per {selectedLotForBid.unit || 'kg'} (₹) *
+                  {t('yourOfferedPrice', 'Your Offered Price per Unit (₹)')} *
                 </label>
                 <input
                   type="number"
@@ -214,7 +216,7 @@ export default function WasteRequests({
 
               <div>
                 <label className="font-extrabold text-[#203128] block mb-1">
-                  Proposed Pickup Date *
+                  {t('proposedPickupDateLabel', 'Proposed Pickup Date')} *
                 </label>
                 <input
                   type="date"
@@ -227,7 +229,7 @@ export default function WasteRequests({
 
               <div>
                 <label className="font-extrabold text-[#203128] block mb-1">
-                  Logistics & Weighing Terms
+                  {t('logisticsWeighingTerms', 'Logistics & Weighing Terms')}
                 </label>
                 <input
                   type="text"
@@ -238,7 +240,7 @@ export default function WasteRequests({
               </div>
 
               <div className="p-3.5 bg-[#DDEBD8] rounded-2xl border border-[#3F7655]/30 flex justify-between items-center">
-                <span className="font-bold text-[#244936]">Total Payout Commitment:</span>
+                <span className="font-bold text-[#244936]">{t('totalPayoutCommitment', 'Total Payout Commitment')}:</span>
                 <span className="text-base font-black text-[#244936]">
                   ₹{(Math.round((parseFloat(bidRate) || 0) * (selectedLotForBid.quantity || selectedLotForBid.totalWeightKg || 0))).toLocaleString()}
                 </span>
@@ -247,7 +249,7 @@ export default function WasteRequests({
               {bidSubmitted && (
                 <div className="p-3.5 bg-emerald-100 text-emerald-800 rounded-2xl font-bold text-center flex items-center justify-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span>Offer dispatched! Collector has been notified.</span>
+                  <span>{t('offerDispatchedNotice', 'Offer dispatched! Collector has been notified.')}</span>
                 </div>
               )}
 
@@ -257,7 +259,7 @@ export default function WasteRequests({
                   onClick={() => setSelectedLotForBid(null)}
                   className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl cursor-pointer"
                 >
-                  Cancel
+                  {t('cancel', 'Cancel')}
                 </button>
                 <button
                   type="submit"
@@ -265,7 +267,7 @@ export default function WasteRequests({
                   className="px-6 py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold rounded-xl shadow cursor-pointer flex items-center gap-1.5"
                 >
                   <Send className="w-4 h-4" />
-                  <span>Confirm & Submit Offer</span>
+                  <span>{t('confirmSubmitOffer', 'Confirm & Submit Offer')}</span>
                 </button>
               </div>
             </form>

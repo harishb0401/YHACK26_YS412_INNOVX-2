@@ -9,9 +9,11 @@ import { structuredEWasteCategories } from '../../data/scrapPrices';
 import { calculateFairPriceRange } from '../../utils/rulesEngine';
 import { mockBenchmarkPrices, mockCollector } from '../../data/mockData';
 import { validateQuotedPriceBackend } from '../../services/pricingService';
+import { useTranslation } from '../../i18n';
 
 export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, onLotCreated, collectorProfile = mockCollector }) {
   const navigate = useNavigate();
+  const { t, tCategory, tCondition } = useTranslation();
 
   const [category, setCategory] = useState(structuredEWasteCategories[0].name);
   const [material, setMaterial] = useState(structuredEWasteCategories[0].description || structuredEWasteCategories[0].name);
@@ -159,7 +161,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           className="px-4 py-2 text-xs font-bold text-[#203128] bg-white border border-[#3F7655]/20 rounded-xl hover:bg-[#DDEBD8]/50 transition flex items-center gap-2 cursor-pointer shadow-sm"
         >
           <ArrowLeft className="w-4 h-4 text-[#3F7655]" />
-          <span>Back to Dashboard</span>
+          <span>{t('backToDashboard', 'Back to Dashboard')}</span>
         </button>
       </div>
 
@@ -167,11 +169,11 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
       <div className="bg-white p-6 sm:p-10 rounded-[32px] border border-[#3F7655]/20 shadow-lg space-y-6">
         <div>
           <span className="text-[10px] font-black uppercase text-[#3F7655] tracking-widest bg-[#DDEBD8] px-3 py-1 rounded-full">
-            E-Waste Manifest & Fair Pricing Engine
+            {t('pricingAndValidationEngine', 'E-Waste Manifest & Fair Pricing Engine')}
           </span>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#203128] mt-2">Create E-Waste Request</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128] mt-2">{t('createEWasteRequest', 'Create E-Waste Request')}</h1>
           <p className="text-xs sm:text-sm text-[#718078]">
-            Declare your collected e-waste volume, evaluate recycler quoted rates with automated backend pricing validation, and broadcast requests to certified CPCB recyclers.
+            {t('eWasteManifestSubtitle', 'Declare your collected e-waste volume, evaluate recycler quoted rates with automated backend pricing validation, and broadcast requests to certified CPCB recyclers.')}
           </p>
         </div>
 
@@ -180,7 +182,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                E-Waste Category *
+                {t('eWasteCategory', 'E-Waste Category')} *
               </label>
               <select
                 value={category}
@@ -188,14 +190,14 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
                 {structuredEWasteCategories.map((c, i) => (
-                  <option key={i} value={c.name}>{c.name}</option>
+                  <option key={i} value={c.name}>{tCategory(c.name)}</option>
                 ))}
               </select>
             </div>
 
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Material Description / Material Type *
+                {t('materialDescription', 'Material Description / Material Type')} *
               </label>
               <input
                 type="text"
@@ -212,7 +214,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Lot Weight (Quantity) *
+                {t('lotWeight', 'Lot Weight (Quantity)')} *
               </label>
               <input
                 type="number"
@@ -227,31 +229,31 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
 
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Unit of Measurement
+                {t('unitOfMeasurement', 'Unit of Measurement')}
               </label>
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
-                <option value="kg">Kilograms (kg)</option>
-                <option value="units">Units / Pieces</option>
-                <option value="tons">Metric Tons (MT)</option>
+                <option value="kg">{t('unitKg', 'Kilograms (kg)')}</option>
+                <option value="units">{t('unitUnits', 'Units / Pieces')}</option>
+                <option value="tons">{t('unitTons', 'Metric Tons (MT)')}</option>
               </select>
             </div>
 
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Condition
+                {t('conditionLabel', 'Condition')}
               </label>
               <select
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
-                <option value="Non-working / Scrap">Non-working / Scrap</option>
-                <option value="Intact / Used">Intact / Used</option>
-                <option value="Partially Dismantled">Partially Dismantled</option>
+                <option value="Non-working / Scrap">{tCondition('Non-working / Scrap')}</option>
+                <option value="Intact / Used">{tCondition('Working / Repairable')}</option>
+                <option value="Partially Dismantled">{tCondition('Mixed Condition')}</option>
               </select>
             </div>
           </div>
@@ -260,21 +262,21 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Storage Location / Hub *
+                {t('storageLocationHub', 'Storage Location / Hub')} *
               </label>
               <input
                 type="text"
                 required
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="Guindy Industrial Estate, Chennai"
+                placeholder={t('placeholderLocation')}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl px-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
               />
             </div>
 
             <div>
               <label className="text-xs font-extrabold text-[#203128] block mb-1">
-                Collection Date *
+                {t('collectionDate', 'Collection Date')} *
               </label>
               <input
                 type="date"
@@ -296,10 +298,10 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 </div>
                 <div>
                   <span className="text-[10px] font-black uppercase tracking-wider text-[#3F7655]">
-                    Pricing & Validation Engine
+                    {t('pricingAndValidationEngine', 'Pricing & Validation Engine')}
                   </span>
                   <h3 className="text-base font-black text-[#203128]">
-                    Quoted Amount
+                    {t('quotedAmountSection', 'Quoted Amount')}
                   </h3>
                 </div>
               </div>
@@ -308,11 +310,11 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 {isValidating && (
                   <span className="text-[11px] font-bold text-[#3F7655] flex items-center gap-1 bg-[#DDEBD8] px-2.5 py-1 rounded-full animate-pulse">
                     <RefreshCw className="w-3 h-3 animate-spin" />
-                    Validating with Backend...
+                    {t('validatingWithBackend', 'Validating with Backend...')}
                   </span>
                 )}
                 <span className="text-[10px] font-black uppercase text-[#3F7655] bg-[#DDEBD8] px-2.5 py-1 rounded-full">
-                  Tolerance: ±{displayTolerance}%
+                  {t('toleranceLabel', 'Tolerance')}: ±{displayTolerance}%
                 </span>
               </div>
             </div>
@@ -321,7 +323,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-black text-[#203128] flex items-center gap-1.5">
-                  <span>Recycler Quoted Price (₹/{unit}) *</span>
+                  <span>{t('recyclerQuotedPrice', 'Recycler Quoted Price')} (₹/{unit}) *</span>
                 </label>
                 <button
                   type="button"
@@ -332,7 +334,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                   className="text-[11px] font-bold text-[#3F7655] hover:text-[#244936] hover:underline flex items-center gap-1 cursor-pointer"
                 >
                   <RefreshCw className="w-3 h-3" />
-                  <span>Use Benchmark (₹{displayBenchmark}/{unit})</span>
+                  <span>{t('useBenchmarkRate', 'Use Benchmark')} (₹{displayBenchmark}/{unit})</span>
                 </button>
               </div>
 
@@ -358,7 +360,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 </span>
               </div>
               <p className="text-[11px] text-[#718078] mt-1.5">
-                Enter the unit price offered by the recycler or your target rate to check instant regulatory clearance.
+                {t('quotedPriceHelpText', 'Enter the unit price offered by the recycler or your target rate to check instant regulatory clearance.')}
               </p>
             </div>
 
@@ -367,46 +369,46 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
               {/* 1. Benchmark Rate */}
               <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
                 <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  Benchmark Rate
+                  {t('benchmarkPriceLabel', 'Benchmark Rate')}
                 </span>
                 <span className="text-base font-black text-[#203128] block">
                   ₹{displayBenchmark} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
                 </span>
                 <span className="text-[10px] font-medium text-[#718078] block">
-                  CPCB reference rate
+                  {t('cpcbReferenceRateLabel', 'CPCB reference rate')}
                 </span>
               </div>
 
               {/* 2. Allowed Price Range */}
               <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
                 <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  Allowed Price Range
+                  {t('allowedPriceRange', 'Allowed Price Range')}
                 </span>
                 <span className="text-sm font-black text-[#3F7655] block truncate">
                   ₹{minPrice} – ₹{maxPrice} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
                 </span>
                 <span className="text-[10px] font-medium text-[#718078] block">
-                  Band of ±{displayTolerance}% from benchmark
+                  {t('toleranceBandText', 'Band of ±{tolerance}% from benchmark', { tolerance: displayTolerance })}
                 </span>
               </div>
 
               {/* 3. Recycler Quoted Price */}
               <div className="p-3.5 bg-white rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
                 <span className="text-[10px] font-extrabold uppercase text-[#718078] block tracking-wide">
-                  Recycler Quoted Price
+                  {t('recyclerQuotedPrice', 'Recycler Quoted Price')}
                 </span>
                 <span className="text-base font-black text-[#203128] block">
                   ₹{parsedQuote || 0} <span className="text-xs font-bold text-[#718078]">/ {unit}</span>
                 </span>
                 <span className="text-[10px] font-semibold block text-[#718078]">
-                  Declared unit offer
+                  {t('declaredUnitOfferLabel', 'Declared unit offer')}
                 </span>
               </div>
 
               {/* 4. Estimated Total Amount = Lot Weight × Recycler Quoted Price */}
               <div className="p-3.5 bg-[#DDEBD8]/60 rounded-2xl border border-[#3F7655]/30 shadow-sm space-y-1">
                 <span className="text-[10px] font-extrabold uppercase text-[#244936] block tracking-wide">
-                  Estimated Total Amount
+                  {t('estimatedTotalAmount', 'Estimated Total Amount')}
                 </span>
                 <span className="text-base font-black text-[#244936] block">
                   ₹{estimatedTotalAmount.toLocaleString()}
@@ -450,23 +452,23 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                             ? 'bg-rose-600 text-white'
                             : 'bg-amber-600 text-white'
                       }`}>
-                        {validation.badgeText}
+                        {validation.isCleared ? t('preClearedBadge', 'PRE-CLEARED ✅') : t('notClearedBadge', 'NOT CLEARED ❌')}
                       </span>
 
                       {!validation.isCleared && (
                         <span className="text-[11px] font-black uppercase text-rose-700 bg-rose-100 px-2 py-0.5 rounded-md">
-                          {validation.position === 'BELOW_RANGE' ? 'Below Allowed Range' : 'Above Allowed Range'}
+                          {validation.position === 'BELOW_RANGE' ? t('belowAllowedRange', 'Below Allowed Range') : t('aboveAllowedRange', 'Above Allowed Range')}
                         </span>
                       )}
                     </div>
 
                     <p className="text-xs font-bold mt-1">
                       {validation.isCleared ? (
-                        <span>The quoted price of <strong className="text-[#3F7655]">₹{parsedQuote}/{unit}</strong> is within the allowed fair price range (₹{minPrice} – ₹{maxPrice}/{unit}). Instant pre-clearance granted.</span>
+                        <span>{t('preClearedMessageText', 'The quoted price of ₹{quote}/{unit} is within the allowed fair price range (₹{min} – ₹{max}/{unit}). Instant pre-clearance granted.', { quote: parsedQuote, unit, min: minPrice, max: maxPrice })}</span>
                       ) : validation.position === 'BELOW_RANGE' ? (
-                        <span>The quoted price of <strong className="text-rose-700">₹{parsedQuote}/{unit}</strong> is <strong>BELOW</strong> the allowed fair range (Minimum allowed: ₹{minPrice}/{unit}) by {validation.diffPercent}%.</span>
+                        <span>{t('belowRangeMessageText', 'The quoted price of ₹{quote}/{unit} is BELOW the allowed fair range (Minimum allowed: ₹{min}/{unit}) by {percent}%.', { quote: parsedQuote, unit, min: minPrice, percent: validation.diffPercent })}</span>
                       ) : (
-                        <span>The quoted price of <strong className="text-amber-700">₹{parsedQuote}/{unit}</strong> is <strong>ABOVE</strong> the allowed fair range (Maximum allowed: ₹{maxPrice}/{unit}) by {validation.diffPercent}%.</span>
+                        <span>{t('aboveRangeMessageText', 'The quoted price of ₹{quote}/{unit} is ABOVE the allowed fair range (Maximum allowed: ₹{max}/{unit}) by {percent}%.', { quote: parsedQuote, unit, max: maxPrice, percent: validation.diffPercent })}</span>
                       )}
                     </p>
                   </div>
@@ -475,7 +477,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                 <div className="text-[11px] font-extrabold sm:text-right shrink-0">
                   {validation.isCleared ? (
                     <span className="text-[#3F7655] bg-white/80 px-2.5 py-1 rounded-xl border border-[#3F7655]/20 block">
-                      ✓ Ready for Immediate Broadcast
+                      {t('readyForImmediateBroadcast', '✓ Ready for Immediate Broadcast')}
                     </span>
                   ) : (
                     <span className={`px-2.5 py-1 rounded-xl border block ${
@@ -483,7 +485,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
                         ? 'bg-white text-rose-700 border-rose-200' 
                         : 'bg-white text-amber-800 border-amber-200'
                     }`}>
-                      ⚠️ Price Out of Bounds
+                      {t('priceOutOfBounds', '⚠️ Price Out of Bounds')}
                     </span>
                   )}
                 </div>
@@ -494,13 +496,13 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
           {/* Notes */}
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              Additional Inspection Notes
+              {t('additionalInspectionNotes', 'Additional Inspection Notes')}
             </label>
             <textarea
               rows="2"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="e.g. Dry indoor storage, segregated into anti-static bins..."
+              placeholder={t('placeholderStorageNotes')}
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl p-4 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
             />
           </div>
@@ -511,7 +513,7 @@ export default function RegisterWaste({ benchmarkPrices = mockBenchmarkPrices, o
             className="w-full py-4 bg-[#3F7655] hover:bg-[#244936] text-white font-black text-xs rounded-2xl shadow-md transition cursor-pointer flex items-center justify-center gap-2"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Submit E-Waste Request & Broadcast to Recyclers</span>
+            <span>{t('submitAndBroadcastBtn', 'Submit E-Waste Request & Broadcast to Recyclers')}</span>
           </button>
         </form>
       </div>

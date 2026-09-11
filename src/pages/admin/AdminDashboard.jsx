@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Users, Package, DollarSign, Scale, AlertTriangle, ArrowRight, ShieldAlert, CheckCircle2 } from 'lucide-react';
 import StatCard from '../../components/Cards/StatCard';
 import { mockCollectors, mockRecyclers, mockWasteLots, mockTransactions, mockAdmin } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function AdminDashboard({
   collectors = mockCollectors,
@@ -11,6 +12,7 @@ export default function AdminDashboard({
   transactions = mockTransactions
 }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const totalCollectors = (collectors || mockCollectors).length;
   const verifiedCollectors = (collectors || mockCollectors).filter(c => c.phone_verified || c.phoneVerified).length;
@@ -26,17 +28,17 @@ export default function AdminDashboard({
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-black uppercase tracking-wider text-[#F2C94C] bg-white/10 px-3 py-0.5 rounded-full">
-              State Regulatory Console
+              {t('stateRegulatoryConsole', 'State Regulatory Console')}
             </span>
             <span className="text-xs font-black text-emerald-300 bg-emerald-950 px-2.5 py-0.5 rounded-full border border-emerald-800">
-              CPCB / TNPCB Master Authority
+              {t('cpcbMasterAuthority', 'CPCB / TNPCB Master Authority')}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black mt-2">
-            Tamil Nadu E-Waste Command Center
+            {t('commandCenterTitle', 'Tamil Nadu E-Waste Command Center')}
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
-            System-wide oversight for informal collectors, authorized recyclers, price integrity, and CPCB EPR compliance.
+            {t('systemWideOversight', 'System-wide oversight for informal collectors, authorized recyclers, price integrity, and CPCB EPR compliance.')}
           </p>
         </div>
 
@@ -46,7 +48,7 @@ export default function AdminDashboard({
             className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#14291E] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
           >
             <ShieldCheck className="w-4 h-4" />
-            <span>Review Pending Verifications</span>
+            <span>{t('reviewPendingVerifications', 'Review Pending Verifications')}</span>
           </button>
         </div>
       </div>
@@ -58,16 +60,16 @@ export default function AdminDashboard({
             <div className="w-10 h-10 rounded-xl bg-[#DDEBD8] text-[#244936] flex items-center justify-center font-bold mb-3">
               <Users className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Collectors</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('collectorsTitle', 'Collectors')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Audit registered collector profiles, verify OTP status, and monitor volume throughput.
+              {t('auditRegisteredCollectors', 'Audit registered collector profiles, verify OTP status, and monitor volume throughput.')}
             </p>
           </div>
           <Link
             to="/admin/collectors"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Manage Collectors</span>
+            <span>{t('manageCollectors', 'Manage Collectors')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -77,16 +79,16 @@ export default function AdminDashboard({
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold mb-3">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Recyclers</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('recyclersTitle', 'Recyclers')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Verify CPCB licenses, manage processing quotas, and inspect facility capacities.
+              {t('verifyCpcbLicenses', 'Verify CPCB licenses, manage processing quotas, and inspect facility capacities.')}
             </p>
           </div>
           <Link
             to="/admin/recyclers"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Manage Recyclers</span>
+            <span>{t('manageRecyclers', 'Manage Recyclers')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -96,16 +98,16 @@ export default function AdminDashboard({
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold mb-3">
               <Package className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Waste Lots</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('wasteLotsTitle', 'Waste Lots')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Inspect active material declarations, tolerance compliance, and QR traceability.
+              {t('inspectActiveDeclarations', 'Inspect active material declarations, tolerance compliance, and QR traceability.')}
             </p>
           </div>
           <Link
             to="/admin/waste-lots"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Audit Waste Lots</span>
+            <span>{t('auditWasteLots', 'Audit Waste Lots')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -115,16 +117,16 @@ export default function AdminDashboard({
             <div className="w-10 h-10 rounded-xl bg-purple-100 text-purple-800 flex items-center justify-center font-bold mb-3">
               <ShieldAlert className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Verification Queue</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('verificationQueue', 'Verification Queue')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Review and approve pending recycler credentials and flagged price discrepancy cases.
+              {t('reviewAndApprovePending', 'Review and approve pending recycler credentials and flagged price discrepancy cases.')}
             </p>
           </div>
           <Link
             to="/admin/verification"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Open Queue</span>
+            <span>{t('openQueue', 'Open Queue')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

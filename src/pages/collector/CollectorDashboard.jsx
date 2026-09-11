@@ -16,7 +16,7 @@ export default function CollectorDashboard({
   collectorProfile = mockCollector 
 }) {
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t, tCategory } = useTranslation();
 
   const myLots = materialLots || mockWasteLots;
   const allOffers = offers || mockOffers;
@@ -34,20 +34,20 @@ export default function CollectorDashboard({
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-black uppercase tracking-wider text-[#F2C94C] bg-white/10 px-3 py-0.5 rounded-full">
-              Collector Portal
+              {t('collectorPortal')}
             </span>
             {collectorProfile?.phone_verified && (
               <span className="text-xs font-black text-[#244936] bg-[#F2C94C] px-2.5 py-0.5 rounded-full flex items-center gap-1">
                 <CheckCircle2 className="w-3 h-3" />
-                Verified
+                {t('phoneVerifiedBadge')}
               </span>
             )}
           </div>
           <h1 className="text-2xl sm:text-3xl font-black mt-2">
-            Welcome back, {collectorProfile?.name || "Ramesh Kumar"}!
+            {t('goodMorningUser', { name: collectorProfile?.name || "Ramesh Kumar" })}
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
-            Create authenticated e-waste requests, receive transparent recycler bids, and track secure escrow payouts.
+            {t('eWasteManifestSubtitle')}
           </p>
         </div>
 
@@ -57,7 +57,7 @@ export default function CollectorDashboard({
             className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#244936] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer shrink-0"
           >
             <Plus className="w-4 h-4" />
-            <span>Create E-Waste Request</span>
+            <span>{t('createEWasteRequest')}</span>
           </button>
         </div>
       </div>
@@ -70,16 +70,16 @@ export default function CollectorDashboard({
             <div className="w-10 h-10 rounded-xl bg-[#DDEBD8] text-[#244936] flex items-center justify-center font-bold mb-3">
               <Plus className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Create E-Waste Request</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('createEWasteRequest')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Declare material category, weight, and condition with automated benchmark price bounds.
+              {t('addEWasteSubtitle')}
             </p>
           </div>
           <Link
             to="/collector/register-waste"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Create Request Now</span>
+            <span>{t('navRegisterEWaste')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -90,16 +90,16 @@ export default function CollectorDashboard({
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold mb-3">
               <Inbox className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">My Requests</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('myDeclaredLots')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              View active requests, review incoming offers from verified recyclers, and accept fair rates.
+              {t('availableRequestsDesc')}
             </p>
           </div>
           <Link
             to="/collector/requests"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>View All Requests</span>
+            <span>{t('viewDetails')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -110,16 +110,16 @@ export default function CollectorDashboard({
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold mb-3">
               <Award className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Transactions & Invoices</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('transactionsTitle')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Review settled payments, escrow releases, and download digital weight receipts.
+              {t('transactionsSubtitle')}
             </p>
           </div>
           <Link
             to="/collector/transactions"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>View Invoices</span>
+            <span>{t('navTransactions')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -129,14 +129,14 @@ export default function CollectorDashboard({
       <div className="bg-white p-6 sm:p-8 rounded-[32px] border border-[#3F7655]/20 shadow-md space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-black text-[#203128]">Recent E-Waste Requests</h2>
-            <p className="text-xs text-[#718078]">Latest material requests in offer review and dispatch pipeline.</p>
+            <h2 className="text-xl font-black text-[#203128]">{t('myDeclaredLots')}</h2>
+            <p className="text-xs text-[#718078]">{t('availableRequestsDesc')}</p>
           </div>
           <Link
             to="/collector/requests"
             className="text-xs font-black text-[#3F7655] hover:underline flex items-center gap-1"
           >
-            <span>View All ({myLots.length})</span>
+            <span>{t('viewDetails')} ({myLots.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -156,7 +156,7 @@ export default function CollectorDashboard({
                   <div className="flex items-start justify-between gap-2 border-b border-[#3F7655]/10 pb-2.5">
                     <div>
                       <span className="text-[10px] font-extrabold uppercase text-[#3F7655] bg-[#DDEBD8] px-2 py-0.5 rounded-full">
-                        {lot.category}
+                        {tCategory(lot.category)}
                       </span>
                       <h4 className="text-sm font-black text-[#203128] mt-1">{lot.material}</h4>
                       <span className="text-[11px] font-mono text-[#718078] font-bold">{lot.id}</span>
@@ -166,13 +166,13 @@ export default function CollectorDashboard({
 
                   <div className="grid grid-cols-2 gap-2 mt-3 text-xs text-[#718078]">
                     <div>
-                      <span className="text-[10px] block uppercase font-bold">Quantity</span>
+                      <span className="text-[10px] block uppercase font-bold">{t('quantityLabel')}</span>
                       <strong className="text-[#203128]">{qty} {unit}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] block uppercase font-bold">Offers</span>
+                      <span className="text-[10px] block uppercase font-bold">{t('statusOFFER_RECEIVED')}</span>
                       <strong className={reqOffers.length > 0 ? "text-emerald-700" : "text-amber-700"}>
-                        {reqOffers.length > 0 ? `${reqOffers.length} Received` : "Awaiting"}
+                        {reqOffers.length > 0 ? `${reqOffers.length} Received` : t('statusAWAITING_OFFERS')}
                       </strong>
                     </div>
                   </div>
@@ -180,13 +180,13 @@ export default function CollectorDashboard({
 
                 <div className="pt-2.5 border-t border-[#3F7655]/10 flex items-center justify-between">
                   <span className="text-[11px] font-bold text-[#3F7655]">
-                    Benchmark: ₹{lot.benchmarkPrice || 350}/{unit}
+                    {t('benchmarkPriceLabel')}: ₹{lot.benchmarkPrice || 350}/{unit}
                   </span>
                   <button
                     onClick={() => navigate(`/collector/requests/${lot.id}`)}
                     className="px-3 py-1.5 bg-[#3F7655] hover:bg-[#244936] text-white rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer"
                   >
-                    <span>View</span>
+                    <span>{t('viewDetails')}</span>
                     <ArrowRight className="w-3 h-3" />
                   </button>
                 </div>

@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Search, MapPin, Phone, Clock, ShieldCheck, ArrowRight, Navigation } from 'lucide-react';
 import { mockRecyclers } from '../../data/mockData';
 import { structuredEWasteCategories } from '../../data/scrapPrices';
+import { useTranslation } from '../../i18n';
 
 export default function Locations() {
   const navigate = useNavigate();
+  const { t, tCategory } = useTranslation();
   const [wasteTypeFilter, setWasteTypeFilter] = useState('ALL');
   const [locationFilter, setLocationFilter] = useState('ALL');
   const [distanceFilter, setDistanceFilter] = useState('ALL');
@@ -16,10 +18,10 @@ export default function Locations() {
   const recyclerLocations = (mockRecyclers || []).map((r, idx) => ({
     ...r,
     distanceKm: [4.2, 12.8, 8.5, 18.0, 25.4][idx % 5],
-    operatingHours: "Mon – Sat: 9:00 AM – 6:00 PM",
+    operatingHours: t('monSatHours', 'Mon – Sat: 9:00 AM – 6:00 PM'),
     contactPhone: r.phone || "+91 94441 23456",
     contactEmail: r.email || "info@recycler.com",
-    authorizationStatus: r.verificationStatus === 'VERIFIED' ? '✓ Authorized CPCB Facility' : '⏳ Pending Authorization',
+    authorizationStatus: r.verificationStatus === 'VERIFIED' ? `✓ ${t('authorizedCpcbFacility', 'Authorized CPCB Facility')}` : `⏳ ${t('pendingAuthorization', 'Pending Authorization')}`,
     isAuthorized: r.verificationStatus === 'VERIFIED',
   }));
 
@@ -49,13 +51,13 @@ export default function Locations() {
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-extrabold uppercase tracking-wider border border-[#3F7655]/20">
-            <MapPin className="w-3.5 h-3.5" /> RECYCLING POINTS DIRECTORY
+            <MapPin className="w-3.5 h-3.5" /> {t('recyclingPointsDirectoryBadge', 'RECYCLING POINTS DIRECTORY')}
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#203128] tracking-tight">
-            Find Authorized Recycling Points
+            {t('findAuthorizedPointsTitle', 'Find Authorized Recycling Points')}
           </h1>
           <p className="text-base text-[#718078] font-medium">
-            Locate CPCB & TNPCB verified e-waste collection hubs and material recovery facilities near you.
+            {t('findAuthorizedPointsSub', 'Locate CPCB & TNPCB verified e-waste collection hubs and material recovery facilities near you.')}
           </p>
         </div>
 
@@ -67,57 +69,57 @@ export default function Locations() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by facility name or area..."
+              placeholder={t('searchFacilityPlaceholder', 'Search by facility name or area...')}
               className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-12 pr-4 py-3 text-xs font-semibold text-[#203128] focus:bg-white focus:border-[#3F7655] focus:outline-none"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 pt-2">
             <div>
-              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">Waste Type / Material</label>
+              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">{t('wasteTypeMaterialLabel', 'Waste Type / Material')}</label>
               <select
                 value={wasteTypeFilter}
                 onChange={(e) => setWasteTypeFilter(e.target.value)}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-xl px-3 py-2 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
-                <option value="ALL">All Materials</option>
+                <option value="ALL">{t('allMaterials', 'All Materials')}</option>
                 {structuredEWasteCategories && structuredEWasteCategories.map((c, i) => (
-                  <option key={i} value={c.name}>{c.name}</option>
+                  <option key={i} value={c.name}>{tCategory(c.name)}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">Location / District</label>
+              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">{t('locationDistrictLabel', 'Location / District')}</label>
               <select
                 value={locationFilter}
                 onChange={(e) => setLocationFilter(e.target.value)}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-xl px-3 py-2 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
                 {locationsList.map((loc, i) => (
-                  <option key={i} value={loc}>{loc === 'ALL' ? 'All Districts' : loc}</option>
+                  <option key={i} value={loc}>{loc === 'ALL' ? t('allDistricts', 'All Districts') : loc}</option>
                 ))}
               </select>
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">Distance Radius</label>
+              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">{t('distanceRadiusLabel', 'Distance Radius')}</label>
               <select
                 value={distanceFilter}
                 onChange={(e) => setDistanceFilter(e.target.value)}
                 className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-xl px-3 py-2 text-xs font-bold text-[#203128] focus:bg-white focus:outline-none"
               >
-                <option value="ALL">Any Distance</option>
-                <option value="10">Within 10 km</option>
-                <option value="20">Within 20 km</option>
+                <option value="ALL">{t('anyDistance', 'Any Distance')}</option>
+                <option value="10">{t('within10km', 'Within 10 km')}</option>
+                <option value="20">{t('within20km', 'Within 20 km')}</option>
               </select>
             </div>
 
             <div>
-              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">Authorization</label>
+              <label className="text-[10px] font-black uppercase text-[#718078] block mb-1">{t('authorizationLabel', 'Authorization')}</label>
               <div className="flex items-center gap-2 pt-1 text-xs font-bold text-[#3F7655]">
                 <ShieldCheck className="w-4 h-4" />
-                <span>CPCB Verified Only</span>
+                <span>{t('cpcbVerifiedOnly', 'CPCB Verified Only')}</span>
               </div>
             </div>
           </div>
@@ -132,10 +134,10 @@ export default function Locations() {
               <div className="flex items-center justify-between pb-3 border-b border-[#3F7655]/10">
                 <h3 className="text-sm font-black text-[#203128] flex items-center gap-2">
                   <Navigation className="w-4 h-4 text-[#3F7655]" />
-                  <span>Interactive Map View</span>
+                  <span>{t('interactiveMapView', 'Interactive Map View')}</span>
                 </h3>
                 <span className="text-[10px] font-extrabold text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                  {filteredRecyclers.length} Facilities Found
+                  {t('facilitiesFoundCount', '{count} Facilities Found', { count: filteredRecyclers.length })}
                 </span>
               </div>
 
@@ -156,14 +158,14 @@ export default function Locations() {
                 ))}
 
                 <div className="bg-white/90 backdrop-blur px-4 py-2 rounded-full border border-[#3F7655]/20 shadow-sm text-xs font-black text-[#244936] pointer-events-none">
-                  Tamil Nadu Recycling Map Grid
+                  {t('tnRecyclingMapGrid', 'Tamil Nadu Recycling Map Grid')}
                 </div>
               </div>
             </div>
 
             <div className="p-4 bg-[#FAF8F2] rounded-2xl border border-[#3F7655]/15 text-xs text-[#718078]">
-              <strong className="text-[#203128] font-bold block mb-1">Authorization Notice:</strong>
-              All points listed comply with Central Pollution Control Board (CPCB) Extended Producer Responsibility rules.
+              <strong className="text-[#203128] font-bold block mb-1">{t('authorizationNoticeLabel', 'Authorization Notice:')}</strong>
+              {t('authorizationNoticeText', 'All points listed comply with Central Pollution Control Board (CPCB) Extended Producer Responsibility rules.')}
             </div>
           </div>
 
@@ -181,7 +183,7 @@ export default function Locations() {
                       {rec.isAuthorized && (
                         <span className="text-[10px] font-black text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full flex items-center gap-1">
                           <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                          <span>Authorized</span>
+                          <span>{t('authorizedBadge', 'Authorized')}</span>
                         </span>
                       )}
                     </div>
@@ -192,17 +194,17 @@ export default function Locations() {
                   </div>
 
                   <span className="text-xs font-black text-[#3F7655] bg-[#DDEBD8] px-3 py-1 rounded-full self-start sm:self-auto">
-                    {rec.distanceKm} km away
+                    {rec.distanceKm} km {t('away', 'away')}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span className="text-[10px] font-extrabold uppercase text-[#718078]">Accepted Waste Types:</span>
+                    <span className="text-[10px] font-extrabold uppercase text-[#718078]">{t('acceptedWasteTypesLabel', 'Accepted Waste Types:')}</span>
                     <div className="flex flex-wrap gap-1 mt-1">
                       {(rec.acceptedCategories || []).map((cat, cIdx) => (
                         <span key={cIdx} className="px-2 py-0.5 bg-[#F8F5EA] border border-[#3F7655]/15 text-[#203128] rounded-md text-[10px] font-bold">
-                          {cat}
+                          {tCategory(cat)}
                         </span>
                       ))}
                     </div>
@@ -228,7 +230,7 @@ export default function Locations() {
                     onClick={() => setSelectedRecycler(rec)}
                     className="px-4 py-2 rounded-xl bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs shadow transition cursor-pointer flex items-center gap-1.5"
                   >
-                    <span>View Details</span>
+                    <span>{t('viewDetails', 'View Details')}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -244,7 +246,7 @@ export default function Locations() {
               <div className="flex items-center justify-between pb-4 border-b border-[#3F7655]/15">
                 <div>
                   <span className="text-[10px] font-black uppercase text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                    RECYCLER DETAILS
+                    {t('recyclerDetailsTitle', 'RECYCLER DETAILS')}
                   </span>
                   <h3 className="text-xl font-black text-[#203128] mt-1">{selectedRecycler.companyName}</h3>
                 </div>
@@ -257,19 +259,19 @@ export default function Locations() {
               </div>
 
               <div className="space-y-3 text-xs font-semibold text-[#203128]">
-                <p><strong>Location:</strong> {selectedRecycler.location}</p>
-                <p><strong>Authorization Status:</strong> {selectedRecycler.authorizationStatus}</p>
-                <p><strong>Registration No:</strong> {selectedRecycler.cpcbRegistrationNo}</p>
-                <p><strong>Contact Person:</strong> {selectedRecycler.contactPerson}</p>
-                <p><strong>Phone:</strong> {selectedRecycler.contactPhone}</p>
-                <p><strong>Email:</strong> {selectedRecycler.contactEmail}</p>
-                <p><strong>Operating Hours:</strong> {selectedRecycler.operatingHours}</p>
+                <p><strong>{t('locationLabel', 'Location')}:</strong> {selectedRecycler.location}</p>
+                <p><strong>{t('authorizationStatusLabel', 'Authorization Status')}:</strong> {selectedRecycler.authorizationStatus}</p>
+                <p><strong>{t('regNoLabel', 'Registration No')}:</strong> {selectedRecycler.cpcbRegistrationNo}</p>
+                <p><strong>{t('contactPersonLabel', 'Contact Person')}:</strong> {selectedRecycler.contactPerson}</p>
+                <p><strong>{t('phoneLabel', 'Phone')}:</strong> {selectedRecycler.contactPhone}</p>
+                <p><strong>{t('emailLabel', 'Email')}:</strong> {selectedRecycler.contactEmail}</p>
+                <p><strong>{t('operatingHoursLabel', 'Operating Hours')}:</strong> {selectedRecycler.operatingHours}</p>
                 <div>
-                  <strong>Accepted Materials:</strong>
+                  <strong>{t('acceptedMaterialsLabel', 'Accepted Materials')}:</strong>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {(selectedRecycler.acceptedCategories || []).map((c, i) => (
                       <span key={i} className="px-2 py-0.5 bg-[#F8F5EA] border border-[#3F7655]/15 rounded text-[10px] font-bold">
-                        {c}
+                        {tCategory(c)}
                       </span>
                     ))}
                   </div>
@@ -281,7 +283,7 @@ export default function Locations() {
                   onClick={() => setSelectedRecycler(null)}
                   className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl cursor-pointer"
                 >
-                  Close
+                  {t('close', 'Close')}
                 </button>
                 <button
                   onClick={() => {
@@ -290,7 +292,7 @@ export default function Locations() {
                   }}
                   className="px-5 py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow cursor-pointer"
                 >
-                  Match Waste Lot with this Recycler →
+                  {t('matchWasteLotWithRecycler', 'Match Waste Lot with this Recycler')} →
                 </button>
               </div>
             </div>

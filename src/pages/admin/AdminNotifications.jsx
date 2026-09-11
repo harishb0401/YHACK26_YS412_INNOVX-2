@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { Bell, ShieldCheck, AlertTriangle, Building, Clock, Users } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function AdminNotifications() {
+  const { t } = useTranslation();
   const [list, setList] = useState([
     {
       id: 'NOTIF-ADM-1',
@@ -37,9 +39,9 @@ export default function AdminNotifications() {
     <div className="space-y-6 max-w-4xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Admin Notifications</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('navNotifications')}</h1>
           <p className="text-xs sm:text-sm text-[#718078]">
-            State-wide compliance alerts, facility verifications, and regulatory notifications.
+            {t('systemWideOversight')}
           </p>
         </div>
 
@@ -47,7 +49,7 @@ export default function AdminNotifications() {
           onClick={markAllRead}
           className="px-4 py-2 bg-white hover:bg-[#DDEBD8] text-[#244936] border border-[#3F7655]/20 rounded-xl font-bold text-xs transition cursor-pointer self-start sm:self-auto shadow-sm"
         >
-          Mark all as read
+          {t('unreadNotifications')}
         </button>
       </div>
 
@@ -67,13 +69,13 @@ export default function AdminNotifications() {
 
             <div className="flex-1 space-y-1">
               <div className="flex items-center justify-between gap-2">
-                <h3 className="text-sm font-black text-[#203128]">{item.title}</h3>
+                <h3 className="text-sm font-black text-[#203128]">{t(item.title)}</h3>
                 <span className="text-[11px] text-[#718078] flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {item.time}
                 </span>
               </div>
-              <p className="text-xs text-[#718078] leading-relaxed">{item.message}</p>
+              <p className="text-xs text-[#718078] leading-relaxed">{t(item.message)}</p>
             </div>
           </div>
         ))}

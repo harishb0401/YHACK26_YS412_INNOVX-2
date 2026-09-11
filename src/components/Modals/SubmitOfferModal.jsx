@@ -70,7 +70,7 @@ export default function SubmitOfferModal({
             </div>
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                RECYCLER BIDDING WORKFLOW
+                {t("recyclerBiddingWorkflow")}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-0.5">
                 {t("submitOffer")}
@@ -184,7 +184,7 @@ export default function SubmitOfferModal({
               rows="2"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add payment terms, weighing protocols, or logistics details..."
+              placeholder={t("offerNotesPlaceholder")}
               className="w-full text-xs font-medium bg-white border border-[#3F7655]/20 rounded-xl p-3 focus:outline-none focus:border-[#3F7655]"
             />
           </div>

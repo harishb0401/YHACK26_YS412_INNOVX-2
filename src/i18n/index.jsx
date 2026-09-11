@@ -66,7 +66,16 @@ export const LanguageProvider = ({ children }) => {
       "Glass": "catGlass",
       "Metal": "catFerrous",
       "Organic": "catOrganic",
-      "Textiles": "catTextiles"
+      "Textiles": "catTextiles",
+      "Mobile phones": "catMobilePhones",
+      "Laptops": "catLaptops",
+      "Computers": "catComputers",
+      "Monitors": "catMonitors",
+      "Televisions": "catTelevisions",
+      "Printers": "catPrinters",
+      "Cables & chargers": "catCablesChargers",
+      "Circuit boards": "catCircuitBoards",
+      "Other electronics": "catOtherElectronics"
     };
     const key = keyMap[cat] || cat;
     return t(key, cat);
@@ -80,10 +89,15 @@ export const LanguageProvider = ({ children }) => {
       "Draft": "statusDRAFT",
       "SUBMITTED": "statusSUBMITTED",
       "Submitted": "statusSUBMITTED",
+      "REGISTERED": "statusREGISTERED",
+      "Registered": "statusREGISTERED",
+      "MATCHED": "statusMATCHED",
+      "Matched": "statusMATCHED",
+      "DISPATCHED": "statusDISPATCHED",
+      "Dispatched": "statusDISPATCHED",
       "AWAITING_OFFERS": "statusAWAITING_OFFERS",
       "Awaiting Offers": "statusAWAITING_OFFERS",
       "AVAILABLE": "statusAVAILABLE",
-      "MATCHED": "statusMATCHED",
       "OFFER_RECEIVED": "statusOFFER_RECEIVED",
       "OFFERS_RECEIVED": "statusOFFERS_RECEIVED",
       "Offers Received": "statusOFFERS_RECEIVED",
@@ -101,7 +115,6 @@ export const LanguageProvider = ({ children }) => {
 
       // Legacy and UI statuses
       "Pending": "statusPending",
-      "Matched": "statusMatched",
       "Pickup Scheduled": "statusPICKUP_SCHEDULED",
       "In Transit": "statusInTransit",
       "Received": "statusReceived",
@@ -122,6 +135,9 @@ export const LanguageProvider = ({ children }) => {
       "Recycled & Certified ✓": "statusRecycledCertified",
       "Normal Range": "statusNormalRange",
       "Flagged (+Above Ref)": "statusFlaggedAboveRef",
+      "OTP Verified": "statusOtpVerified",
+      "Not Verified": "statusNotVerified",
+      "Not verified": "statusNotVerified",
 
       // Recycler Verification Statuses
       "VERIFIED": "recStatusVERIFIED",

@@ -4,7 +4,7 @@ import { Search, CheckCircle2, XCircle, MapPin, ArrowRight, BookOpen, ShieldAler
 import { useTranslation } from '../../i18n';
 
 export default function RecycleGuide({ onOpenSearchModal }) {
-  const { t } = useTranslation();
+  const { t, tCategory } = useTranslation();
   const navigate = useNavigate();
   const [guideSearch, setGuideSearch] = useState('');
   const [selectedCatId, setSelectedCatId] = useState('mobiles');
@@ -15,170 +15,220 @@ export default function RecycleGuide({ onOpenSearchModal }) {
       id: 'mobiles',
       name: 'Mobile phones',
       icon: <Smartphone className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Old, unused, or damaged mobile phones, smartphones, and cellular devices.',
-      components: ['Printed Circuit Boards (PCBs)', 'Precious Metals (Gold, Silver, Copper)', 'Polycarbonate Plastics', 'Lithium-ion Battery'],
+      whatIsIt: t('rgMobWhatIsIt', 'Old, unused, or damaged mobile phones, smartphones, and cellular devices.'),
+      components: [
+        t('rgMobComp1', 'Printed Circuit Boards (PCBs)'),
+        t('rgMobComp2', 'Precious Metals (Gold, Silver, Copper)'),
+        t('rgMobComp3', 'Polycarbonate Plastics'),
+        t('rgMobComp4', 'Lithium-ion Battery')
+      ],
       dos: [
-        'Remove all personal data and perform a factory reset',
-        'Keep batteries safely separated where applicable',
-        'Hand over to authorized recycling channels'
+        t('rgMobDo1', 'Remove all personal data and perform a factory reset'),
+        t('rgMobDo2', 'Keep batteries safely separated where applicable'),
+        t('rgMobDo3', 'Hand over to authorized recycling channels')
       ],
       donts: [
-        'Do not throw electronics into regular waste bins',
-        'Do not puncture or damage lithium batteries',
-        'Do not burn electronic components or wires'
+        t('rgMobDont1', 'Do not throw electronics into regular waste bins'),
+        t('rgMobDont2', 'Do not puncture or damage lithium batteries'),
+        t('rgMobDont3', 'Do not burn electronic components or wires')
       ]
     },
     {
       id: 'laptops',
       name: 'Laptops',
       icon: <Laptop className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Portable notebook computers, ultrabooks, and laptop chargers.',
-      components: ['Motherboards & RAM Chips', 'Aluminum & Magnesium Alloy Casing', 'LCD/OLED Display Panels', 'Lithium-Polymer Batteries'],
+      whatIsIt: t('rgLapWhatIsIt', 'Portable notebook computers, ultrabooks, and laptop chargers.'),
+      components: [
+        t('rgLapComp1', 'Motherboards & RAM Chips'),
+        t('rgLapComp2', 'Aluminum & Magnesium Alloy Casing'),
+        t('rgLapComp3', 'LCD/OLED Display Panels'),
+        t('rgLapComp4', 'Lithium-Polymer Batteries')
+      ],
       dos: [
-        'Back up and erase hard disk drive data prior to disposal',
-        'Detach external chargers and cables for separate processing',
-        'Hand over intact to CPCB verified recyclers'
+        t('rgLapDo1', 'Back up and erase hard disk drive data prior to disposal'),
+        t('rgLapDo2', 'Detach external chargers and cables for separate processing'),
+        t('rgLapDo3', 'Hand over intact to CPCB verified recyclers')
       ],
       donts: [
-        'Do not dismantle display screens manually',
-        'Do not expose damaged laptop batteries to heat',
-        'Do not crush or incinerate laptop bodies'
+        t('rgLapDont1', 'Do not dismantle display screens manually'),
+        t('rgLapDont2', 'Do not expose damaged laptop batteries to heat'),
+        t('rgLapDont3', 'Do not crush or incinerate laptop bodies')
       ]
     },
     {
       id: 'computers',
       name: 'Computers',
       icon: <HardDrive className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Desktop PC towers, workstations, power supply units (PSUs), and internal drives.',
-      components: ['High-Grade Motherboards', 'Copper Heat Sinks & Wiring', 'Steel/Iron Chassis', 'Power Transformers'],
+      whatIsIt: t('rgCompWhatIsIt', 'Desktop PC towers, workstations, power supply units (PSUs), and internal drives.'),
+      components: [
+        t('rgCompComp1', 'High-Grade Motherboards'),
+        t('rgCompComp2', 'Copper Heat Sinks & Wiring'),
+        t('rgCompComp3', 'Steel/Iron Chassis'),
+        t('rgCompComp4', 'Power Transformers')
+      ],
       dos: [
-        'Remove data drives or execute cryptographic wipe',
-        'Keep metal casing intact during aggregation',
-        'Separate power cords for copper recovery'
+        t('rgCompDo1', 'Remove data drives or execute cryptographic wipe'),
+        t('rgCompDo2', 'Keep metal casing intact during aggregation'),
+        t('rgCompDo3', 'Separate power cords for copper recovery')
       ],
       donts: [
-        'Do not open power supply capacitors without safety tools',
-        'Do not discard heavy metal computer cases in municipal dumps',
-        'Do not burn wire insulation'
+        t('rgCompDont1', 'Do not open power supply capacitors without safety tools'),
+        t('rgCompDont2', 'Do not discard heavy metal computer cases in municipal dumps'),
+        t('rgCompDont3', 'Do not burn wire insulation')
       ]
     },
     {
       id: 'monitors',
       name: 'Monitors',
       icon: <Monitor className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Computer display monitors (LCD, LED, and legacy CRT glass monitors).',
-      components: ['Lead-containing CRT Glass', 'CCFL Backlight Tubes (Mercury trace)', 'Internal Driver PCBs', 'ABS Plastic Housings'],
+      whatIsIt: t('rgMonWhatIsIt', 'Computer display monitors (LCD, LED, and legacy CRT glass monitors).'),
+      components: [
+        t('rgMonComp1', 'Lead-containing CRT Glass'),
+        t('rgMonComp2', 'CCFL Backlight Tubes (Mercury trace)'),
+        t('rgMonComp3', 'Internal Driver PCBs'),
+        t('rgMonComp4', 'ABS Plastic Housings')
+      ],
       dos: [
-        'Handle CRT monitors with extreme care to prevent glass breakage',
-        'Store in dry, sheltered collection nodes',
-        'Hand over to certified e-waste dismantling units'
+        t('rgMonDo1', 'Handle CRT monitors with extreme care to prevent glass breakage'),
+        t('rgMonDo2', 'Store in dry, sheltered collection nodes'),
+        t('rgMonDo3', 'Hand over to certified e-waste dismantling units')
       ],
       donts: [
-        'Do not smash glass tubes or expose vacuum funnels',
-        'Do not dump broken screens in open spaces',
-        'Do not mix with household scrap iron'
+        t('rgMonDont1', 'Do not smash glass tubes or expose vacuum funnels'),
+        t('rgMonDont2', 'Do not dump broken screens in open spaces'),
+        t('rgMonDont3', 'Do not mix with household scrap iron')
       ]
     },
     {
       id: 'televisions',
       name: 'Televisions',
       icon: <Tv className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Smart TVs, flat screens, OLED displays, and older tube televisions.',
-      components: ['Mainboard Electronics', 'Power Inverters & Transformers', 'Polarized Display Filters', 'Copper Induction Coils'],
+      whatIsIt: t('rgTvWhatIsIt', 'Smart TVs, flat screens, OLED displays, and older tube televisions.'),
+      components: [
+        t('rgTvComp1', 'Mainboard Electronics'),
+        t('rgTvComp2', 'Power Inverters & Transformers'),
+        t('rgTvComp3', 'Polarized Display Filters'),
+        t('rgTvComp4', 'Copper Induction Coils')
+      ],
       dos: [
-        'Keep TV bodies structurally intact during transport',
-        'Keep remote controls and cords grouped with unit',
-        'Register for scheduled pickup with licensed recyclers'
+        t('rgTvDo1', 'Keep TV bodies structurally intact during transport'),
+        t('rgTvDo2', 'Keep remote controls and cords grouped with unit'),
+        t('rgTvDo3', 'Register for scheduled pickup with licensed recyclers')
       ],
       donts: [
-        'Do not break backlight lamps containing mercury vapour',
-        'Do not scavenge internal boards without ventilation',
-        'Do not leave out in wet weather'
+        t('rgTvDont1', 'Do not break backlight lamps containing mercury vapour'),
+        t('rgTvDont2', 'Do not scavenge internal boards without ventilation'),
+        t('rgTvDont3', 'Do not leave out in wet weather')
       ]
     },
     {
       id: 'printers',
       name: 'Printers',
       icon: <Printer className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'LaserJet, Inkjet, thermal printers, scanners, and multi-function copiers.',
-      components: ['Stepper Motors & Micro-controllers', 'Toner Cartridges & Ink Heads', 'Rubber Rollers & Metal Rods', 'Plastic Enclosures'],
+      whatIsIt: t('rgPrintWhatIsIt', 'LaserJet, Inkjet, thermal printers, scanners, and multi-function copiers.'),
+      components: [
+        t('rgPrintComp1', 'Stepper Motors & Micro-controllers'),
+        t('rgPrintComp2', 'Toner Cartridges & Ink Heads'),
+        t('rgPrintComp3', 'Rubber Rollers & Metal Rods'),
+        t('rgPrintComp4', 'Plastic Enclosures')
+      ],
       dos: [
-        'Remove ink or toner cartridges prior to handover',
-        'Store spent toner in closed bags to avoid airborne particulate',
-        'Recycle plastic and electronic chassis via EPR hubs'
+        t('rgPrintDo1', 'Remove ink or toner cartridges prior to handover'),
+        t('rgPrintDo2', 'Store spent toner in closed bags to avoid airborne particulate'),
+        t('rgPrintDo3', 'Recycle plastic and electronic chassis via EPR hubs')
       ],
       donts: [
-        'Do not inhale loose laser toner powder',
-        'Do not wash ink residue into storm drains',
-        'Do not burn plastic gears or cartridges'
+        t('rgPrintDont1', 'Do not inhale loose laser toner powder'),
+        t('rgPrintDont2', 'Do not wash ink residue into storm drains'),
+        t('rgPrintDont3', 'Do not burn plastic gears or cartridges')
       ]
     },
     {
       id: 'batteries',
       name: 'Batteries',
       icon: <Battery className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Rechargeable Lithium-ion, Lead-Acid UPS, and Nickel-Metal Hydride battery packs.',
-      components: ['Cobalt & Lithium Compounds', 'Lead & Sulfuric Acid Plates', 'Nickel & Cadmium Electrodes', 'Copper/Aluminum Foils'],
+      whatIsIt: t('rgBatWhatIsIt', 'Rechargeable Lithium-ion, Lead-Acid UPS, and Nickel-Metal Hydride battery packs.'),
+      components: [
+        t('rgBatComp1', 'Cobalt, Nickel & Manganese Cathodes'),
+        t('rgBatComp2', 'Lithium Salts & Electrolyte Solvents'),
+        t('rgBatComp3', 'Lead Plates & Sulfuric Acid'),
+        t('rgBatComp4', 'Copper & Aluminum Current Collectors')
+      ],
       dos: [
-        'Tape terminals of 9V/Lithium batteries with non-conductive tape',
-        'Store in non-metallic, fireproof containers',
-        'Channel strictly to authorized hydrometallurgy facilities'
+        t('rgBatDo1', 'Insulate exposed battery terminals with non-conductive tape'),
+        t('rgBatDo2', 'Store in cool, dry containment away from direct sunlight'),
+        t('rgBatDo3', 'Hand over directly to authorized battery recyclers')
       ],
       donts: [
-        'Do not submerge lithium batteries in water',
-        'Do not crush, short-circuit, or pierce battery packs',
-        'Do not mix with regular organic or paper waste'
+        t('rgBatDont1', 'Do not short-circuit positive and negative terminals'),
+        t('rgBatDont2', 'Do not expose damaged battery packs to water or flame'),
+        t('rgBatDont3', 'Do not dispose of lead-acid batteries with regular trash')
       ]
     },
     {
       id: 'cables',
       name: 'Cables & chargers',
       icon: <Cable className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Copper electrical wires, power adapters, HDMI cables, and charging leads.',
-      components: ['High-Purity Copper Core', 'PVC/Rubber Insulation', 'Gold-plated Terminals', 'Ferrite Beads'],
+      whatIsIt: t('rgCabWhatIsIt', 'Copper electrical wires, power adapters, HDMI cables, and charging leads.'),
+      components: [
+        t('rgCabComp1', 'High-Purity Copper Core'),
+        t('rgCabComp2', 'PVC/Rubber Insulation'),
+        t('rgCabComp3', 'Gold-plated Terminals'),
+        t('rgCabComp4', 'Ferrite Beads')
+      ],
       dos: [
-        'Bundle and tie wires together by material type',
-        'Keep copper wiring dry to preserve recycling grade',
-        'Use mechanical granulators rather than burning'
+        t('rgCabDo1', 'Bundle and tie wires together by material type'),
+        t('rgCabDo2', 'Keep copper wiring dry to preserve recycling grade'),
+        t('rgCabDo3', 'Use mechanical granulators rather than burning')
       ],
       donts: [
-        'NEVER open-burn wire bundles to strip plastic insulation',
-        'Do not inhale toxic dioxins produced from burning PVC',
-        'Do not cut live electrical cables'
+        t('rgCabDont1', 'NEVER open-burn wire bundles to strip plastic insulation'),
+        t('rgCabDont2', 'Do not inhale toxic dioxins produced from burning PVC'),
+        t('rgCabDont3', 'Do not cut live electrical cables')
       ]
     },
     {
       id: 'circuit-boards',
       name: 'Circuit boards',
       icon: <Cpu className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'High-grade telecommunication PCBs, motherboard cards, and controller boards.',
-      components: ['Gold Bonding Wires & Gold Finger Plating', 'Palladium & Tantalum Capacitors', 'Tin/Lead Solder Points', 'Fiberglass Substrates'],
+      whatIsIt: t('rgPcbWhatIsIt', 'High-grade telecommunication PCBs, motherboard cards, and controller boards.'),
+      components: [
+        t('rgPcbComp1', 'Gold Bonding Wires & Gold Finger Plating'),
+        t('rgPcbComp2', 'Palladium & Tantalum Capacitors'),
+        t('rgPcbComp3', 'Tin/Lead Solder Points'),
+        t('rgPcbComp4', 'Fiberglass Substrates')
+      ],
       dos: [
-        'Store PCBs in electrostatic-safe dry bins',
-        'Sort PCBs by grade (High-grade telecom vs Low-grade brown board)',
-        'Transfer to authorized smelting and recovery plants'
+        t('rgPcbDo1', 'Store PCBs in electrostatic-safe dry bins'),
+        t('rgPcbDo2', 'Sort PCBs by grade (High-grade telecom vs Low-grade brown board)'),
+        t('rgPcbDo3', 'Transfer to authorized smelting and recovery plants')
       ],
       donts: [
-        'Do not use dangerous backyard acid baths (aqua regia)',
-        'Do not burn fiberglass substrates to extract metals',
-        'Do not dump acidic tailings into local water tables'
+        t('rgPcbDont1', 'Do not use dangerous backyard acid baths (aqua regia)'),
+        t('rgPcbDont2', 'Do not burn fiberglass substrates to extract metals'),
+        t('rgPcbDont3', 'Do not dump acidic tailings into local water tables')
       ]
     },
     {
       id: 'other-electronics',
       name: 'Other electronics',
       icon: <Layers className="w-6 h-6 text-[#3F7655]" />,
-      whatIsIt: 'Microwaves, routers, set-top boxes, smart gadgets, and medical electronics.',
-      components: ['Magnetrons & Transformers', 'RF Transmitter Modules', 'Mixed Metal Chassis', 'Silicone & Plastics'],
+      whatIsIt: t('rgOthWhatIsIt', 'Microwaves, routers, set-top boxes, smart gadgets, and medical electronics.'),
+      components: [
+        t('rgOthComp1', 'Small Transformers & Relays'),
+        t('rgOthComp2', 'Plastic & Metal Housings'),
+        t('rgOthComp3', 'Low-Grade PCBs & Displays'),
+        t('rgOthComp4', 'Power Supply Units')
+      ],
       dos: [
-        'Check device label for hazardous material warnings',
-        'Separate heavy metal transformers from electronics',
-        'Declare on Eco-Link platform for verified classification'
+        t('rgOthDo1', 'Check device label for hazardous material warnings'),
+        t('rgOthDo2', 'Separate heavy metal transformers from electronics'),
+        t('rgOthDo3', 'Declare on Eco-Link platform for verified classification')
       ],
       donts: [
-        'Do not puncture sealed cooling coils or vacuum components',
-        'Do not dispose of medical sensors in general trash',
-        'Do not leave e-waste in vacant public lands'
+        t('rgOthDont1', 'Do not puncture sealed cooling coils or vacuum components'),
+        t('rgOthDont2', 'Do not dispose of medical sensors in general trash'),
+        t('rgOthDont3', 'Do not leave e-waste in vacant public lands')
       ]
     }
   ];
@@ -198,13 +248,13 @@ export default function RecycleGuide({ onOpenSearchModal }) {
         {/* Header (Section 3 Specification) */}
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#DDEBD8] text-[#244936] text-xs font-extrabold uppercase tracking-wider border border-[#3F7655]/20">
-            <BookOpen className="w-3.5 h-3.5 text-[#3F7655]" /> CPCB STANDARDIZED RECYCLING GUIDE
+            <BookOpen className="w-3.5 h-3.5 text-[#3F7655]" /> {t('cpcbRecyclingGuideBadge', 'CPCB STANDARDIZED RECYCLING GUIDE')}
           </span>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-[#203128] tracking-tight">
-            How to Recycle Your E-Waste
+            {t('guideMainHeading', 'How to Recycle Your E-Waste')}
           </h1>
           <p className="text-base text-[#718078] font-medium">
-            Learn proper classification, valuable component recovery, and safe handling guidelines for 10 electronic waste categories.
+            {t('guideSubHeading', 'Learn proper classification, valuable component recovery, and safe handling guidelines for 10 electronic waste categories.')}
           </p>
         </div>
 
@@ -216,7 +266,7 @@ export default function RecycleGuide({ onOpenSearchModal }) {
               type="text"
               value={guideSearch}
               onChange={(e) => setGuideSearch(e.target.value)}
-              placeholder="Search category, e.g. Mobile, Laptop, PCB, Battery, Cables..."
+              placeholder={t('searchGuidePlaceholder', 'Search category, e.g. Mobile, Laptop, PCB, Battery, Cables...')}
               className="w-full bg-white border-2 border-[#3F7655]/25 rounded-2xl pl-12 pr-4 py-3.5 text-xs font-bold text-[#203128] focus:border-[#3F7655] focus:outline-none shadow-sm"
             />
           </div>
@@ -234,7 +284,7 @@ export default function RecycleGuide({ onOpenSearchModal }) {
                   : 'bg-white text-[#203128] border-[#3F7655]/15 hover:bg-[#DDEBD8]'
               }`}
             >
-              <span>{cat.name}</span>
+              <span>{tCategory(cat.name)}</span>
             </button>
           ))}
         </div>
@@ -251,9 +301,9 @@ export default function RecycleGuide({ onOpenSearchModal }) {
                 </div>
                 <div>
                   <span className="text-xs font-black uppercase tracking-widest text-[#3F7655]">
-                    CPCB E-WASTE CLASSIFICATION
+                    {t('cpcbClassificationBadge', 'CPCB E-WASTE CLASSIFICATION')}
                   </span>
-                  <h2 className="text-2xl sm:text-3xl font-black text-[#203128]">{activeCategory.name}</h2>
+                  <h2 className="text-2xl sm:text-3xl font-black text-[#203128]">{tCategory(activeCategory.name)}</h2>
                 </div>
               </div>
 
@@ -262,14 +312,14 @@ export default function RecycleGuide({ onOpenSearchModal }) {
                 className="px-5 py-2.5 bg-[#F8F5EA] hover:bg-[#DDEBD8] text-[#203128] font-bold text-xs rounded-xl border border-[#3F7655]/20 transition flex items-center gap-2 cursor-pointer self-start sm:self-auto"
               >
                 <MapPin className="w-4 h-4 text-[#3F7655]" />
-                <span>Find Drop Points</span>
+                <span>{t('findDropPoints', 'Find Drop Points')}</span>
               </button>
             </div>
 
             {/* WHAT IS IT (Section 3 Specification) */}
             <div className="space-y-2">
               <h3 className="text-xs font-extrabold uppercase text-[#3F7655] tracking-wider">
-                What is it?
+                {t('whatIsItLabel', 'What is it?')}
               </h3>
               <p className="text-sm font-semibold text-[#203128] leading-relaxed">
                 {activeCategory.whatIsIt}
@@ -279,7 +329,7 @@ export default function RecycleGuide({ onOpenSearchModal }) {
             {/* VALUABLE COMPONENTS / MATERIALS (Section 3 Specification) */}
             <div className="space-y-3">
               <h3 className="text-xs font-extrabold uppercase text-[#3F7655] tracking-wider">
-                Valuable Components & Recyclable Materials:
+                {t('valuableComponentsLabel', 'Valuable Components & Recyclable Materials:')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                 {activeCategory.components.map((comp, idx) => (
@@ -298,7 +348,7 @@ export default function RecycleGuide({ onOpenSearchModal }) {
               <div className="p-6 bg-emerald-50/70 rounded-2xl border border-emerald-200 space-y-3">
                 <h3 className="text-sm font-black text-emerald-900 uppercase tracking-wider flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-emerald-600" />
-                  <span>Do</span>
+                  <span>{t('doLabel', 'Do')}</span>
                 </h3>
                 <ul className="space-y-2.5">
                   {activeCategory.dos.map((item, idx) => (
@@ -314,7 +364,7 @@ export default function RecycleGuide({ onOpenSearchModal }) {
               <div className="p-6 bg-rose-50/70 rounded-2xl border border-rose-200 space-y-3">
                 <h3 className="text-sm font-black text-rose-900 uppercase tracking-wider flex items-center gap-2">
                   <XCircle className="w-5 h-5 text-rose-600" />
-                  <span>Don't</span>
+                  <span>{t('dontLabel', "Don't")}</span>
                 </h3>
                 <ul className="space-y-2.5">
                   {activeCategory.donts.map((item, idx) => (
@@ -331,13 +381,13 @@ export default function RecycleGuide({ onOpenSearchModal }) {
             {/* Footer Action */}
             <div className="pt-4 border-t border-[#3F7655]/10 flex flex-col sm:flex-row items-center justify-between gap-4">
               <span className="text-xs text-[#718078] font-semibold">
-                Have e-waste of this category to dispose? Register a digital lot to get benchmark prices.
+                {t('haveEWasteToDisposeText', 'Have e-waste of this category to dispose? Register a digital lot to get benchmark prices.')}
               </span>
               <button
                 onClick={() => navigate('/collector/register-waste')}
                 className="px-6 py-2.5 bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs rounded-xl shadow transition cursor-pointer"
               >
-                Register E-Waste Lot →
+                {t('registerEWasteLotBtn', 'Register E-Waste Lot →')}
               </button>
             </div>
 

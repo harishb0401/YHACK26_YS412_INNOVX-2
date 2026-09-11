@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Search, Package, Filter, ShieldCheck, QrCode } from 'lucide-react';
 import StatusBadge from '../../components/StatusBadge';
 import { mockWasteLots } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function AdminWasteLots({ materialLots = mockWasteLots }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
+  const { t, tCategory, tStatus } = useTranslation();
 
   const lots = materialLots || mockWasteLots;
 
@@ -22,9 +24,9 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Regulated Waste Lots</h1>
+        <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('regulatedWasteLotsTitle', 'Regulated Waste Lots')}</h1>
         <p className="text-xs sm:text-sm text-[#718078]">
-          Live state-wide registry of all declared material lots, benchmark values, and QR traceability statuses.
+          {t('regulatedWasteLotsSub', 'Live state-wide registry of all declared material lots, benchmark values, and QR traceability statuses.')}
         </p>
       </div>
 
@@ -36,7 +38,7 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search lot ID, material, location..."
+            placeholder={t('searchLotPlaceholder', 'Search lot ID, material, location...')}
             className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
           />
         </div>
@@ -52,28 +54,28 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
                   : 'bg-[#F8F5EA] text-[#203128] border border-[#3F7655]/15 hover:bg-[#DDEBD8]'
               }`}
             >
-              {st === 'ALL' ? 'All Lots' : st}
+              {st === 'ALL' ? t('allLots', 'All Lots') : tStatus(st)}
             </button>
           ))}
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-[32px] border border-[#3F7655]/20 shadow-md overflow-hidden">
+      <div className="bg-[#FAF8F2] border border-[#3F7655]/15 rounded-[32px] overflow-hidden shadow-md">
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
             <thead className="bg-[#FAF8F2] text-[#718078] uppercase text-[10px] font-black border-b border-[#3F7655]/10">
               <tr>
-                <th className="p-4 pl-6">Lot Identifier</th>
-                <th className="p-4">Category & Material</th>
-                <th className="p-4">Quantity</th>
-                <th className="p-4">Benchmark Rate</th>
-                <th className="p-4">Location Hub</th>
-                <th className="p-4">Lifecycle Status</th>
-                <th className="p-4 pr-6 text-right">QR Signature</th>
+                <th className="p-4 pl-6">{t('lotIdentifierCol', 'Lot Identifier')}</th>
+                <th className="p-4">{t('catAndMaterialCol', 'Category & Material')}</th>
+                <th className="p-4">{t('quantityLabel', 'Quantity')}</th>
+                <th className="p-4">{t('benchmarkRateCol', 'Benchmark Rate')}</th>
+                <th className="p-4">{t('locationHubCol', 'Location Hub')}</th>
+                <th className="p-4">{t('lifecycleStatusCol', 'Lifecycle Status')}</th>
+                <th className="p-4 pr-6 text-right">{t('qrSignatureCol', 'QR Signature')}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#3F7655]/10 text-[#203128] font-semibold">
+            <tbody className="divide-y divide-[#3F7655]/10 text-[#203128] font-semibold bg-white">
               {filtered.map((lot) => (
                 <tr key={lot.id} className="hover:bg-[#F8F5EA]/50 transition">
                   <td className="p-4 pl-6">
@@ -81,7 +83,7 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
                     <span className="text-[10px] text-[#718078]">{lot.createdDate || 'Recent'}</span>
                   </td>
                   <td className="p-4">
-                    <span className="font-extrabold block">{lot.category}</span>
+                    <span className="font-extrabold block">{tCategory(lot.category)}</span>
                     <span className="text-[11px] text-[#718078]">{lot.material}</span>
                   </td>
                   <td className="p-4 font-black">{lot.quantity || lot.totalWeightKg} {lot.unit || 'kg'}</td>

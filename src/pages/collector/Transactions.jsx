@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import { Search, DollarSign, ArrowRight, Download, CheckCircle2 } from 'lucide-react';
 import TransactionCard from '../../components/Cards/TransactionCard';
 import { mockTransactions } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function Transactions({ transactions = mockTransactions }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState('');
 
   const txList = transactions || mockTransactions;
@@ -23,16 +25,16 @@ export default function Transactions({ transactions = mockTransactions }) {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Transactions & Invoices</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('transactionsTitle')}</h1>
           <p className="text-xs sm:text-sm text-[#718078]">
-            Direct UPI settlements, escrow payouts, and certified weighbridge tax invoices.
+            {t('transactionsSubtitle')}
           </p>
         </div>
 
         <div className="p-4 bg-[#DDEBD8] rounded-2xl border border-[#3F7655]/20 flex items-center gap-3">
           <DollarSign className="w-6 h-6 text-[#244936]" />
           <div>
-            <span className="text-[10px] font-extrabold text-[#244936] uppercase block">Total Payouts Received</span>
+            <span className="text-[10px] font-extrabold text-[#244936] uppercase block">{t('totalEarnings')}</span>
             <span className="text-xl font-black text-[#244936]">₹{totalSettled.toLocaleString()}</span>
           </div>
         </div>
@@ -46,7 +48,7 @@ export default function Transactions({ transactions = mockTransactions }) {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search invoice ID, lot ID, recycler..."
+            placeholder={t('search')}
             className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
           />
         </div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import LoginForm from './LoginForm';
 import SignupForm from './SignupForm';
+import { useTranslation } from '../../i18n';
 
 export default function AuthCard({ initialTab = 'login', onLoginSuccess }) {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState(initialTab);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function AuthCard({ initialTab = 'login', onLoginSuccess }) {
               : 'text-[#718078] hover:text-[#203128]'
           }`}
         >
-          Login
+          {t('navLogin', 'Login')}
         </button>
         <button
           type="button"
@@ -44,7 +46,7 @@ export default function AuthCard({ initialTab = 'login', onLoginSuccess }) {
               : 'text-[#718078] hover:text-[#203128]'
           }`}
         >
-          Sign Up
+          {t('navSignUp', 'Sign Up')}
         </button>
       </div>
 

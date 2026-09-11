@@ -33,7 +33,7 @@ export default function CompareOffersModal({
             </div>
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                OFFER COMPARISON & SETTLEMENT
+                {t('offerComparisonBadge', 'OFFER COMPARISON & SETTLEMENT')}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-0.5">
                 {t("compareOffersTitle")}
@@ -71,7 +71,7 @@ export default function CompareOffersModal({
 
           {lotOffers.length === 0 ? (
             <div className="p-8 bg-white rounded-2xl border border-[#3F7655]/15 text-center text-slate-500 text-xs font-bold">
-              No recycler offers received yet for this lot. Recyclers in proximity have been notified.
+              {t('noRecyclerOffersYet', 'No recycler offers received yet for this lot. Recyclers in proximity have been notified.')}
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -102,7 +102,7 @@ export default function CompareOffersModal({
                               <ShieldCheck className="w-3 h-3 text-emerald-600" />
                               {t("verifiedRecyclerBadge")}
                             </span>
-                            <span className="text-[10px] text-slate-500 font-semibold">{offer.distanceKm} km away</span>
+                            <span className="text-[10px] text-slate-500 font-semibold">{offer.distanceKm} km {t('away', 'away')}</span>
                           </div>
                         </div>
 
@@ -132,7 +132,7 @@ export default function CompareOffersModal({
                       <div className="text-xs text-slate-600 space-y-1">
                         <div className="flex items-center gap-1.5 text-slate-700 font-semibold">
                           <Calendar className="w-3.5 h-3.5 text-[#3F7655]" />
-                          <span>Proposed Pickup: <strong>{offer.proposedPickupDate || 'Within 2 days'}</strong></span>
+                          <span>{t('proposedPickup', 'Proposed Pickup')}: <strong>{offer.proposedPickupDate || 'Within 2 days'}</strong></span>
                         </div>
                         <p className="text-[11px] text-slate-500 line-clamp-2 italic">
                           "{offer.notes}"

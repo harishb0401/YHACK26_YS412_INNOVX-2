@@ -105,7 +105,7 @@ export default function RespondRequirementModal({
         <div className="flex items-center justify-between pb-4 border-b border-[#3F7655]/15">
           <div>
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-              COLLECTOR DECLARATION
+              {t("collectorDeclaration")}
             </span>
             <h3 className="text-xl font-black text-[#244936] mt-1">
               Respond to: {requirement.recyclerName}
@@ -129,7 +129,7 @@ export default function RespondRequirementModal({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <label className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
-                Declared Material Items (Weights & Rates)
+                {t("declaredMaterialItems")}
               </label>
               <button
                 type="button"
@@ -137,7 +137,7 @@ export default function RespondRequirementModal({
                 className="text-xs font-bold text-[#3F7655] hover:text-[#244936] flex items-center gap-1 bg-[#DDEBD8] px-2.5 py-1 rounded-full"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Add Item</span>
+                <span>{t("addItem")}</span>
               </button>
             </div>
 
@@ -174,7 +174,7 @@ export default function RespondRequirementModal({
                   </div>
 
                   <div className="w-20 text-right">
-                    <span className="text-[11px] font-bold text-slate-500 block">Subtotal</span>
+                    <span className="text-[11px] font-bold text-slate-500 block">{t("subtotal")}</span>
                     <span className="text-xs font-black text-[#3F7655]">
                       ₹{Math.round(item.weightKg * item.referencePrice)}
                     </span>
@@ -198,20 +198,20 @@ export default function RespondRequirementModal({
           <div className="bg-[#DDEBD8]/50 rounded-2xl p-4 border border-[#3F7655]/20 space-y-3">
             <div className="flex items-center gap-2 text-xs font-extrabold text-[#244936]">
               <Calculator className="w-4 h-4 text-[#3F7655]" />
-              <span>Rule-Based Reference Calculation</span>
+              <span>{t("ruleBasedCalculation")}</span>
             </div>
 
             <div className="grid grid-cols-3 gap-2 text-center">
               <div className="bg-white p-2.5 rounded-xl border border-[#3F7655]/15">
-                <span className="text-[10px] text-slate-500 font-bold block">Total Weight</span>
+                <span className="text-[10px] text-slate-500 font-bold block">{t("totalWeight")}</span>
                 <span className="text-base font-black text-[#244936]">{totalWeightKg} kg</span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-[#3F7655]/15">
-                <span className="text-[10px] text-slate-500 font-bold block">Avg Reference Rate</span>
+                <span className="text-[10px] text-slate-500 font-bold block">{t("avgRefRate")}</span>
                 <span className="text-base font-black text-[#244936]">₹{averageRefRate}/kg</span>
               </div>
               <div className="bg-white p-2.5 rounded-xl border border-[#3F7655]/15">
-                <span className="text-[10px] text-slate-500 font-bold block">Estimated Lot Value</span>
+                <span className="text-[10px] text-slate-500 font-bold block">{t("estimatedLotValueLabel")}</span>
                 <span className="text-base font-black text-[#3F7655]">₹{estimatedRefValue.toLocaleString()}</span>
               </div>
             </div>
@@ -243,7 +243,7 @@ export default function RespondRequirementModal({
 
             <div>
               <label className="block text-xs font-extrabold text-[#203128] mb-1.5">
-                Collector Organization / Name
+                {t("collectorOrgName")}
               </label>
               <input
                 type="text"

@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { User, Phone, Mail, Lock, ArrowRight, Truck, ShieldCheck, Check, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { useTranslation } from '../../i18n';
 
 export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [signupRole, setSignupRole] = useState('collector'); // 'collector' | 'recycler'
   const [fullName, setFullName] = useState('');
@@ -17,17 +19,17 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!fullName.trim() || !signupPhone.trim() || !signupEmail.trim() || !signupPassword.trim()) {
-      setErrorMessage('Please fill out all required fields.');
+      setErrorMessage(t('fillAllRequired') || 'Please fill out all required fields.');
       return;
     }
 
     if (signupPassword !== confirmPassword) {
-      setErrorMessage('Passwords do not match.');
+      setErrorMessage(t('passwordsDoNotMatch') || 'Passwords do not match.');
       return;
     }
 
     setErrorMessage('');
-    setSuccessMessage('Account created successfully! Redirecting...');
+    setSuccessMessage(t('accountCreatedRedirecting') || 'Account created successfully! Redirecting...');
 
     const userPayload = {
       role: signupRole,
@@ -53,16 +55,16 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
     <div className="space-y-5 animate-in fade-in duration-150">
       {/* Title & Subtitle */}
       <div className="text-center space-y-1">
-        <h3 className="text-xl sm:text-2xl font-black text-[#203128]">Create Your Account</h3>
+        <h3 className="text-xl sm:text-2xl font-black text-[#203128]">{t('createYourAccount')}</h3>
         <p className="text-xs font-semibold text-[#718078]">
-          Join the Eco-Link e-waste ecosystem
+          {t('joinEcosystem')}
         </p>
       </div>
 
       {/* Role selection / Account Type */}
       <div className="space-y-1.5">
         <label className="text-[10px] font-black uppercase text-[#718078] tracking-wider block">
-          Account Type
+          {t('accountType')}
         </label>
         <div className="grid grid-cols-2 gap-2.5">
           <button
@@ -81,8 +83,8 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
                 <Truck className="w-3.5 h-3.5" />
               </div>
               <div>
-                <span className="text-xs font-black text-[#203128] block">Collector</span>
-                <span className="text-[10px] text-[#718078] block">Register lots & earn</span>
+                <span className="text-xs font-black text-[#203128] block">{t('collectorRole')}</span>
+                <span className="text-[10px] text-[#718078] block">{t('registerLotsAndEarn') || 'Register lots & earn'}</span>
               </div>
             </div>
             {signupRole === 'collector' && <Check className="w-4 h-4 text-[#3F7655]" />}
@@ -104,8 +106,8 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
                 <ShieldCheck className="w-3.5 h-3.5 text-[#F2C94C]" />
               </div>
               <div>
-                <span className="text-xs font-black text-[#203128] block">Recycler</span>
-                <span className="text-[10px] text-[#718078] block">Procure & recycle</span>
+                <span className="text-xs font-black text-[#203128] block">{t('recyclerRole')}</span>
+                <span className="text-[10px] text-[#718078] block">{t('procureAndRecycle') || 'Procure & recycle'}</span>
               </div>
             </div>
             {signupRole === 'recycler' && <Check className="w-4 h-4 text-[#244936]" />}
@@ -132,7 +134,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
       <form onSubmit={handleSubmit} className="space-y-3.5">
         <div>
           <label className="text-xs font-extrabold text-[#203128] block mb-1">
-            Full Name *
+            {t('fullName')} *
           </label>
           <div className="relative">
             <User className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -150,7 +152,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              Phone Number *
+              {t('phoneNumber')} *
             </label>
             <div className="relative">
               <Phone className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -167,7 +169,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
 
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              Email Address *
+              {t('emailAddress')} *
             </label>
             <div className="relative">
               <Mail className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -186,7 +188,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              Password *
+              {t('password')} *
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -203,7 +205,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
 
           <div>
             <label className="text-xs font-extrabold text-[#203128] block mb-1">
-              Confirm Password *
+              {t('confirmPassword')} *
             </label>
             <div className="relative">
               <Lock className="w-4 h-4 text-[#718078] absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -223,7 +225,7 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
           type="submit"
           className="w-full py-3.5 rounded-2xl bg-[#3F7655] hover:bg-[#244936] text-white font-extrabold text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer mt-3"
         >
-          <span>Create Account</span>
+          <span>{t('createAccountBtn')}</span>
           <ArrowRight className="w-4 h-4" />
         </button>
       </form>
@@ -231,13 +233,13 @@ export default function SignupForm({ onSignupSuccess, onSwitchToLogin }) {
       {/* Switch to Login */}
       <div className="text-center pt-2">
         <p className="text-xs font-semibold text-[#718078]">
-          Already have an account?{' '}
+          {t('alreadyHaveAccount')}{' '}
           <button
             type="button"
             onClick={onSwitchToLogin}
             className="font-extrabold text-[#3F7655] hover:underline cursor-pointer ml-1"
           >
-            Login
+            {t('navLogin')}
           </button>
         </p>
       </div>

@@ -165,7 +165,7 @@ export default function AddWasteModal({
             </div>
             <div>
               <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                COLLECTOR MANIFEST WORKFLOW
+                {t('collectorManifestWorkflowBadge', 'COLLECTOR MANIFEST WORKFLOW')}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-0.5">
                 {t("addEWaste")}
@@ -266,7 +266,7 @@ export default function AddWasteModal({
                 type="text"
                 value={material}
                 onChange={(e) => setMaterial(e.target.value)}
-                placeholder="e.g. Dell PowerEdge Server Boards, Li-ion pouch cells"
+                placeholder={t("addWastePlaceholderDescription")}
                 className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
                 required
               />
@@ -279,11 +279,11 @@ export default function AddWasteModal({
               <select
                 value={condition}
                 onChange={(e) => setCondition(e.target.value)}
-                className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
+                className="w-full text-xs font-bold bg-[#FAF8F2] border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
               >
-                <option value="Non-working / Scrap">Non-working / Scrap</option>
-                <option value="Mixed Condition">Mixed Condition</option>
-                <option value="Working / Repairable">Working / Repairable</option>
+                <option value="Non-working / Scrap">{tCondition("Non-working / Scrap")}</option>
+                <option value="Mixed Condition">{tCondition("Mixed Condition")}</option>
+                <option value="Working / Repairable">{tCondition("Working / Repairable")}</option>
               </select>
             </div>
           </div>
@@ -312,11 +312,11 @@ export default function AddWasteModal({
               <select
                 value={unit}
                 onChange={(e) => setUnit(e.target.value)}
-                className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
+                className="w-full text-xs font-bold bg-[#FAF8F2] border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
               >
-                <option value="kg">kg (Kilograms)</option>
-                <option value="units">units (Items)</option>
-                <option value="tons">tons (Metric Tons)</option>
+                <option value="kg">{t('unitKg', 'kg (Kilograms)')}</option>
+                <option value="units">{t('unitUnits', 'units (Items)')}</option>
+                <option value="tons">{t('unitTons', 'tons (Metric Tons)')}</option>
               </select>
             </div>
           </div>
@@ -330,7 +330,7 @@ export default function AddWasteModal({
               <select
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
+                className="w-full text-xs font-bold bg-[#FAF8F2] border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
               >
                 {tamilNaduLocations.map((loc, i) => (
                   <option key={i} value={loc}>{loc}</option>
@@ -400,7 +400,7 @@ export default function AddWasteModal({
               rows="2"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              placeholder="Provide lot storage details, packaging condition, or component inventory..."
+              placeholder={t("addWastePlaceholderStorage")}
               className="w-full text-xs font-medium bg-white border border-[#3F7655]/20 rounded-xl p-3 focus:outline-none focus:border-[#3F7655]"
             />
           </div>

@@ -4,9 +4,11 @@ import { ShieldCheck, Package, ShoppingBag, DollarSign, Scale, RefreshCw, ArrowR
 import StatCard from '../../components/Cards/StatCard';
 import WasteLotCard from '../../components/Cards/WasteLotCard';
 import { mockWasteLots, mockRecycler, mockTransactions } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function RecyclerDashboard({ recyclerProfile = mockRecycler, materialLots = mockWasteLots }) {
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   const availableLots = (materialLots || mockWasteLots).filter(l => ['REGISTERED', 'MATCHED', 'AWAITING_OFFERS', 'AVAILABLE'].includes(l.status));
   const activeProcessing = (materialLots || mockWasteLots).filter(l => ['ACCEPTED', 'DISPATCHED', 'OFFER_ACCEPTED'].includes(l.status));
@@ -23,18 +25,18 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
         <div>
           <div className="flex items-center gap-2">
             <span className="text-xs font-black uppercase tracking-wider text-[#F2C94C] bg-white/10 px-3 py-0.5 rounded-full">
-              CPCB Authorized Recycler Portal
+              {t('recyclerPortal')}
             </span>
             <span className="text-xs font-black text-[#244936] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5 text-[#3F7655]" />
-              Verified Facility
+              {t('recStatusVERIFIED')}
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-black mt-2">
             {recyclerProfile?.companyName || "GreenCycle Material Recovery Ltd"}
           </h1>
           <p className="text-xs sm:text-sm text-[#DDEBD8] mt-1">
-            Procure authentic e-waste lots, submit transparent bids, and generate Form-2 EPR compliance receipts.
+            {t('availableRequestsDesc')}
           </p>
         </div>
 
@@ -44,11 +46,10 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
             className="px-6 py-3.5 bg-[#F2C94C] hover:bg-[#e0b83b] text-[#244936] rounded-2xl font-black text-xs shadow-md transition flex items-center gap-2 cursor-pointer"
           >
             <ShoppingBag className="w-4 h-4" />
-            <span>Browse Available Waste</span>
+            <span>{t('availableCollectorRequests')}</span>
           </button>
         </div>
       </div>
-
 
       {/* Quick Action Navigation Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -57,16 +58,16 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
             <div className="w-10 h-10 rounded-xl bg-[#DDEBD8] text-[#244936] flex items-center justify-center font-bold mb-3">
               <ShoppingBag className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Waste Requests</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('navWasteRequests')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Browse newly declared collector lots matching your facility's authorized categories.
+              {t('availableRequestsDesc')}
             </p>
           </div>
           <Link
             to="/recycler/waste-requests"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Browse Waste Stream</span>
+            <span>{t('availableCollectorRequests')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -76,36 +77,35 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
             <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold mb-3">
               <Award className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">Transactions & Invoices</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('transactionsTitle')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Track settled lot payouts, escrow releases, and download digital weight receipts.
+              {t('transactionsSubtitle')}
             </p>
           </div>
           <Link
             to="/recycler/transactions"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>View Transactions</span>
+            <span>{t('navTransactions')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
-
 
         <div className="bg-white p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-3 flex flex-col justify-between">
           <div>
             <div className="w-10 h-10 rounded-xl bg-blue-100 text-blue-800 flex items-center justify-center font-bold mb-3">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="text-base font-extrabold text-[#203128]">CPCB Compliance Hub</h3>
+            <h3 className="text-base font-extrabold text-[#203128]">{t('navCompliance')}</h3>
             <p className="text-xs text-[#718078] mt-1">
-              Generate certified Form-2 manifests, track material recovery ratios, and download audits.
+              {t('cpcbVerifLayerSub')}
             </p>
           </div>
           <Link
             to="/recycler/compliance"
             className="text-xs font-black text-[#3F7655] hover:text-[#244936] flex items-center gap-1.5 pt-3 border-t border-[#3F7655]/10"
           >
-            <span>Review Compliance</span>
+            <span>{t('navCompliance')}</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
@@ -115,14 +115,14 @@ export default function RecyclerDashboard({ recyclerProfile = mockRecycler, mate
       <div className="bg-white p-6 sm:p-8 rounded-[32px] border border-[#3F7655]/20 shadow-md space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-black text-[#203128]">Available Matching Waste Lots</h2>
-            <p className="text-xs text-[#718078]">E-Waste ready for bid submission from registered collectors.</p>
+            <h2 className="text-xl font-black text-[#203128]">{t('availableCollectorRequests')}</h2>
+            <p className="text-xs text-[#718078]">{t('requestsAvailableBidding')}</p>
           </div>
           <Link
             to="/recycler/waste-requests"
             className="text-xs font-black text-[#3F7655] hover:underline flex items-center gap-1"
           >
-            <span>View All Stream ({availableLots.length})</span>
+            <span>{t('viewDetails')} ({availableLots.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, Plus, ShieldCheck, ArrowRight } from 'lucide-react';
-import { useTranslation } from '../../i18n';
+import { useTranslation, useLanguage } from '../../i18n';
 import { ewasteCategoriesList, tamilNaduLocations } from '../../data/scrapPrices';
 
 export default function PostRequirementModal({ 
@@ -9,6 +9,7 @@ export default function PostRequirementModal({
   onAddRequirement 
 }) {
   const { t } = useTranslation();
+  const { tCategory } = useLanguage();
 
   const [category, setCategory] = useState(ewasteCategoriesList[0]);
   const [requiredQuantityKg, setRequiredQuantityKg] = useState(50);
@@ -59,7 +60,7 @@ export default function PostRequirementModal({
             </div>
             <div>
               <span className="text-[11px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                RECYCLER INTAKE DEMAND
+                {t("intakeDemand")}
               </span>
               <h3 className="text-xl font-black text-[#244936] mt-0.5">
                 {t("postRequirement")}
@@ -78,7 +79,7 @@ export default function PostRequirementModal({
         {/* CPCB Verified Notice */}
         <div className="bg-[#DDEBD8]/50 rounded-2xl p-3.5 border border-[#3F7655]/20 flex items-center gap-2.5 text-xs text-[#244936]">
           <ShieldCheck className="w-5 h-5 text-[#3F7655] shrink-0" />
-          <span>Posting as: <strong>GreenCycle Material Recovery Ltd</strong> (CPCB Reg: TN-EPR-2026-8821)</span>
+          <span>{t("postingAs", { name: "GreenCycle Material Recovery Ltd", reg: "TN-EPR-2026-8821" })}</span>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -94,7 +95,7 @@ export default function PostRequirementModal({
                 className="w-full text-xs font-bold bg-white border border-[#3F7655]/20 rounded-xl px-3 py-2.5 focus:outline-none focus:border-[#3F7655]"
               >
                 {ewasteCategoriesList.map((cat, i) => (
-                  <option key={i} value={cat}>{cat}</option>
+                  <option key={i} value={cat}>{tCategory(cat)}</option>
                 ))}
               </select>
             </div>
@@ -180,7 +181,7 @@ export default function PostRequirementModal({
 
           <div>
             <label className="block text-xs font-extrabold text-[#203128] mb-1">
-              Processing & Requirement Notes
+              {t("processingNotes")}
             </label>
             <textarea
               rows="2"

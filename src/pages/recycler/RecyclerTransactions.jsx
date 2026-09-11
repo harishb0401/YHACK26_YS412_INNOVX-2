@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { Search, DollarSign, Download, CheckCircle2, ShieldCheck, Building } from 'lucide-react';
 import TransactionCard from '../../components/Cards/TransactionCard';
 import { mockTransactions } from '../../data/mockData';
+import { useTranslation } from '../../i18n';
 
 export default function RecyclerTransactions({ transactions = mockTransactions }) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { t } = useTranslation();
 
   const txList = transactions || mockTransactions;
 
@@ -21,16 +23,16 @@ export default function RecyclerTransactions({ transactions = mockTransactions }
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">Procurement Transactions</h1>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('transactionsTitle')}</h1>
           <p className="text-xs sm:text-sm text-[#718078]">
-            Audit trails of escrow releases, GST input credit receipts, and digital purchase orders.
+            {t('transactionsSubtitle')}
           </p>
         </div>
 
         <div className="p-4 bg-[#DDEBD8] rounded-2xl border border-[#3F7655]/20 flex items-center gap-3">
           <DollarSign className="w-6 h-6 text-[#244936]" />
           <div>
-            <span className="text-[10px] font-extrabold text-[#244936] uppercase block">Total Procurement Spend</span>
+            <span className="text-[10px] font-extrabold text-[#244936] uppercase block">{t('totalValue')}</span>
             <span className="text-xl font-black text-[#244936]">₹{totalSpent.toLocaleString()}</span>
           </div>
         </div>
@@ -44,7 +46,7 @@ export default function RecyclerTransactions({ transactions = mockTransactions }
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search invoice ID, lot ID, collector..."
+            placeholder={t('search')}
             className="w-full bg-[#F8F5EA] border border-[#3F7655]/20 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-semibold text-[#203128] focus:bg-white focus:outline-none"
           />
         </div>

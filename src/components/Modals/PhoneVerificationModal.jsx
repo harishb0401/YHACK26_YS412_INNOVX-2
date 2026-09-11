@@ -143,7 +143,7 @@ export default function PhoneVerificationModal({
                     onClick={() => setOtpStep(false)}
                     className="text-[11px] font-bold text-[#3F7655] underline cursor-pointer"
                   >
-                    Change
+                    {t("change")}
                   </button>
                 </div>
 

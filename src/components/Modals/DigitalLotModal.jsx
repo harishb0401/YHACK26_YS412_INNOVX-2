@@ -56,7 +56,7 @@ export default function DigitalLotModal({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-2.5 py-0.5 rounded-full">
-                  DIGITAL MATERIAL LOT
+                  {t("digitalMaterialLotBadge")}
                 </span>
                 <StatusBadge status={lot.status} size="sm" />
               </div>
@@ -84,7 +84,7 @@ export default function DigitalLotModal({
                 : 'text-slate-600 hover:text-[#244936]'
             }`}
           >
-            Lot Overview & QR
+            {t("lotOverviewAndQR")}
           </button>
 
           <button
@@ -104,8 +104,8 @@ export default function DigitalLotModal({
           <div className="p-4 rounded-2xl bg-emerald-100 border border-emerald-300 text-emerald-900 flex items-center gap-3 animate-fadeIn">
             <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
             <div>
-              <h5 className="font-bold text-sm">Physical Handover Verified</h5>
-              <p className="text-xs text-emerald-800">Physical QR code scanned and verified at weighbridge. Waste handed over to recycler.</p>
+              <h5 className="font-bold text-sm">{t("physicalHandoverVerified")}</h5>
+              <p className="text-xs text-emerald-800">{t("physicalQrScannedMsg")}</p>
             </div>
           </div>
         )}
@@ -138,7 +138,7 @@ export default function DigitalLotModal({
                   <rect x="15" y="45" width="20" height="10" fill="#244936" />
                 </svg>
                 <span className="text-[10px] font-bold text-slate-500 mt-1 uppercase tracking-wider">
-                  Scan at Handover
+                  {t("scanAtHandover")}
                 </span>
               </div>
 
@@ -160,10 +160,10 @@ export default function DigitalLotModal({
                 </div>
 
                 <div className="text-xs text-slate-500 pt-1 space-y-0.5">
-                  <div><strong>Collector:</strong> {lot.collectorName} ({lot.collectorPhone || '+91 98401 23456'})</div>
-                  <div><strong>Location:</strong> {lot.location}</div>
+                  <div><strong>{t("collector")}:</strong> {lot.collectorName} ({lot.collectorPhone || '+91 98401 23456'})</div>
+                  <div><strong>{t("location")}:</strong> {lot.location}</div>
                   {lot.selectedRecyclerName && (
-                    <div><strong>Assigned Recycler:</strong> {lot.selectedRecyclerName}</div>
+                    <div><strong>{t("assignedRecycler")}:</strong> {lot.selectedRecyclerName}</div>
                   )}
                 </div>
               </div>
@@ -174,7 +174,7 @@ export default function DigitalLotModal({
               <div className="flex items-center justify-between">
                 <span className="text-xs font-black text-[#244936] flex items-center gap-1.5">
                   <Scale className="w-4 h-4 text-[#3F7655]" />
-                  {t("fairPriceRangeLabel")} Details
+                  {t("fairPriceRangeDetails")}
                 </span>
                 <span className="text-[10px] font-bold text-slate-500 bg-[#FAF8F2] px-2 py-0.5 rounded border">
                   Tolerance: ±{Math.round((lot.tolerance || 0.25) * 100)}%
@@ -205,12 +205,12 @@ export default function DigitalLotModal({
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-[#3F7655]" />
                   <div>
-                    <span>Agreed Settlement Rate: <strong>₹{lot.agreedPricePerUnit}/kg</strong></span>
-                    <span className="block text-[11px] text-[#718078] font-normal">Recycler: {lot.selectedRecyclerName}</span>
+                    <span>{t("agreedSettlementRate")}: <strong>₹{lot.agreedPricePerUnit}/kg</strong></span>
+                    <span className="block text-[11px] text-[#718078] font-normal">{t("recycler")}: {lot.selectedRecyclerName}</span>
                   </div>
                 </div>
                 <span className="text-base font-black text-[#244936]">
-                  Total: ₹{lot.agreedTotalValue?.toLocaleString()}
+                  {t("totalValue")}: ₹{lot.agreedTotalValue?.toLocaleString()}
                 </span>
               </div>
             )}
@@ -221,7 +221,7 @@ export default function DigitalLotModal({
                 <div className="flex items-center justify-between text-xs font-extrabold text-[#244936]">
                   <span className="flex items-center gap-1.5">
                     <Award className="w-4 h-4 text-[#3F7655]" />
-                    Certified Material Yield Certificate
+                    {t("certifiedYieldCertificate")}
                   </span>
                   <span className="font-mono text-[11px] bg-white px-2 py-0.5 rounded border border-[#3F7655]/20">
                     {lot.proof.certificateId}
@@ -230,15 +230,15 @@ export default function DigitalLotModal({
 
                 <div className="grid grid-cols-3 gap-2 pt-1 text-center">
                   <div className="bg-white p-2 rounded-xl">
-                    <span className="text-[10px] text-slate-500 font-bold block">Gold</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">{t("gold")}</span>
                     <span className="text-sm font-black text-amber-600">{lot.proof.recoveredGoldGrams || "0.85 g"}</span>
                   </div>
                   <div className="bg-white p-2 rounded-xl">
-                    <span className="text-[10px] text-slate-500 font-bold block">Copper</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">{t("copper")}</span>
                     <span className="text-sm font-black text-rose-600">{lot.proof.recoveredCopperKg || "1.4 kg"}</span>
                   </div>
                   <div className="bg-white p-2 rounded-xl">
-                    <span className="text-[10px] text-slate-500 font-bold block">Aluminum</span>
+                    <span className="text-[10px] text-slate-500 font-bold block">{t("aluminum")}</span>
                     <span className="text-sm font-black text-slate-700">{lot.proof.recoveredAluminumKg || "2.1 kg"}</span>
                   </div>
                 </div>
@@ -263,13 +263,13 @@ export default function DigitalLotModal({
 
                   <div className="bg-[#FAF8F2] p-3 rounded-xl border border-[#3F7655]/10 space-y-1">
                     <div className="flex items-center justify-between text-xs">
-                      <h5 className="font-extrabold text-[#203128]">{item.event}</h5>
+                      <h5 className="font-extrabold text-[#203128]">{t(item.event, item.event)}</h5>
                       <span className="text-[10px] font-bold text-slate-500 font-mono">{item.timestamp}</span>
                     </div>
 
                     <div className="flex items-center gap-2 text-[11px] text-slate-600">
                       <span className="font-bold text-[#3F7655] bg-[#DDEBD8] px-2 py-0.2 rounded">
-                        {item.userRole}
+                        {t(item.userRole, item.userRole)}
                       </span>
                       <span>{typeof item.details === 'string' ? item.details : JSON.stringify(item.details)}</span>
                     </div>
