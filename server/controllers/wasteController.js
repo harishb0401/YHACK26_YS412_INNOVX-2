@@ -1,6 +1,5 @@
 import { supabase } from '../config/supabase.js';
 import { generateLotId, generateEventId } from '../utils/generateId.js';
-import { generateSafeQRPayload } from '../utils/qr.js';
 import { classifyEWaste, calculateFairPriceRange } from '../services/pricingService.js';
 import { matchLotsToRecycler } from '../services/matchingService.js';
 
@@ -71,22 +70,13 @@ export async function createWasteLot(req, res, next) {
     // 2. Generate unique Lot ID
     const lotId = generateLotId();
 
-    // 3. Generate safe QR payload
-    const qrPayload = generateSafeQRPayload({
-      lotId,
-      category: classification.category,
-      quantity: parsedQuantity,
-      unit,
-      timestamp: new Date().toISOString()
-    });
-
     const finalLocationText = locationText || location || 'Chennai Hub';
     const baseDescription = description || notes || `${parsedQuantity} ${unit} declared`;
     const finalDescription = clientOperationId 
       ? `${baseDescription} [OpId: ${clientOperationId}]`
       : baseDescription;
 
-    // 4. Insert waste lot into Supabase
+    // 3. Insert waste lot into Supabase
     const { data: newLot, error: insertErr } = await supabase
       .from('waste_lots')
       .insert([
@@ -106,7 +96,6 @@ export async function createWasteLot(req, res, next) {
           min_fair_price: pricingRange.lowerLimit,
           max_fair_price: pricingRange.upperLimit,
           status: 'AWAITING_OFFERS',
-          qr_code_data: qrPayload,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         }

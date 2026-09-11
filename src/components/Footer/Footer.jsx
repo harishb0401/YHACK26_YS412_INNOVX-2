@@ -29,7 +29,7 @@ export default function Footer() {
 
             <div className="flex items-center gap-2 text-xs font-semibold text-[#F2C94C] pt-1">
               <ShieldCheck className="w-4 h-4 text-[#F2C94C]" />
-              <span>{t("cpcbVerified")} · EPR Traceability Layer</span>
+              <span>{t("cpcbVerified")} · EPR Compliance Layer</span>
             </div>
           </div>
 
@@ -88,7 +88,7 @@ export default function Footer() {
             <ul className="space-y-2 text-[#DDEBD8] text-xs">
               <li>{t("cpcbEprAligned")}</li>
               <li>{t("deterministicRuleEngine")}</li>
-              <li>{t("digitalMaterialLotsQr")}</li>
+              <li>{t("digitalMaterialLots")}</li>
               <li>{t("tnSidcoNodes")}</li>
             </ul>
           </div>

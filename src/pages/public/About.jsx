@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Leaf, Scale, QrCode, Building2, Award, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Leaf, Scale, FileCheck2, Building2, Award, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 
 export default function About() {
@@ -19,7 +19,7 @@ export default function About() {
             {t('aboutMainTitle', 'Digital E-Waste Infrastructure for Tamil Nadu')}
           </h1>
           <p className="text-base sm:text-lg text-[#718078] font-medium leading-relaxed">
-            {t('aboutSubTitle', 'Eco-Link bridges informal collectors and CPCB-authorized recyclers through transparent pricing benchmark models, structured classification, matching engines, and end-to-end traceability.')}
+            {t('aboutSubTitle', 'Eco-Link bridges informal collectors and CPCB-authorized recyclers through transparent pricing benchmark models, structured classification, and recycler matching engines.')}
           </p>
         </div>
 
@@ -48,11 +48,11 @@ export default function About() {
 
           <div className="bg-white p-8 rounded-[28px] border border-[#3F7655]/20 shadow-md space-y-4">
             <div className="w-12 h-12 rounded-2xl bg-[#DDEBD8] text-[#3F7655] flex items-center justify-center font-black">
-              <QrCode className="w-6 h-6" />
+              <FileCheck2 className="w-6 h-6" />
             </div>
-            <h3 className="text-xl font-extrabold text-[#203128]">{t('pillarTraceability', 'Traceability & Digital QR')}</h3>
+            <h3 className="text-xl font-extrabold text-[#203128]">{t('pillarCertifiedRecycling', 'Certified Recycling & Handover')}</h3>
             <p className="text-xs text-[#718078] leading-relaxed">
-              {t('pillarTraceabilityDesc', 'Digital Material Lots are tracked from initial registration through recycler matching, logistics dispatch, physical weighbridge QR scan, to final certified material recovery.')}
+              {t('pillarCertifiedRecyclingDesc', 'Material lots are formally handed over to authorized recycling facilities with verified weighing, transparent pricing records, and certified environmental compliance.')}
             </p>
           </div>
 

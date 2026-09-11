@@ -53,7 +53,6 @@ export async function getMyTransactions(req, res, next) {
         paymentMethod: 'Eco-Link Simulated Smart Escrow (UPI/NEFT)',
         date: tx.created_at ? tx.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
         receiptId: tx.receipt_id,
-        qrHash: tx.qr_signature || `TXN-VERIFIED-${tx.transaction_id}`,
         createdAt: tx.created_at
       };
     });
@@ -129,7 +128,6 @@ export async function getTransactionById(req, res, next) {
       paymentMethod: 'Eco-Link Simulated Smart Escrow (UPI/NEFT)',
       date: tx.created_at ? tx.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
       receiptId: tx.receipt_id,
-      qrHash: tx.qr_signature,
       createdAt: tx.created_at
     };
 
@@ -185,7 +183,6 @@ export async function getAllTransactions(req, res, next) {
         paymentMethod: 'Eco-Link Simulated Smart Escrow (UPI/NEFT)',
         date: tx.created_at ? tx.created_at.split('T')[0] : new Date().toISOString().split('T')[0],
         receiptId: tx.receipt_id,
-        qrHash: tx.qr_signature,
         createdAt: tx.created_at
       };
     });

@@ -1,6 +1,5 @@
 import { supabase } from '../config/supabase.js';
 import { generateTransactionId, generateReceiptId } from '../utils/generateId.js';
-import { generateTransactionQRSignature } from '../utils/qr.js';
 
 /**
  * Handles atomic offer acceptance, competing offer rejection, status updates,
@@ -44,11 +43,6 @@ export async function acceptOfferAtomic({ collectorId, offerId }) {
   // Generate unique IDs
   const transactionId = generateTransactionId();
   const receiptId = generateReceiptId();
-  const qrSignature = generateTransactionQRSignature({
-    transactionId,
-    lotId: lot.id,
-    amount: offer.total_amount
-  });
 
   // 4. Try executing PostgreSQL atomic RPC function
   const { data: rpcData, error: rpcErr } = await supabase.rpc('accept_offer_atomic', {
@@ -57,7 +51,7 @@ export async function acceptOfferAtomic({ collectorId, offerId }) {
     p_lot_id: lot.id,
     p_transaction_id: transactionId,
     p_receipt_id: receiptId,
-    p_qr_signature: qrSignature
+    p_qr_signature: null
   });
 
   if (!rpcErr && rpcData) {
@@ -125,7 +119,7 @@ export async function acceptOfferAtomic({ collectorId, offerId }) {
         weight: lot.quantity,
         payment_status: 'ESCROW_LOCKED',
         receipt_id: receiptId,
-        qr_signature: qrSignature,
+        qr_signature: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       }

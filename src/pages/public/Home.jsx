@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   ArrowRight, Search, CheckCircle2, MapPin, Truck, Award, Sparkles, 
-  BookOpen, Heart, Leaf, ShieldCheck, ChevronRight, ChevronLeft, Droplets, Users, RefreshCw, QrCode, DollarSign, Cpu, FileCheck2, Building2
+  BookOpen, Heart, Leaf, ShieldCheck, ChevronRight, ChevronLeft, Droplets, Users, RefreshCw, DollarSign, Cpu, FileCheck2, Building2
 } from 'lucide-react';
 import { useTranslation } from '../../i18n';
 import { 
@@ -54,7 +54,7 @@ export default function Home({ onOpenSearchModal }) {
 
               {/* Exact Section 1 Description */}
               <p className="text-lg sm:text-xl text-[#718078] max-w-2xl leading-relaxed mx-auto lg:mx-0 font-medium">
-                {t('heroDescText', 'A digital platform connecting e-waste collectors with authorized recyclers through transparent pricing, waste classification, matching, and traceability.')}
+                {t('heroDescText', 'A digital platform connecting e-waste collectors with authorized recyclers through transparent pricing, waste classification, and recycler matching.')}
               </p>
 
               {/* Exact Section 1 Buttons: Get Started & How It Works */}
@@ -129,11 +129,11 @@ export default function Home({ onOpenSearchModal }) {
 
                   <div className="p-3 rounded-2xl bg-[#DDEBD8]/60 border border-[#3F7655]/20 flex items-center justify-between">
                     <div>
-                      <span className="text-slate-600 font-bold block text-[10px]">3. {t('digitalLotTraceabilityStep', 'Digital Lot & Traceability')}</span>
+                      <span className="text-slate-600 font-bold block text-[10px]">3. {t('digitalLotHandoverStep', 'Digital Lot & Handover')}</span>
                       <strong className="text-[#244936]">EL-2026-00125</strong>
                     </div>
                     <span className="text-xs font-black text-[#3F7655] flex items-center gap-1">
-                      <QrCode className="w-4 h-4" /> {t('matched', 'Matched')}
+                      <CheckCircle2 className="w-4 h-4" /> {t('matched', 'Matched')}
                     </span>
                   </div>
                 </div>
@@ -164,7 +164,7 @@ export default function Home({ onOpenSearchModal }) {
               {t('designedForTransparencyTitle', 'Designed for Complete Transparency')}
             </h2>
             <p className="text-base text-[#718078]">
-              {t('standardizingTransactionsSub', 'Standardizing e-waste transactions with fair pricing, verified participants, and digital traceability.')}
+              {t('standardizingTransactionsSub', 'Standardizing e-waste transactions with fair pricing, verified participants, and certified recycling.')}
             </p>
           </div>
 
@@ -224,20 +224,20 @@ export default function Home({ onOpenSearchModal }) {
               </ul>
             </div>
 
-            {/* Card 4: Traceability */}
+            {/* Card 4: Certified Recycling */}
             <div className="bg-[#FAF8F2] p-6 rounded-[28px] border border-[#3F7655]/20 shadow-sm space-y-4 hover:border-[#3F7655]/50 transition">
               <div className="w-12 h-12 rounded-2xl bg-[#3F7655] text-white flex items-center justify-center font-black">
                 <FileCheck2 className="w-6 h-6" />
               </div>
-              <h3 className="text-xl font-extrabold text-[#203128]">{t('traceabilityTitle', 'Traceability')}</h3>
+              <h3 className="text-xl font-extrabold text-[#203128]">{t('certifiedRecyclingTitle', 'Certified Recycling')}</h3>
               <ul className="space-y-2 text-xs font-bold text-[#718078]">
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#3F7655]" />
-                  <span>{t('trackHandoverFeat', 'Track waste from collection to physical handover')}</span>
+                  <span>{t('trackHandoverFeat', 'Formal handover from collection to authorized recycler')}</span>
                 </li>
                 <li className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-[#3F7655]" />
-                  <span>{t('realtimeQrLogsFeat', 'Real-time status updates & digital QR logs')}</span>
+                  <span>{t('transparentLogsFeat', 'Real-time status updates & transparent settlement logs')}</span>
                 </li>
               </ul>
             </div>
@@ -272,7 +272,7 @@ export default function Home({ onOpenSearchModal }) {
             {t('howItWorksBadge', 'HOW IT WORKS')}
           </span>
           <h2 className="text-3xl font-extrabold text-[#203128]">
-            {t('workflowFlowTitle', 'Register → Classify → Price → Match → Handover → Track')}
+            {t('workflowFlowTitle', 'Register → Classify → Price → Match → Handover → Settle')}
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -281,8 +281,8 @@ export default function Home({ onOpenSearchModal }) {
               { step: t('step2Classify', '2. Classify'), desc: t('identifyWasteCategory', 'Identify Waste Category') },
               { step: t('step3Price', '3. Price'), desc: t('benchmarkValidation', 'Benchmark Validation') },
               { step: t('step4Match', '4. Match'), desc: t('findSuitableRecycler', 'Find Suitable Recycler') },
-              { step: t('step5Handover', '5. Handover'), desc: t('qrScanCollection', 'QR Scan & Collection') },
-              { step: t('step6Track', '6. Track'), desc: t('eprComplianceRecord', 'EPR Compliance Record') },
+              { step: t('step5Handover', '5. Handover'), desc: t('handoverCollection', 'Collection & Handover') },
+              { step: t('step6Settle', '6. Settlement'), desc: t('eprComplianceRecord', 'EPR Compliance Record') },
             ].map((s, idx) => (
               <div key={idx} className="bg-white p-4 rounded-2xl border border-[#3F7655]/15 shadow-sm space-y-1">
                 <span className="text-xs font-black text-[#3F7655] block">{s.step}</span>
@@ -304,38 +304,6 @@ export default function Home({ onOpenSearchModal }) {
       {/* 4. BOTTOM SECTIONS */}
       <section className="py-20 bg-white border-b border-[#3F7655]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-          
-          {/* Environmental Impact Metrics */}
-          <div className="space-y-6">
-            <div className="text-center max-w-xl mx-auto space-y-2">
-              <span className="text-xs font-extrabold uppercase tracking-widest text-[#3F7655] bg-[#DDEBD8] px-3 py-1 rounded-full">
-                {t('envImpactBadge', 'ENVIRONMENTAL IMPACT')}
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black text-[#203128]">
-                {t('drivingResourceRecoveryTitle', 'Driving Measurable Resource Recovery')}
-              </h2>
-            </div>
-
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 text-center">
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#3F7655] block">{communityImpactStats.recycledKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('totalEWasteProcessed', 'Total E-Waste Processed')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#244936] block">{communityImpactStats.co2SavedKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('co2EmissionsPrevented', 'CO₂ Emissions Prevented')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-amber-600 block">{communityImpactStats.goldRecoveredGrams}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('preciousMetalsRecovered', 'Precious Metals Recovered')}</span>
-              </div>
-              <div className="p-6 bg-[#FAF8F2] rounded-3xl border border-[#3F7655]/15">
-                <span className="text-3xl font-black text-[#3F7655] block">{communityImpactStats.copperRecoveredKg}</span>
-                <span className="text-xs font-bold text-[#718078] mt-1 block">{t('secondaryCopperRecycled', 'Secondary Copper Recycled')}</span>
-              </div>
-            </div>
-          </div>
-
           {/* Number of Waste Lots Processed */}
           <div className="p-8 rounded-[32px] bg-[#DDEBD8]/50 border border-[#3F7655]/20 flex flex-col sm:flex-row items-center justify-between gap-6">
             <div className="space-y-1 text-center sm:text-left">

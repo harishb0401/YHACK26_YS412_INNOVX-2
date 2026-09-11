@@ -128,7 +128,6 @@ export default function AddWasteModal({
       minEstimatedValue: fairPricing.minEstimatedValue,
       maxEstimatedValue: fairPricing.maxEstimatedValue,
       status: "AVAILABLE",
-      qrPayload: `ECOLINK::${newLotId}::QTY=${quantity}${unit}::CAT=${selectedCatObj.name}::EST_VAL=${fairPricing.estimatedLotValue}`,
       timeline: [
         createTraceabilityEvent("Phone Verified", "Collector", "Completed", { phone: collectorProfile?.phone || "+91 98401 23456" }),
         createTraceabilityEvent("Waste Added", "Collector", "Completed", { quantity: `${quantity} ${unit}`, material }),

@@ -9,7 +9,6 @@ dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 import { supabase } from '../config/supabase.js';
 import { generateLotId, generateOfferId, generateTransactionId, generateReceiptId } from '../utils/generateId.js';
-import { generateSafeQRPayload, generateTransactionQRSignature } from '../utils/qr.js';
 
 async function seed() {
   if (!supabase) {
@@ -148,13 +147,7 @@ async function seed() {
       benchmark_rate: 650,
       min_fair_price: 488,
       max_fair_price: 813,
-      status: 'AWAITING_OFFERS',
-      qr_code_data: generateSafeQRPayload({
-        lotId: 'REQ-2026-881240',
-        category: 'PCB / Electronic Components',
-        quantity: 45,
-        unit: 'kg'
-      })
+      status: 'AWAITING_OFFERS'
     },
     {
       id: lot2Id,
@@ -172,13 +165,7 @@ async function seed() {
       benchmark_rate: 320,
       min_fair_price: 240,
       max_fair_price: 400,
-      status: 'OFFERS_RECEIVED',
-      qr_code_data: generateSafeQRPayload({
-        lotId: 'REQ-2026-992110',
-        category: 'Computer Equipment',
-        quantity: 120,
-        unit: 'kg'
-      })
+      status: 'OFFERS_RECEIVED'
     }
   ];
 

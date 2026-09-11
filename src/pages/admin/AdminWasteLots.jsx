@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Search, Package, Filter, ShieldCheck, QrCode } from 'lucide-react';
+import { Search, Package, Filter, ShieldCheck } from 'lucide-react';
 import StatusBadge from '../../components/StatusBadge';
 import { mockWasteLots } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
@@ -26,7 +26,7 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
       <div>
         <h1 className="text-2xl sm:text-3xl font-black text-[#203128]">{t('regulatedWasteLotsTitle', 'Regulated Waste Lots')}</h1>
         <p className="text-xs sm:text-sm text-[#718078]">
-          {t('regulatedWasteLotsSub', 'Live state-wide registry of all declared material lots, benchmark values, and QR traceability statuses.')}
+          {t('regulatedWasteLotsSub', 'Live state-wide registry of all declared material lots, benchmark values, and verification statuses.')}
         </p>
       </div>
 
@@ -71,8 +71,7 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
                 <th className="p-4">{t('quantityLabel', 'Quantity')}</th>
                 <th className="p-4">{t('benchmarkRateCol', 'Benchmark Rate')}</th>
                 <th className="p-4">{t('locationHubCol', 'Location Hub')}</th>
-                <th className="p-4">{t('lifecycleStatusCol', 'Lifecycle Status')}</th>
-                <th className="p-4 pr-6 text-right">{t('qrSignatureCol', 'QR Signature')}</th>
+                <th className="p-4 pr-6 text-right">{t('lifecycleStatusCol', 'Lifecycle Status')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#3F7655]/10 text-[#203128] font-semibold bg-white">
@@ -89,11 +88,8 @@ export default function AdminWasteLots({ materialLots = mockWasteLots }) {
                   <td className="p-4 font-black">{lot.quantity || lot.totalWeightKg} {lot.unit || 'kg'}</td>
                   <td className="p-4">₹{lot.benchmarkPrice || 350} / kg</td>
                   <td className="p-4">{lot.location}</td>
-                  <td className="p-4">
+                  <td className="p-4 pr-6 text-right">
                     <StatusBadge status={lot.status} />
-                  </td>
-                  <td className="p-4 pr-6 text-right font-mono text-[10px] text-[#718078]">
-                    {lot.qrPayload || `EPR-QR-${lot.id}`}
                   </td>
                 </tr>
               ))}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { 
-  ArrowLeft, QrCode, MapPin, Scale, Clock, ShieldCheck, 
+  ArrowLeft, MapPin, Scale, Clock, ShieldCheck, 
   CheckCircle2, AlertTriangle, FileText, Send, DollarSign, 
   Calendar, Check, X, Building, Truck, Sparkles, Image as ImageIcon, Loader2
 } from 'lucide-react';
@@ -194,19 +194,6 @@ export default function RequestDetails({
               <span>•</span>
               <span>{t('submissionDate', 'Submitted')}: {request.collectionDate || request.createdDate || 'Today'}</span>
             </p>
-          </div>
-
-          {/* QR & Hash Box */}
-          <div className="bg-[#FAF8F2] p-3.5 rounded-2xl border border-[#3F7655]/15 flex items-center gap-3">
-            <div className="w-12 h-12 bg-white rounded-xl border border-[#3F7655]/20 flex items-center justify-center text-[#244936] shadow-sm shrink-0">
-              <QrCode className="w-7 h-7" />
-            </div>
-            <div className="overflow-hidden">
-              <span className="text-[10px] font-extrabold uppercase text-[#718078] block">{t('cpcbQrSignature', 'CPCB QR Signature')}</span>
-              <span className="text-xs font-black text-[#203128] font-mono truncate block max-w-[200px]">
-                {request.qrPayload || `EPR-QR-${request.id}`}
-              </span>
-            </div>
           </div>
         </div>
 
@@ -447,7 +434,7 @@ export default function RequestDetails({
         <div className="space-y-4 pt-6 border-t border-[#3F7655]/10">
           <h3 className="text-sm font-black text-[#203128] flex items-center gap-2">
             <Clock className="w-4 h-4 text-[#3F7655]" />
-            <span>{t('requestLifecycleTitle', 'Request Lifecycle & Traceability Audit')}</span>
+            <span>{t('requestLifecycleTitle', 'Request Lifecycle & Status History')}</span>
           </h3>
 
           <div className="space-y-3">

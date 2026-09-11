@@ -3,7 +3,7 @@ import { structuredEWasteCategories, referenceScrapPrices } from '../data/scrapP
 /**
  * ECO-Link Rule-Based Deterministic Engine
  * Transparent, deterministic, auditable rules for e-waste classification,
- * fair pricing limits, recycler matching, offer evaluation, and traceability.
+ * fair pricing limits, recycler matching, offer evaluation, and lifecycle milestones.
  */
 
 /**
@@ -193,10 +193,10 @@ export function matchLotsToRecycler(lots = [], recycler) {
 }
 
 /**
- * 5. createTraceabilityEvent:
- * Creates standard milestone timestamp entry for lot traceability ledger
+ * 5. createTimelineEvent / createTraceabilityEvent:
+ * Creates standard milestone timestamp entry for lot status and lifecycle history
  */
-export function createTraceabilityEvent(event, userRole, status, details = {}) {
+export function createTimelineEvent(event, userRole, status, details = {}) {
   const now = new Date();
   const timeStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) + ', ' +
                  now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -211,6 +211,8 @@ export function createTraceabilityEvent(event, userRole, status, details = {}) {
     details
   };
 }
+
+export const createTraceabilityEvent = createTimelineEvent;
 
 /**
  * Backward compatibility helpers

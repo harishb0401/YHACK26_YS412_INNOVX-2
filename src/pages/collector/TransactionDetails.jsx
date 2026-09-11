@@ -1,6 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, DollarSign, CheckCircle2, Download, ShieldCheck, QrCode, FileText, Calendar, Building, MapPin } from 'lucide-react';
+import { ArrowLeft, DollarSign, CheckCircle2, Download, ShieldCheck, FileText, Calendar, Building, MapPin } from 'lucide-react';
 import { mockTransactions } from '../../data/mockData';
 import { useTranslation } from '../../i18n';
 
@@ -102,7 +102,7 @@ export default function TransactionDetails({ transactions = mockTransactions }) 
           </div>
         </div>
 
-        {/* CPCB Traceability Badge */}
+        {/* CPCB Compliance Badge */}
         <div className="p-4 bg-[#DDEBD8]/50 rounded-2xl border border-[#3F7655]/20 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
             <ShieldCheck className="w-5 h-5 text-[#3F7655]" />
